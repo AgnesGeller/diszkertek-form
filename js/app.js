@@ -171,3 +171,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const today = new Date().toISOString().split("T")[0];
     dateInput.value = today;
 });
+
+function toggleTakaras(value) {
+    const box = document.getElementById("takarasExtra");
+
+    if (value === "igen") {
+        box.style.display = "block";
+    } else {
+        box.style.display = "none";
+    }
+}

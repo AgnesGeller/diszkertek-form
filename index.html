@@ -84,7 +84,7 @@
 </select>
 
 <div id="gyerekExtra" style="display:none;">
-<input type="text" class="form-control mb-3" name="gyerekKor">
+<input type="text" class="form-control mb-3" name="gyerekKor" placeholder="Mennyi idősek a gyermekek?">
 </div>
 
 <select class="form-select mb-2" name="allat" onchange="toggleAllat(this.value)">
@@ -93,7 +93,7 @@
 </select>
 
 <div id="allatExtra" style="display:none;">
-<input type="text" class="form-control mb-3" name="allatTipus">
+<input type="text" class="form-control mb-3" name="allatTipus" placeholder="Milyen állat(ok)?">
 </div>
 
 <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
@@ -104,18 +104,68 @@
 <div class="form-step">
 <h3>III. Vizuális</h3>
 
-<select class="form-select mb-3" name="oldalTakaras">
-<option>Oldalsó takarás?</option>
-<option>Igen</option>
-<option>Nem</option>
+<label>Szeretné, hogy a szomszédok ne lássanak be a kertbe?</label>
+<select class="form-select mb-3" name="oldalTakaras" onchange="toggleTakaras(this.value)">
+    <option value="nem">Nem</option>
+    <option value="igen">Igen</option>
+    <option value="talan">Talán</option>
 </select>
+
+<div id="takarasExtra" style="display:none;">
+
+    <label>Mivel szeretné eltakarni?</label>
+
+    <div class="dropdown mb-3">
+        <button class="btn btn-outline-secondary dropdown-toggle w-100"
+        data-bs-toggle="dropdown"
+        data-bs-auto-close="outside">
+        Választás
+        </button>
+
+        <div class="dropdown-menu p-3 w-100" onclick="event.stopPropagation()">
+
+            <div class="form-check">
+                <input type="checkbox" name="takarasTipus" value="kerites">
+                <label>Kerítés</label>
+            </div>
+
+            <div class="form-check">
+                <input type="checkbox" name="takarasTipus" value="beton">
+                <label>Beton kerítés</label>
+            </div>
+
+            <div class="form-check">
+                <input type="checkbox" name="takarasTipus" value="halo">
+                <label>Árnyékoló háló</label>
+            </div>
+
+            <div class="form-check">
+                <input type="checkbox" name="takarasTipus" value="soveny">
+                <label>Sövény</label>
+            </div>
+
+            <div class="form-check">
+                <input type="checkbox" name="takarasTipus" value="fak">
+                <label>Fák</label>
+            </div>
+
+            <div class="form-check">
+                <input type="checkbox" name="takarasTipus" value="pergola">
+                <label>Pergola / árnyékoló</label>
+            </div>
+
+        </div>
+    </div>
+
+    <input type="text" class="form-control mb-3" name="takarasMegjegyzes" placeholder="Egyéb elképzelés (pl. magasság, típus)">
+
+</div>
 
 <textarea class="form-control mb-3" name="vizualMegjegyzes"></textarea>
 
 <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
 <button type="button" class="btn btn-primary next-btn">Tovább</button>
 </div>
-
 <!-- STEP 4 KÖLTSÉG -->
 <div class="form-step">
 <h3>Költségkeret</h3>
