@@ -56,15 +56,15 @@
 </select>
 
 <input type="number" class="form-control mb-3" name="tavolsag" placeholder="Távolság Pomáztól (telephelyünk) (km)" required>
-
+<label>Szállás biztosított?</label>
 <select class="form-select mb-2" name="szallas" onchange="toggleSzallas(this.value)">
-<option value="nem">Szállás: Nem</option>
+<option value="nem">Nem</option>
 <option value="igen">Igen</option>
 <option value="talan">Talán</option>
 </select>
 
 <div id="szallasExtra" style="display:none;">
-<input type="text" class="form-control mb-3" name="szallasMegjegyzes">
+<input type="text" class="form-control mb-3" name="szallasMegjegyzes" placeholder="Hány éj / hány fő / hány szoba?">
 </div>
 
 <input type="number" class="form-control mb-3" name="telekMeret" placeholder="Telek m²" required>
