@@ -17,32 +17,15 @@ function showStep(index) {
 }
 
 
-// NEXT GOMB + VALIDÁCIÓ
+// NEXT GOMB (VALIDÁCIÓ NÉLKÜL)
 nextBtns.forEach(btn => {
     btn.addEventListener("click", () => {
-
-        const currentInputs = steps[currentStep].querySelectorAll("input, select, textarea");
-
-        let valid = true;
-
-        currentInputs.forEach(input => {
-            if (input.hasAttribute("required") && !input.value) {
-                input.style.border = "2px solid red";
-                valid = false;
-            } else {
-                input.style.border = "";
-            }
-        });
-
-        if (!valid) {
-            alert("Hiányzó kötelező mező!");
-            return;
-        }
 
         if (currentStep < steps.length - 1) {
             currentStep++;
             showStep(currentStep);
         }
+
     });
 });
 
@@ -93,14 +76,6 @@ document.getElementById("submitBtn").addEventListener("click", function(){
     });
 
     // HIÁNYZÓ ADATOK KEZELÉSE
-    if (!result.dokumentumok) {
-        result.dokumentumok = "nincs megadva";
-    }
-
-    if (!result.ontozes) {
-        result.ontozes = "nem";
-    }
-    // HIÁNYZÓ ADATOK KEZELÉSE
     if (!result.dokumentumok) result.dokumentumok = "nincs megadva";
     if (!result.funkcio) result.funkcio = "nincs megadva";
     if (!result.stilus) result.stilus = "nincs megadva";
@@ -113,7 +88,7 @@ document.getElementById("submitBtn").addEventListener("click", function(){
 
     console.log(result);
 
-    // EMAIL VALIDÁCIÓ
+    // EMAIL VALIDÁCIÓ (CSAK ITT MARAD)
     if (!result.email) {
         alert("Add meg az email címed!");
         isSubmitting = false;
@@ -130,7 +105,6 @@ document.getElementById("submitBtn").addEventListener("click", function(){
     emailjs.send("service_gi1vj2r", "template_m0utevq", result)
     .then(function() {
 
-        // AUTO REPLY
         emailjs.send("service_gi1vj2r", "template_ciz2tq2", result);
 
         alert("Sikeresen elküldve!");
@@ -161,12 +135,7 @@ function updateProgress() {
 // SZÁLLÁS LOGIKA
 function toggleSzallas(value) {
     const box = document.getElementById("szallasExtra");
-
-    if (value === "igen") {
-        box.style.display = "block";
-    } else {
-        box.style.display = "none";
-    }
+    box.style.display = (value === "igen") ? "block" : "none";
 }
 
 function togglePihenes(value) {
