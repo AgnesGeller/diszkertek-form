@@ -43,37 +43,85 @@
 <!-- FORM WRAPPER -->
 <div class="container mt-5 mb-5">
 
-    <form id="surveyForm" onsubmit="return false;">
+    <form id="surveyForm">
 
-        <!-- STEP 1 -->
-        <div class="form-step active">
-            <h3>I. Alapadatok</h3>
-            <div class="mb-3">
-                <label>Név</label>
-                <input type="text" class="form-control" name="nev" required>
-            </div>
-                <div class="mb-3">
-                <label>Email</label>
-            <input type="email" class="form-control" name="email" required autocomplete="email" inputmode="email">
-            </div>
+       <!-- STEP 1 -->
+<div class="form-step active">
+    <h3>I. Alapadatok</h3>
+    <!-- NÉV -->
+<label>Név</label>
+<input type="text" class="form-control mb-3" name="nev" required>
 
-            <div class="mb-3">
-                <label>Dátum</label>
-                <input type="date" class="form-control" name="datum" required>
-            </div>
+<!-- EMAIL -->
+<label>Email</label>
+<input type="email" class="form-control mb-3" name="email" required autocomplete="email">
 
-            <div class="mb-3">
-                <label>Helyszín címe</label>
-                <input type="text" class="form-control" name="cim" required>
-            </div>
+    <!-- DÁTUM -->
+    <label>Dátum</label>
+    <input type="date" class="form-control mb-3" name="datum" required>
 
-            <div class="mb-3">
-                <label>Telek mérete (m²)</label>
-                <input type="number" class="form-control" name="telekMeret" required>
-            </div>
+    <!-- CÍM -->
+    <label>Helyszín címe</label>
+    <input type="text" class="form-control mb-3" name="cim" required>
 
-            <button type="button" class="btn btn-primary next-btn">Tovább</button>
-        </div>
+    <!-- LAKÓÖVEZET -->
+    <label>Lakóövezeti besorolás</label>
+    <select class="form-select mb-3" name="ovezet" required>
+        <option value="">Válassz</option>
+        <option value="kertvaros">Kertváros</option>
+        <option value="belvaros">Belváros</option>
+        <option value="falusi">Falusi</option>
+        <option value="ipari">Ipari</option>
+        <option value="egyeb">Egyéb</option>
+    </select>
+
+    <!-- TÁVOLSÁG -->
+    <label>Kiszállási távolság (km)</label>
+    <input type="number" class="form-control mb-3" name="tavolsag" required>
+
+    <!-- SZÁLLÁS -->
+    <label>Szállás biztosított?</label>
+    <select class="form-select mb-2" name="szallas" onchange="toggleSzallas(this.value)">
+        <option value="nem">Nem</option>
+        <option value="igen">Igen</option>
+        <option value="talan">Talán</option>
+    </select>
+
+    <!-- SZÁLLÁS EXTRA -->
+    <div id="szallasExtra" style="display:none;">
+        <input type="text" class="form-control mb-3" name="szallasMegjegyzes" placeholder="Részletek (pl. hány fő, milyen szállás)">
+    </div>
+
+    <!-- TELEK -->
+    <label>Telek mérete (m²)</label>
+    <input type="number" class="form-control mb-3" name="telekMeret" required>
+
+    <!-- TERVEZÉSI TERÜLET -->
+    <label>Tervezési terület mérete (m²)</label>
+    <input type="number" class="form-control mb-3" name="tervezesiTerulet">
+
+    <!-- DOKUMENTUMOK -->
+<label class="mt-3">Átadott dokumentumok</label>
+
+<select class="form-select mb-3" name="dokumentumok" multiple size="4">
+    <option value="tervrajz">Tervrajz</option>
+    <option value="geodezia">Geodéziai felmérés</option>
+    <option value="helyszinrajz">Helyszínrajz</option>
+    <option value="epitesi">Építési engedély</option>
+    <option value="latvany">Látványterv</option>
+    <option value="fotok">Fotók</option>
+    <option value="inspiracio">Inspirációs képek</option>
+    <option value="kivitelezesi">Kivitelezési terv</option>
+</select>
+
+<!-- EGYÉB -->
+<input type="text" class="form-control mb-3" name="egyebDokumentum" placeholder="Egyéb dokumentum">
+
+<!-- MEGJEGYZÉS -->
+<textarea class="form-control mb-3" name="megjegyzes" rows="2" placeholder="Megjegyzés"></textarea>
+<button type="button" class="btn btn-primary next-btn">Tovább</button>
+</div>
+
 
         <!-- STEP 2 -->
         <div class="form-step">

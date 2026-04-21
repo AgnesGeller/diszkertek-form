@@ -21,7 +21,7 @@ function showStep(index) {
 nextBtns.forEach(btn => {
     btn.addEventListener("click", () => {
 
-        const currentInputs = steps[currentStep].querySelectorAll("input, select");
+        const currentInputs = steps[currentStep].querySelectorAll("input, select, textarea");
 
         let valid = true;
 
@@ -34,7 +34,10 @@ nextBtns.forEach(btn => {
             }
         });
 
-        if (!valid) return;
+        if (!valid) {
+            alert("Hiányzó kötelező mező!");
+            return;
+        }
 
         if (currentStep < steps.length - 1) {
             currentStep++;
@@ -70,7 +73,7 @@ function startForm() {
 }
 
 
-// SUBMIT GOMB (FONTOS: button id="submitBtn")
+// SUBMIT
 document.getElementById("submitBtn").addEventListener("click", function(){
 
     if (isSubmitting) return;
@@ -89,14 +92,24 @@ document.getElementById("submitBtn").addEventListener("click", function(){
         }
     });
 
-    console.log(result);
-
-    result.email = result.email?.trim().toLowerCase();
+    // HIÁNYZÓ ADATOK KEZELÉSE
+    if (!result.dokumentumok) {
+        result.dokumentumok = "nincs megadva";
+    }
 
     if (!result.igeny) {
         result.igeny = "nincs megadva";
     }
 
+    if (!result.ontozes) {
+        result.ontozes = "nem";
+    }
+
+    result.email = result.email?.trim().toLowerCase();
+
+    console.log(result);
+
+    // EMAIL VALIDÁCIÓ
     if (!result.email) {
         alert("Add meg az email címed!");
         isSubmitting = false;
@@ -109,7 +122,7 @@ document.getElementById("submitBtn").addEventListener("click", function(){
         return;
     }
 
-    // ADMIN EMAIL
+    // EMAIL KÜLDÉS
     emailjs.send("service_gi1vj2r", "template_m0utevq", result)
     .then(function() {
 
@@ -140,6 +153,14 @@ function updateProgress() {
     });
 }
 
-document.getElementById("surveyForm").addEventListener("submit", function(e){
-    e.preventDefault();
-});
+
+// SZÁLLÁS LOGIKA
+function toggleSzallas(value) {
+    const box = document.getElementById("szallasExtra");
+
+    if (value === "igen") {
+        box.style.display = "block";
+    } else {
+        box.style.display = "none";
+    }
+}
