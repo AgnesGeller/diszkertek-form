@@ -97,13 +97,17 @@ document.getElementById("submitBtn").addEventListener("click", function(){
         result.dokumentumok = "nincs megadva";
     }
 
-    if (!result.igeny) {
-        result.igeny = "nincs megadva";
-    }
-
     if (!result.ontozes) {
         result.ontozes = "nem";
     }
+    // HIÁNYZÓ ADATOK KEZELÉSE
+    if (!result.dokumentumok) result.dokumentumok = "nincs megadva";
+    if (!result.funkcio) result.funkcio = "nincs megadva";
+    if (!result.stilus) result.stilus = "nincs megadva";
+    if (!result.fenntartas) result.fenntartas = "nincs megadva";
+    if (!result.taroloTipus) result.taroloTipus = "nincs megadva";
+    if (!result.alap) result.alap = "nincs megadva";
+    if (!result.ontozes) result.ontozes = "nem";
 
     result.email = result.email?.trim().toLowerCase();
 
@@ -173,4 +177,14 @@ function togglePihenes(value) {
 function toggleSutes(value) {
     const box = document.getElementById("sutesExtra");
     box.style.display = (value === "igen") ? "block" : "none";
+}
+
+function toggleGyerek(value) {
+    document.getElementById("gyerekExtra").style.display =
+        (value === "igen") ? "block" : "none";
+}
+
+function toggleAllat(value) {
+    document.getElementById("allatExtra").style.display =
+        (value === "igen") ? "block" : "none";
 }
