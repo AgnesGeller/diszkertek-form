@@ -164,3 +164,13 @@ function toggleSzallas(value) {
         box.style.display = "none";
     }
 }
+
+function togglePihenes(value) {
+    const box = document.getElementById("pihenesExtra");
+    box.style.display = (value === "igen") ? "block" : "none";
+}
+
+function toggleSutes(value) {
+    const box = document.getElementById("sutesExtra");
+    box.style.display = (value === "igen") ? "block" : "none";
+}
