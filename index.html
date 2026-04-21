@@ -32,10 +32,11 @@
     </div>
 
     <div class="step-indicator mt-2">
-        <span class="step active">1</span>
-        <span class="step">2</span>
-        <span class="step">3</span>
-    </div>
+    <span class="step active">1</span>
+    <span class="step">2</span>
+    <span class="step">3</span>
+    <span class="step">4</span>
+</div>
 
 </div>
 
@@ -83,7 +84,7 @@
             </div>
 
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="sutofőzes">
+                <input class="form-check-input" type="checkbox" name="igeny" value="sutofőzes">
                 <label class="form-check-label">Sütés-főzés</label>
             </div>
 
@@ -95,7 +96,7 @@
         <div class="form-step">
             <h3>Költségkeret</h3>
 
-            <select class="form-select"> name="koltseg">
+            <select class="form-select" name="koltseg">
                 <option>1M Ft alatt</option>
                 <option>1–2M Ft</option>
                 <option>2–4M Ft</option>
@@ -108,6 +109,25 @@
             <button type="submit" class="btn btn-success">Küldés</button>
         </div>
 
+
+         <!-- STEP 4 -->
+        <div class="form-step">
+    <h3>III. Vizuális és fenntartási igények</h3>
+
+    <div class="mb-3">
+        <label>Oldalsó takarás szükséges?</label>
+        <input type="text" class="form-control" name="takaras">
+    </div>
+
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="ontozes" value="automata">
+        <label class="form-check-label">Automata öntözőrendszer</label>
+    </div>
+
+    <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
+    <button type="button" class="btn btn-primary next-btn">Tovább</button>
+</div>
+
     </form>
 
 </div>
@@ -115,7 +135,7 @@
 <!-- FOOTER -->
 <footer class="bg-dark text-white text-center p-3">
     <p>+36706349630 | info@diszkertek.hu</p>
-    <p>wwww.diszkertek.hu></p>
+    <p>www.diszkertek.hu</p>
     <p>Copyright © 2026 by Díszkertek. Minden jog fenntartva.</p>
 </footer>
 
