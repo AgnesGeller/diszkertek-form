@@ -8,6 +8,8 @@ function showStep(index) {
     steps.forEach((step, i) => {
         step.classList.toggle("active", i === index);
     });
+
+    updateProgress(); // EZ ÚJ
 }
 
 nextBtns.forEach(btn => {
@@ -62,3 +64,15 @@ document.getElementById("surveyForm").addEventListener("submit", function(e){
 
     alert("Sikeres beküldés!");
 });
+
+const progressBar = document.getElementById("progressBar");
+const stepIndicators = document.querySelectorAll(".step");
+
+function updateProgress() {
+    let percent = ((currentStep + 1) / steps.length) * 100;
+    progressBar.style.width = percent + "%";
+
+    stepIndicators.forEach((step, i) => {
+        step.classList.toggle("active", i <= currentStep);
+    });
+}

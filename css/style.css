@@ -34,6 +34,33 @@ body {
     display: block;
     animation: fadeIn 0.5s ease-in-out;
 }
+
+.progress-wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+}
+
+.step {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.step.active {
+    background: #198754;
+    color: white;
+}
+
 #surveyForm {
     margin-top: 60px;
 }
