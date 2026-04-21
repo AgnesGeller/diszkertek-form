@@ -4,6 +4,7 @@ const nextBtns = document.querySelectorAll(".next-btn");
 const prevBtns = document.querySelectorAll(".prev-btn");
 
 let currentStep = 0;
+let isSubmitting = false;
 
 
 // STEP MEGJELENÍTÉS
@@ -54,7 +55,7 @@ prevBtns.forEach(btn => {
 });
 
 
-// HERO GOMB → FORM SCROLL
+// HERO → SCROLL
 function startForm() {
     const form = document.querySelector("#surveyForm");
 
@@ -62,42 +63,67 @@ function startForm() {
         behavior: "smooth"
     });
 
-    form.style.transition = "opacity 0.5s";
     form.style.opacity = 0;
-
     setTimeout(() => {
         form.style.opacity = 1;
     }, 100);
 }
 
 
-// FORM SUBMIT
-document.getElementById("surveyForm").addEventListener("submit", function(e){
-    e.preventDefault();
+// SUBMIT GOMB (FONTOS: button id="submitBtn")
+document.getElementById("submitBtn").addEventListener("click", function(){
 
-    const data = new FormData(this);
+    if (isSubmitting) return;
+    isSubmitting = true;
+
+    const form = document.getElementById("surveyForm");
+    const data = new FormData(form);
 
     let result = {};
 
-   data.forEach((value, key) => {
-    if (result[key]) {
-        result[key] += ", " + value;
-    } else {
-        result[key] = value;
-    }
-});
+    data.forEach((value, key) => {
+        if (result[key]) {
+            result[key] += ", " + value;
+        } else {
+            result[key] = value;
+        }
+    });
 
     console.log(result);
-    if (!result.igeny) {
-    result.igeny = "nincs megadva";
-}
 
+    result.email = result.email?.trim().toLowerCase();
+
+    if (!result.igeny) {
+        result.igeny = "nincs megadva";
+    }
+
+    if (!result.email) {
+        alert("Add meg az email címed!");
+        isSubmitting = false;
+        return;
+    }
+
+    if (!result.email.includes("@")) {
+        alert("Érvénytelen email!");
+        isSubmitting = false;
+        return;
+    }
+
+    // ADMIN EMAIL
     emailjs.send("service_gi1vj2r", "template_m0utevq", result)
-.then(function(response) {
-    alert("Sikeresen elküldve!");
-}, function(error) {
-    alert("Hiba történt!");
-});
+    .then(function() {
+
+        // AUTO REPLY
+        emailjs.send("service_gi1vj2r", "template_ciz2tq2", result);
+
+        alert("Sikeresen elküldve!");
+        isSubmitting = false;
+
+    }, function() {
+        alert("Hiba történt!");
+        isSubmitting = false;
+    });
+
 });
 
 
@@ -113,3 +139,7 @@ function updateProgress() {
         step.classList.toggle("active", i <= currentStep);
     });
 }
+
+document.getElementById("surveyForm").addEventListener("submit", function(e){
+    e.preventDefault();
+});

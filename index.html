@@ -43,7 +43,7 @@
 <!-- FORM WRAPPER -->
 <div class="container mt-5 mb-5">
 
-    <form id="surveyForm">
+    <form id="surveyForm" onsubmit="return false;">
 
         <!-- STEP 1 -->
         <div class="form-step active">
@@ -54,7 +54,7 @@
             </div>
                 <div class="mb-3">
                 <label>Email</label>
-            <input type="email" class="form-control" name="email" required>
+            <input type="email" class="form-control" name="email" required autocomplete="email" inputmode="email">
             </div>
 
             <div class="mb-3">
@@ -134,7 +134,7 @@
 
     
     <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
-    <button type="submit" class="btn btn-success">Küldés</button>
+    <button type="button" id="submitBtn" class="btn btn-success">Küldés</button>
 </div>
 
     </form>
