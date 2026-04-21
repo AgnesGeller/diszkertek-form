@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Díszkertek – Helyszíni felmérés</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="icon" href="./assets/favicon64.png">
+    
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <span class="navbar-brand">Díszkertek</span>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero text-white text-center d-flex align-items-center">
+    <div class="container">
+        <h1>Helyszíni felmérés</h1>
+        <p>Kérjük töltse ki az alábbi űrlapot az ajánlat elkészítéséhez</p>
+        <button class="btn btn-success mt-3" onclick="startForm()">Kezdés</button>
+    </div>
+</section>
+
+<!-- FORM WRAPPER -->
+<div class="container mt-5 mb-5">
+
+    <form id="surveyForm">
+
+        <!-- STEP 1 -->
+        <div class="form-step active">
+            <h3>I. Alapadatok</h3>
+
+            <div class="mb-3">
+                <label>Dátum</label>
+                <input type="date" class="form-control" name="datum">
+            </div>
+
+            <div class="mb-3">
+                <label>Helyszín címe</label>
+                <input type="text" class="form-control" name="cim">
+            </div>
+
+            <div class="mb-3">
+                <label>Telek mérete (m²)</label>
+                <input type="number" class="form-control" name="telekMeret">
+            </div>
+
+            <button type="button" class="btn btn-primary next-btn">Tovább</button>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="form-step">
+            <h3>II. Funkcionális igények</h3>
+
+            <label>Mit szeretne?</label>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="igeny" value="pihenes">
+                <label class="form-check-label">Pihenés</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="kozossegi">
+                <label class="form-check-label">Közösségi tér</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="sutofőzes">
+                <label class="form-check-label">Sütés-főzés</label>
+            </div>
+
+            <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
+            <button type="button" class="btn btn-primary next-btn">Tovább</button>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="form-step">
+            <h3>Költségkeret</h3>
+
+            <select class="form-control" name="koltseg">
+                <option>1M Ft alatt</option>
+                <option>1–2M Ft</option>
+                <option>2–4M Ft</option>
+                <option>4–7M Ft</option>
+                <option>7–10M Ft</option>
+                <option>10M Ft felett</option>
+            </select>
+
+            <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
+            <button type="submit" class="btn btn-success">Küldés</button>
+        </div>
+
+    </form>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="bg-dark text-white text-center p-3">
+    <p>+36706349630 | info@diszkertek.hu</p>
+    <p>2013 Pomáz, Katona József utca 17.</p>
+    <p>Copyright © 2026 by Malárik Tamás E.V. Minden jog fenntartva.</p>
+</footer>
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- JS -->
+<script src="./js/app.js"></script>
+
+</body>
+</html>
