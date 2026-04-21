@@ -107,7 +107,7 @@ document.getElementById("submitBtn").addEventListener("click", function(){
 
         emailjs.send("service_gi1vj2r", "template_ciz2tq2", result);
 
-        alert("Sikeresen elküldve!");
+        showSuccessModal();
         isSubmitting = false;
 
     }, function() {
@@ -157,3 +157,17 @@ function toggleAllat(value) {
     document.getElementById("allatExtra").style.display =
         (value === "igen") ? "block" : "none";
 }
+
+function showSuccessModal() {
+    document.getElementById("successModal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("successModal").style.display = "none";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const dateInput = document.querySelector('input[name="datum"]');
+    const today = new Date().toISOString().split("T")[0];
+    dateInput.value = today;
+});

@@ -42,6 +42,7 @@
 
 <input type="text" class="form-control mb-3" name="nev" placeholder="Név" required>
 <input type="email" class="form-control mb-3" name="email" placeholder="Email" required>
+<label>Dátum (felmérés napja)</label>
 <input type="date" class="form-control mb-3" name="datum" required>
 <input type="text" class="form-control mb-3" name="cim" placeholder="Cím" required>
 
@@ -152,6 +153,17 @@
 </div>
 
 </form>
+</div>
+<div id="successModal" class="success-modal">
+    <div class="success-box">
+        <h2>Köszönjük! 🌿</h2>
+        <p>Sikeresen elküldted a felmérést.</p>
+        <p>Hamarosan felvesszük veled a kapcsolatot.</p>
+
+        <button onclick="closeModal()" class="btn btn-success mt-3">
+            Rendben
+        </button>
+    </div>
 </div>
 
 <footer class="bg-dark text-white text-center p-3">
