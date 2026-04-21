@@ -12,22 +12,39 @@ function showStep(index) {
 
 nextBtns.forEach(btn => {
     btn.addEventListener("click", () => {
-        currentStep++;
-        showStep(currentStep);
+        if (currentStep < steps.length - 1) {
+            currentStep++;
+            showStep(currentStep);
+        }
     });
 });
 
 prevBtns.forEach(btn => {
     btn.addEventListener("click", () => {
-        currentStep--;
-        showStep(currentStep);
+        if (currentStep > 0) {
+            currentStep--;
+            showStep(currentStep);
+        }
     });
 });
 
 function startForm() {
-    document.querySelector("#surveyForm").scrollIntoView({
+    const form = document.querySelector("#surveyForm");
+
+    form.scrollIntoView({
         behavior: "smooth"
     });
+
+    form.style.transition = "opacity 0.5s";
+form.style.opacity = 0;
+
+setTimeout(() => {
+    form.style.opacity = 1;
+}, 100);
+
+    setTimeout(() => {
+        form.style.opacity = 1;
+    }, 300);
 }
 
 // FORM SUBMIT
