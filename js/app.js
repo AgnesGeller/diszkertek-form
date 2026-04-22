@@ -46,9 +46,9 @@ function startForm() {
     currentStep = 0;
     showStep(currentStep);
 
-    window.scrollTo({
-        top: document.querySelector("#surveyForm").offsetTop - 80,
-        behavior: "smooth"
+    document.querySelector(".form-step.active").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
     });
 }
 
