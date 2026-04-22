@@ -191,3 +191,8 @@ stepDots.forEach((dot, index) => {
         });
     });
 });
+
+function toggleTarolo(value) {
+    document.getElementById("taroloExtra").style.display =
+        (value === "igen") ? "block" : "none";
+}
