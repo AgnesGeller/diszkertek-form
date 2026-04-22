@@ -193,16 +193,12 @@ stepDots.forEach((dot, index) => {
 });
 
 function toggleTarolo(value) {
-    document.getElementById("taroloExtra").style.display =
-        (value === "igen") ? "block" : "none";
-}
-
-function toggleTarolo(value) {
     const box = document.getElementById("taroloExtra");
-
-    if (value === "igen") {
-        box.style.display = "block";
-    } else {
-        box.style.display = "none";
-    }
+    box.style.display = (value === "igen") ? "block" : "none";
 }
+document.addEventListener("DOMContentLoaded", () => {
+    const select = document.querySelector('[name="taroloVan"]');
+    if (select) {
+        toggleTarolo(select.value);
+    }
+});

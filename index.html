@@ -530,6 +530,240 @@ Választás
 <button type="button" class="btn btn-primary next-btn">Tovább</button>
 
 </div>
+
+<div class="form-step">
+<h3>Füvesítés</h3>
+
+<!-- MÉRETEK -->
+<input type="number" class="form-control mb-2" name="fuHossz" placeholder="Hossz (m)">
+<input type="number" class="form-control mb-2" name="fuSzelesseg" placeholder="Szélesség (m)">
+<input type="number" class="form-control mb-3" name="fuTerulet" placeholder="Terület (m²)">
+
+
+<!-- TÍPUS -->
+<label>Füvesítés típusa</label>
+
+<div class="dropdown mb-3">
+<button class="btn btn-outline-secondary dropdown-toggle w-100"
+data-bs-toggle="dropdown"
+data-bs-auto-close="outside">
+Választás
+</button>
+
+<div class="dropdown-menu p-3 w-100" onclick="event.stopPropagation()">
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fu1" name="fuTipus" value="fumag">
+<label class="form-check-label" for="fu1">Fűmagvetés</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fu2" name="fuTipus" value="gyep">
+<label class="form-check-label" for="fu2">Gyepszőnyeg</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fu3" name="fuTipus" value="aljnovenyzet">
+<label class="form-check-label" for="fu3">Aljnövényzet (geotextil)</label>
+</div>
+
+</div>
+</div>
+
+
+<!-- MUNKÁK -->
+<label>Füvesítési munkák</label>
+
+<div class="dropdown mb-3">
+<button class="btn btn-outline-secondary dropdown-toggle w-100"
+data-bs-toggle="dropdown"
+data-bs-auto-close="outside">
+Választás
+</button>
+
+<div class="dropdown-menu p-3 w-100" onclick="event.stopPropagation()">
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm1" name="fuMunka" value="gyomirtas">
+<label class="form-check-label" for="fm1">Gyomirtás</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm2" name="fuMunka" value="felso_maras">
+<label class="form-check-label" for="fm2">Felsőmarás (2 cm)</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm3" name="fuMunka" value="rotalas">
+<label class="form-check-label" for="fm3">Rotálás</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm4" name="fuMunka" value="tragya">
+<label class="form-check-label" for="fm4">Talajjavítás (trágya)</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm5" name="fuMunka" value="komposzt">
+<label class="form-check-label" for="fm5">Talajjavítás (komposzt)</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm6" name="fuMunka" value="talajcsere">
+<label class="form-check-label" for="fm6">Talajcsere</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm7" name="fuMunka" value="durva_gep">
+<label class="form-check-label" for="fm7">Durva tereprendezés (gép)</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm8" name="fuMunka" value="durva_kezzel">
+<label class="form-check-label" for="fm8">Durva tereprendezés (kézzel)</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm9" name="fuMunka" value="finom_vas">
+<label class="form-check-label" for="fm9">Finom tereprendezés (szintező vas)</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm10" name="fuMunka" value="finom_vizmertek">
+<label class="form-check-label" for="fm10">Finom tereprendezés (vízmérték)</label>
+</div>
+
+</div>
+</div>
+
+
+<textarea class="form-control mb-3" name="fuMegjegyzes" placeholder="Megjegyzés"></textarea>
+
+
+<button type="button" class="btn btn-secondary prev-btn">Vissza</button>
+<button type="button" class="btn btn-primary next-btn">Tovább</button>
+
+</div>
+
+
+<div class="form-step">
+<h3>Növényzet</h3>
+
+<!-- ===== FA ÜLTETÉS ===== -->
+<label>Fa ültetés</label>
+
+<input type="number" class="form-control mb-3" name="faDb" placeholder="Fa darabszám">
+
+<div class="dropdown mb-3">
+<button class="btn btn-outline-secondary dropdown-toggle w-100"
+data-bs-toggle="dropdown"
+data-bs-auto-close="outside">
+Fa jellemzők
+</button>
+
+<div class="dropdown-menu p-3 w-100">
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fa1" name="faJellemzo" value="orokzold">
+<label class="form-check-label" for="fa1">Örökzöld</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fa2" name="faJellemzo" value="napos">
+<label class="form-check-label" for="fa2">Napos</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fa3" name="faJellemzo" value="arnyekos">
+<label class="form-check-label" for="fa3">Árnyékos</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fa4" name="faJellemzo" value="felarnyek">
+<label class="form-check-label" for="fa4">Félárnyékos</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fa5" name="faJellemzo" value="homogen">
+<label class="form-check-label" for="fa5">Homogén</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fa6" name="faJellemzo" value="tobbfajta">
+<label class="form-check-label" for="fa6">Több fajta</label>
+</div>
+
+</div>
+</div>
+
+
+<!-- ===== TALAJTAKARÁS ===== -->
+<label>Talajtakarás</label>
+
+<div class="dropdown mb-3">
+<button class="btn btn-outline-secondary dropdown-toggle w-100"
+data-bs-toggle="dropdown"
+data-bs-auto-close="outside">
+Talajtakarás
+</button>
+
+<div class="dropdown-menu p-3 w-100">
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="takar1" name="talajtakaro" value="geotextil">
+<label class="form-check-label" for="takar1">Geotextília</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="takar2" name="talajtakaro" value="fenyokereg">
+<label class="form-check-label" for="takar2">Fenyőkéreg</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="takar3" name="talajtakaro" value="faapritek">
+<label class="form-check-label" for="takar3">Faapríték</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="takar4" name="talajtakaro" value="diszkavics">
+<label class="form-check-label" for="takar4">Díszkavics</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="takar5" name="talajtakaro" value="murva">
+<label class="form-check-label" for="takar5">Murva / andezit</label>
+</div>
+
+</div>
+</div>
+
+
+<!-- ===== SÖVÉNY ===== -->
+<label>Sövény</label>
+
+<input type="number" class="form-control mb-2" name="sovenyHossz" placeholder="Hossz (m)">
+<input type="number" class="form-control mb-2" name="sovenyTotav" placeholder="Tőtáv (m)">
+<input type="number" class="form-control mb-3" name="sovenySortav" placeholder="Sortáv (m)">
+
+
+<!-- ===== ÁGYÁS ===== -->
+<label>Ágyás</label>
+
+<input type="number" class="form-control mb-2" name="agyasDb" placeholder="Ágyások száma">
+<input type="text" class="form-control mb-3" name="agyasMeret" placeholder="Méret (pl. 3x2m)">
+
+
+
+<!-- ===== KEDVELT NÖVÉNYEK ===== -->
+<textarea class="form-control mb-3" name="kedveltNovenyek" placeholder="Kedvelt növények"></textarea>
+
+
+<button type="button" class="btn btn-secondary prev-btn">Vissza</button>
+<button type="button" class="btn btn-primary next-btn">Tovább</button>
+
+</div>
+
+
 <!-- STEP 6 -->
 <div class="form-step">
 <h3>Véglegesítés</h3>
