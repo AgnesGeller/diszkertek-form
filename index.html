@@ -294,6 +294,32 @@ Stílus választás
 
 <textarea class="form-control mb-3" name="vizualMegjegyzes" placeholder="Egyéb megjegyzés (pl. zavaró látvány, kilátás, szomszédok)"></textarea>
 
+<!-- ===== VIZUÁLIS KIEGÉSZÍTÉS ===== -->
+<label class="mt-3">Vizuális és térkapcsolati megjegyzések</label>
+
+<select class="form-select mb-2" name="hatsoBelathato">
+<option value="">Hátsó telek belátható?</option>
+<option value="igen">Igen</option>
+<option value="nem">Nem</option>
+<option value="reszben">Részben</option>
+</select>
+
+<select class="form-select mb-2" name="kapcsolat">
+<option value="">Épület–kert kapcsolat</option>
+<option value="eros">Erős</option>
+<option value="kozepes">Közepes</option>
+<option value="gyenge">Gyenge</option>
+</select>
+
+<select class="form-select mb-2" name="zavar">
+<option value="">Zavart okozó látvány?</option>
+<option value="igen">Igen</option>
+<option value="nem">Nem</option>
+<option value="van_de_kezelheto">Van, de kezelhető</option>
+</select>
+
+<textarea class="form-control mb-3" name="megjegyzes" placeholder="Megjegyzés"></textarea>
+
 <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
 <button type="button" class="btn btn-primary next-btn">Tovább</button>
 </div>
@@ -325,12 +351,51 @@ Stílus választás
 <button type="button" class="btn btn-primary next-btn">Tovább</button>
 </div>
 
+
 <!-- STEP 7 -->
 <div class="form-step">
-<h3>STEP 7 – Fenntartás és tároló</h3>
+<h3>Fenntartás és tároló</h3>
 
 <!-- ===== FENNTARTÁS ===== -->
 <label>Fenntartási igény</label>
+<label class="mt-3">Fenntartási megoldások</label>
+
+<div class="dropdown mb-3">
+<button class="btn btn-outline-secondary dropdown-toggle w-100"
+data-bs-toggle="dropdown"
+data-bs-auto-close="outside">
+Választás
+</button>
+
+<div class="dropdown-menu p-3 w-100" onclick="event.stopPropagation()">
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fextra1" name="fenntartasExtra" value="ontozorendszer">
+<label class="form-check-label" for="fextra1">Automata öntözőrendszer</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fextra2" name="fenntartasExtra" value="robotfunyiro">
+<label class="form-check-label" for="fextra2">Robotfűnyíró</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fextra3" name="fenntartasExtra" value="sajat">
+<label class="form-check-label" for="fextra3">Saját fenntartás</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fextra4" name="fenntartasExtra" value="kertesz_rendszeres">
+<label class="form-check-label" for="fextra4">Kertész rendszeresen</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fextra5" name="fenntartasExtra" value="kertesz_alkalmi">
+<label class="form-check-label" for="fextra5">Kertész alkalmanként</label>
+</div>
+
+</div>
+</div>
 
 <div class="dropdown mb-3">
 <button class="btn btn-outline-secondary dropdown-toggle w-100"
@@ -371,10 +436,9 @@ Választás
 
 
 <!-- TÁROLÓ RÉSZ -->
-<div id="taroloExtra">
+<div id="taroloExtra" style="display:none;">
 
 <label>Tároló típusa</label>
-
 
 <div class="dropdown mb-3">
 <button class="btn btn-outline-secondary dropdown-toggle w-100"

@@ -196,3 +196,13 @@ function toggleTarolo(value) {
     document.getElementById("taroloExtra").style.display =
         (value === "igen") ? "block" : "none";
 }
+
+function toggleTarolo(value) {
+    const box = document.getElementById("taroloExtra");
+
+    if (value === "igen") {
+        box.style.display = "block";
+    } else {
+        box.style.display = "none";
+    }
+}
