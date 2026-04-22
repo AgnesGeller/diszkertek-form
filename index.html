@@ -69,6 +69,8 @@
 
 <input type="number" class="form-control mb-3" name="telekMeret" placeholder="Telek m²" required>
 
+<input type="number" class="form-control mb-3" name="kertTerulet" placeholder="Mekkora kertet szeretne kialakítani (m²)?">
+
 <button type="button" class="btn btn-primary next-btn">Tovább</button>
 </div>
 
@@ -76,29 +78,157 @@
 <div class="form-step">
 <h3>II. Funkcionális igények</h3>
 
-<input type="number" class="form-control mb-3" name="csaladLetszam" placeholder="Család létszám">
+<input type="number" class="form-control mb-3" name="csaladLetszam" placeholder="Család létszáma">
 
+<label>Gyermek?</label>
 <select class="form-select mb-2" name="gyerek" onchange="toggleGyerek(this.value)">
-<option value="nem">Gyermek: Nem</option>
+<option value="nem">Nem</option>
 <option value="igen">Igen</option>
+<option value="talan">Talán</option>
 </select>
 
 <div id="gyerekExtra" style="display:none;">
 <input type="text" class="form-control mb-3" name="gyerekKor" placeholder="Mennyi idősek a gyermekek?">
 </div>
 
+<label>Háziállat?</label>
 <select class="form-select mb-2" name="allat" onchange="toggleAllat(this.value)">
-<option value="nem">Állat: Nem</option>
+<option value="nem">Nem</option>
 <option value="igen">Igen</option>
+<option value="talan">Talán</option>
 </select>
 
 <div id="allatExtra" style="display:none;">
 <input type="text" class="form-control mb-3" name="allatTipus" placeholder="Milyen állat(ok)?">
 </div>
 
+<!-- FUNKCIÓK -->
+<label class="mt-3">Mit szeretnének?</label>
+
+<div class="dropdown mb-3">
+<button class="btn btn-outline-secondary dropdown-toggle w-100"
+data-bs-toggle="dropdown"
+data-bs-auto-close="outside">
+Választás
+</button>
+
+<div class="dropdown-menu p-3 w-100" onclick="event.stopPropagation()">
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" id="f1" name="funkcio" value="pihenes">
+    <label class="form-check-label" for="f1">Pihenés</label>
+</div>
+
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" id="f2" name="funkcio" value="kozossegi">
+    <label class="form-check-label" for="f2">Közösségi tér</label>
+</div>
+
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" id="f3" name="funkcio" value="sutofőzes">
+    <label class="form-check-label" for="f3">Sütés-főzés</label>
+</div>
+
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" id="f4" name="funkcio" value="jatszo">
+    <label class="form-check-label" for="f4">Játszóhely</label>
+</div>
+
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" id="f5" name="funkcio" value="konyhakert">
+    <label class="form-check-label" for="f5">Konyhakert</label>
+</div>
+
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" id="f6" name="funkcio" value="tarolas">
+    <label class="form-check-label" for="f6">Tárolás</label>
+</div>
+
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" id="f7" name="funkcio" value="parkolas">
+    <label class="form-check-label" for="f7">Parkolás</label>
+</div>
+
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" id="f8" name="funkcio" value="arnyekolas">
+    <label class="form-check-label" for="f8">Árnyékolás</label>
+</div>
+
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" id="f9" name="funkcio" value="furdozes">
+    <label class="form-check-label" for="f9">Fürdőzés</label>
+</div>
+
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" id="f10" name="funkcio" value="ures">
+    <label class="form-check-label" for="f10">Üres tér</label>
+</div>
+
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" id="f11" name="funkcio" value="latvany">
+    <label class="form-check-label" for="f11">Szép látvány</label>
+</div>
+</div>
+</div> 
+
+
+<!-- STÍLUS -->
+<label>Esztétikai igény</label>
+
+<div class="dropdown mb-3">
+
+<button class="btn btn-outline-secondary dropdown-toggle w-100"
+data-bs-toggle="dropdown"
+data-bs-auto-close="outside">
+Stílus választás
+</button>
+
+<div class="dropdown-menu p-3 w-100" onclick="event.stopPropagation()">
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="s1" name="stilus" value="modern">
+<label class="form-check-label" for="s1">Modern</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="s2" name="stilus" value="mediterran">
+<label class="form-check-label" for="s2">Mediterrán</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="s3" name="stilus" value="japan">
+<label class="form-check-label" for="s3">Japán</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="s4" name="stilus" value="angol">
+<label class="form-check-label" for="s4">Angol</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="s5" name="stilus" value="tropusi">
+<label class="form-check-label" for="s5">Trópusi</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="s6" name="stilus" value="termeszetes">
+<label class="form-check-label" for="s6">Természetközeli</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="s7" name="stilus" value="minimalista">
+<label class="form-check-label" for="s7">Minimalista</label>
+</div>
+
+</div> <!-- dropdown-menu -->
+</div> <!-- dropdown -->
+
+
+<input type="text" class="form-control mb-3" name="egyediIgeny" placeholder="Egyedi igény">
+
 <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
 <button type="button" class="btn btn-primary next-btn">Tovább</button>
-</div>
+
+</div> <!-- form-step -->
 
 <!-- STEP 3 -->
 <div class="form-step">
@@ -161,7 +291,7 @@
 
 </div>
 
-<textarea class="form-control mb-3" name="vizualMegjegyzes"></textarea>
+<textarea class="form-control mb-3" name="vizualMegjegyzes" placeholder="Egyéb megjegyzés (pl. zavaró látvány, kilátás, szomszédok)"></textarea>
 
 <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
 <button type="button" class="btn btn-primary next-btn">Tovább</button>
@@ -193,6 +323,7 @@
 <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
 <button type="button" class="btn btn-primary next-btn">Tovább</button>
 </div>
+
 
 <!-- STEP 6 -->
 <div class="form-step">

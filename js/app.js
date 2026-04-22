@@ -43,18 +43,14 @@ prevBtns.forEach(btn => {
 
 // HERO → SCROLL
 function startForm() {
-    const form = document.querySelector("#surveyForm");
+    currentStep = 0;
+    showStep(currentStep);
 
-    form.scrollIntoView({
+    window.scrollTo({
+        top: document.querySelector("#surveyForm").offsetTop - 80,
         behavior: "smooth"
     });
-
-    form.style.opacity = 0;
-    setTimeout(() => {
-        form.style.opacity = 1;
-    }, 100);
 }
-
 
 // SUBMIT
 document.getElementById("submitBtn").addEventListener("click", function(){
@@ -159,13 +155,12 @@ function toggleAllat(value) {
 }
 
 function showSuccessModal() {
-    document.getElementById("successModal").style.display = "flex";
+    document.getElementById("successModal").classList.add("show");
 }
 
 function closeModal() {
-    document.getElementById("successModal").style.display = "none";
+    document.getElementById("successModal").classList.remove("show");
 }
-
 document.addEventListener("DOMContentLoaded", () => {
     const dateInput = document.querySelector('input[name="datum"]');
     const today = new Date().toISOString().split("T")[0];
@@ -181,3 +176,18 @@ function toggleTakaras(value) {
         box.style.display = "none";
     }
 }
+
+
+const stepDots = document.querySelectorAll(".step");
+
+stepDots.forEach((dot, index) => {
+    dot.addEventListener("click", () => {
+        currentStep = index;
+        showStep(currentStep);
+
+        window.scrollTo({
+            top: document.querySelector("#surveyForm").offsetTop - 50,
+            behavior: "smooth"
+        });
+    });
+});
