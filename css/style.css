@@ -15,21 +15,6 @@ body {
     display: block;
 }
 
-.hero-btn {
-    position: absolute;
-    bottom: 5%;
-    left: 50%;
-    transform: translateX(-50%);
-    transition: 0.3s;
-    padding: 12px 30px;
-    font-size: 1rem;
-    border-radius: 50px;
-}
-
-.hero-btn:hover {
-    transform: translateX(-50%) scale(1.05);
-}
-
 
 .progress-wrapper {
     max-width: 600px;
@@ -197,10 +182,6 @@ body {
     transform: translateY(-2px);
 }
 
-.form-control:focus,
-.form-select:focus {
-    transform: scale(1.02);
-}
 
 .btn {
     border-radius: 30px;
