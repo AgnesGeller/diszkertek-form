@@ -80,6 +80,23 @@ body {
         height: auto;
     }
 }
+.hero-cta {
+    text-align: center;
+    margin-top: -40px;
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 2;
+}
+.hero-cta {
+    margin-top: 30px;
+}
+
+.hero-cta .btn {
+    padding: 14px 40px;
+    font-size: 18px;
+    border-radius: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
 
 .progress {
     height: 8px;
