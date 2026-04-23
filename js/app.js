@@ -161,11 +161,6 @@ function showSuccessModal() {
 function closeModal() {
     document.getElementById("successModal").classList.remove("show");
 }
-document.addEventListener("DOMContentLoaded", () => {
-    const dateInput = document.querySelector('input[name="datum"]');
-    const today = new Date().toISOString().split("T")[0];
-    dateInput.value = today;
-});
 
 function toggleTakaras(value) {
     const box = document.getElementById("takarasExtra");
@@ -178,6 +173,38 @@ function toggleTakaras(value) {
 }
 
 
+function toggleTarolo(value) {
+    const box = document.getElementById("taroloExtra");
+    box.style.display = (value === "igen") ? "block" : "none";
+}
+document.addEventListener("DOMContentLoaded", () => {
+
+    // DÁTUM
+    const dateInput = document.querySelector('input[name="datum"]');
+    if (dateInput) {
+        const today = new Date().toISOString().split("T")[0];
+        dateInput.value = today;
+    }
+
+    // TÁROLÓ
+    const select = document.querySelector('[name="taroloVan"]');
+    if (select) {
+        toggleTarolo(select.value);
+    }
+
+    // DROPDOWN FIX
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        menu.addEventListener('click', function (e) {
+            if (
+                e.target.tagName === "INPUT" ||
+                e.target.tagName === "LABEL"
+            ) {
+                e.stopPropagation();
+            }
+        });
+    });
+
+});
 const stepDots = document.querySelectorAll(".step");
 
 stepDots.forEach((dot, index) => {
@@ -190,15 +217,4 @@ stepDots.forEach((dot, index) => {
             behavior: "smooth"
         });
     });
-});
-
-function toggleTarolo(value) {
-    const box = document.getElementById("taroloExtra");
-    box.style.display = (value === "igen") ? "block" : "none";
-}
-document.addEventListener("DOMContentLoaded", () => {
-    const select = document.querySelector('[name="taroloVan"]');
-    if (select) {
-        toggleTarolo(select.value);
-    }
 });

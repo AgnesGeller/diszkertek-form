@@ -18,7 +18,7 @@
 <body>
 
 <section class="hero">
-    <img src="./assets/hero.jpg" class="hero-img">
+    <img src="./assets/hero1.jpg" class="hero-img">
     <button onclick="startForm()" class="btn btn-success hero-btn">Kezdés</button>
 </section>
 
@@ -885,6 +885,123 @@ Választás
 
 
 <textarea class="form-control mb-3" name="anyagMozgatasMegjegyzes" placeholder="Megjegyzés"></textarea>
+
+
+<!-- GOMBOK -->
+<button type="button" class="btn btn-secondary prev-btn">Vissza</button>
+<button type="button" class="btn btn-primary next-btn">Tovább</button>
+
+</div>
+
+
+<!-- STEP 9 -->
+<div class="form-step">
+<h3>Füvesítés</h3>
+
+<!-- MÉRETEK -->
+<input type="number" class="form-control mb-2" name="fuHossz" placeholder="Hossz (m)">
+<input type="number" class="form-control mb-2" name="fuSzelesseg" placeholder="Szélesség (m)">
+<input type="number" class="form-control mb-3" name="fuTerulet" placeholder="Terület (m²)">
+
+
+<!-- TÍPUS -->
+<label>Füvesítés típusa</label>
+
+<div class="dropdown mb-3">
+<button class="btn btn-outline-secondary dropdown-toggle w-100"
+data-bs-toggle="dropdown"
+data-bs-auto-close="outside">
+Választás
+</button>
+
+<div class="dropdown-menu p-3 w-100">
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fu1" name="fuTipus" value="fumag">
+<label class="form-check-label" for="fu1">Fűmagvetés</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fu2" name="fuTipus" value="gyepszonyeg">
+<label class="form-check-label" for="fu2">Gyepszőnyeg</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fu3" name="fuTipus" value="aljnovenyzet">
+<label class="form-check-label" for="fu3">Aljnövényzet (geotextil)</label>
+</div>
+
+</div>
+</div>
+
+
+<!-- MUNKÁLATOK -->
+<label>Munkálatok</label>
+
+<div class="dropdown mb-3">
+<button class="btn btn-outline-secondary dropdown-toggle w-100"
+data-bs-toggle="dropdown"
+data-bs-auto-close="outside">
+Választás
+</button>
+
+<div class="dropdown-menu p-3 w-100">
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm1" name="fuMunka" value="gyomirtas">
+<label class="form-check-label" for="fm1">Gyomirtás</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm2" name="fuMunka" value="felsoMaras">
+<label class="form-check-label" for="fm2">2 cm felsőmarás</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm3" name="fuMunka" value="rotalas">
+<label class="form-check-label" for="fm3">Rotálás</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm4" name="fuMunka" value="tragya">
+<label class="form-check-label" for="fm4">Talaj javítás (trágya)</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm5" name="fuMunka" value="komposzt">
+<label class="form-check-label" for="fm5">Talaj javítás (komposzt)</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm6" name="fuMunka" value="talajcsere">
+<label class="form-check-label" for="fm6">Talaj csere</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm7" name="fuMunka" value="durvaGep">
+<label class="form-check-label" for="fm7">Durva tereprendezés géppel</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm8" name="fuMunka" value="durvaKez">
+<label class="form-check-label" for="fm8">Durva tereprendezés kézzel</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm9" name="fuMunka" value="finomVas">
+<label class="form-check-label" for="fm9">Finom tereprendezés szintező vassal</label>
+</div>
+
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="fm10" name="fuMunka" value="finomViz">
+<label class="form-check-label" for="fm10">Finom tereprendezés vízmértékkel</label>
+</div>
+
+</div>
+</div>
+
+
+<textarea class="form-control mb-3" name="fuMegjegyzes" placeholder="Megjegyzés"></textarea>
 
 
 <!-- GOMBOK -->
