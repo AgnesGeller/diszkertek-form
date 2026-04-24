@@ -294,7 +294,7 @@ function formatSummary(result) {
         .join("\n\n");
 }
 
-function buildEmailPayload(result) {
+function buildEmailPayloads(result) {
     const submittedAt = new Date().toLocaleString("hu-HU", {
         year: "numeric",
         month: "2-digit",
@@ -308,7 +308,7 @@ function buildEmailPayload(result) {
         ? `Új helyszíni felmérés - ${result.nev}`
         : "Új helyszíni felmérés";
 
-    return {
+    const basePayload = {
         ...result,
         submitted_at: submittedAt,
         form_name: "Díszkertek helyszíni felmérő",
@@ -316,24 +316,38 @@ function buildEmailPayload(result) {
         customer_email: formatFieldValue(result.email),
         reply_to: formatFieldValue(result.email),
         project_address: formatFieldValue(result.cim),
-        project_goal: formatFieldValue(result.projektCel),
-        email_subject: subjectBase,
-        internal_subject: `${subjectBase} | belső értesítés`,
-        customer_subject: "Köszönjük a helyszíni felmérő kitöltését",
-        summary,
-        internal_summary: summary,
-        customer_summary: [
+        project_goal: formatFieldValue(result.projektCel)
+    };
+
+    const customerSummary = [
             `Név: ${formatFieldValue(result.nev)}`,
             `Email: ${formatFieldValue(result.email)}`,
             `Helyszín: ${formatFieldValue(result.cim)}`,
             `Fő cél: ${formatFieldValue(result.projektCel)}`,
             `Beküldés ideje: ${submittedAt}`
-        ].join("\n"),
+        ].join("\n");
+
+    const internalPayload = {
+        ...basePayload,
+        email_subject: subjectBase,
+        internal_subject: `${subjectBase} | belső értesítés`,
+        summary,
+        internal_summary: summary,
         intro_line: "Új helyszíni felmérő érkezett a weboldalról.",
+        closing_line: "A teljes összefoglaló alább olvasható."
+    };
+
+    const customerPayload = {
+        ...basePayload,
+        email_subject: "Köszönjük a helyszíni felmérő kitöltését",
+        customer_subject: "Köszönjük a helyszíni felmérő kitöltését",
+        summary: customerSummary,
+        customer_summary: customerSummary,
         customer_intro_line: "Köszönjük, hogy kitöltötted a Díszkertek helyszíni felmérő űrlapját.",
-        closing_line: "A teljes összefoglaló alább olvasható.",
         customer_closing_line: "Hamarosan felvesszük veled a kapcsolatot a megadott elérhetőségen."
     };
+
+    return { internalPayload, customerPayload };
 }
 
 function setConditionalVisibility(trigger) {
@@ -403,7 +417,7 @@ async function submitSurvey() {
         return;
     }
 
-    const emailPayload = buildEmailPayload(result);
+    const { internalPayload, customerPayload } = buildEmailPayloads(result);
 
     isSubmitting = true;
     submitButton.disabled = true;
@@ -411,8 +425,8 @@ async function submitSurvey() {
 
     try {
         await Promise.all([
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CUSTOMER, emailPayload),
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_INTERNAL, emailPayload)
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CUSTOMER, customerPayload),
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_INTERNAL, internalPayload)
         ]);
 
         showSuccessModal();
