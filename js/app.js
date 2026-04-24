@@ -33,6 +33,10 @@ const EMAIL_FIELD_LABELS = {
     funkcio: "Funkcionális igények",
     stilus: "Esztétikai stílus",
     egyediIgeny: "Egyedi igény",
+    kiuloIgeny: "Kiülő vagy pergola igénye",
+    vizElemIgeny: "Vízelem igénye",
+    burkolatIgeny: "Burkolat vagy járda igénye",
+    gyerekbiztonsag: "Gyerek- vagy állatbiztos kialakítás",
     oldalTakaras: "Oldalsó takarás szükséges",
     takarasTipus: "Takarás típusa",
     takarasMegjegyzes: "Takarás megjegyzés",
@@ -41,6 +45,8 @@ const EMAIL_FIELD_LABELS = {
     zavar: "Zavart okozó látvány",
     vizualMegjegyzes: "Vizuális megjegyzés",
     megjegyzes: "Térkapcsolati megjegyzés",
+    zajvedelem: "Zajvédelem vagy intimitás",
+    panoramaFontos: "Panoráma megtartása",
     koltseg: "Költségkeret",
     koltsegPontosan: "Pontos költség",
     terepHossz: "Tereprendezés hossza",
@@ -58,6 +64,8 @@ const EMAIL_FIELD_LABELS = {
     foldhordasTalicskaval: "Földhordás talicskával",
     foldhordasVodorrel: "Földhordás vödörrel",
     lepcsofokDb: "Lépcsőfokok száma",
+    megtartandoElemek: "Megtartandó elemek",
+    bontandoElemek: "Bontandó vagy átalakítandó elemek",
     terepMegjegyzes: "Tereprendezési megjegyzés",
     fenntartasExtra: "Fenntartási megoldások",
     fenntartas: "Fenntartási szint",
@@ -70,6 +78,10 @@ const EMAIL_FIELD_LABELS = {
     alap: "Alaptípus",
     taroloMegjegyzes: "Tároló megjegyzés",
     fenntartasiMegjegyzes: "Fenntartási megjegyzés",
+    ontozesForrasa: "Öntözés vízforrása",
+    vilagitasIgeny: "Kültéri világítás igénye",
+    aramKiallas: "Kültéri áramkiállás",
+    vizelvezetes: "Vízelvezetési igény",
     fuHossz: "Füvesítés hossza",
     fuSzelesseg: "Füvesítés szélessége",
     fuTerulet: "Füvesítési terület",
@@ -95,6 +107,8 @@ const EMAIL_FIELD_LABELS = {
     egyebGepek: "Egyéb gép vagy jármű",
     bobcatTonna: "Bobcat tömege",
     forgoKotroTonna: "Forgó kotró tömege",
+    bejaroSzelesseg: "Bejáró szélessége",
+    bejutasMagassag: "Bejutási magasságkorlát",
     anyagMozgatas: "Anyagmozgatás módja",
     mozgatasiTavGeppel: "Mozgatás géppel",
     mozgatasiTavTalicska: "Mozgatás talicskával",
@@ -111,8 +125,9 @@ const EMAIL_FIELD_LABELS = {
     megvalositasModja: "Megvalósítás módja",
     tervezettKezdes: "Tervezett kezdés",
     tervezettBefejezes: "Tervezett befejezés",
-    heszEllenorzes: "HÉSZ ellenőrzés",
-    megrendeloAlairasa: "Megrendelő aláírása",
+    kivitelezesiUtemezes: "Kivitelezési ütemezés",
+    prioritasok: "Legfontosabb prioritások",
+    tervdokumentacioVan: "Van tervdokumentáció",
     egyebMegjegyzes: "Egyéb megjegyzés"
 };
 
@@ -123,11 +138,11 @@ const SUMMARY_SECTIONS = [
     },
     {
         title: "Funkcionális igények",
-        fields: ["csaladLetszam", "gyerek", "gyerekKor", "allat", "allatTipus", "funkcio", "stilus", "egyediIgeny"]
+        fields: ["csaladLetszam", "gyerek", "gyerekKor", "allat", "allatTipus", "funkcio", "stilus", "egyediIgeny", "kiuloIgeny", "vizElemIgeny", "burkolatIgeny", "gyerekbiztonsag"]
     },
     {
         title: "Vizuális szempontok",
-        fields: ["oldalTakaras", "takarasTipus", "takarasMegjegyzes", "hatsoBelathato", "kapcsolat", "zavar", "vizualMegjegyzes", "megjegyzes"]
+        fields: ["oldalTakaras", "takarasTipus", "takarasMegjegyzes", "hatsoBelathato", "kapcsolat", "zavar", "vizualMegjegyzes", "megjegyzes", "zajvedelem", "panoramaFontos"]
     },
     {
         title: "Költségkeret",
@@ -135,11 +150,11 @@ const SUMMARY_SECTIONS = [
     },
     {
         title: "Tereprendezés",
-        fields: ["terepHossz", "terepSzelesseg", "terepTerulet", "szintkulonbseg", "teruletJellemzes", "talajJellemzes", "tobbletFold", "foldHiany", "terepMod", "gepesitettTerulet", "kezierosTerulet", "foldhordasGeppel", "foldhordasTalicskaval", "foldhordasVodorrel", "lepcsofokDb", "terepMegjegyzes"]
+        fields: ["terepHossz", "terepSzelesseg", "terepTerulet", "szintkulonbseg", "teruletJellemzes", "talajJellemzes", "tobbletFold", "foldHiany", "terepMod", "gepesitettTerulet", "kezierosTerulet", "foldhordasGeppel", "foldhordasTalicskaval", "foldhordasVodorrel", "lepcsofokDb", "megtartandoElemek", "bontandoElemek", "terepMegjegyzes"]
     },
     {
         title: "Fenntartás és tároló",
-        fields: ["fenntartasExtra", "fenntartas", "fenntartasiMegjegyzes", "taroloVan", "taroloTipus", "hossz", "szelesseg", "magassag", "terulet", "alap", "taroloMegjegyzes"]
+        fields: ["fenntartasExtra", "fenntartas", "fenntartasiMegjegyzes", "ontozesForrasa", "vilagitasIgeny", "aramKiallas", "vizelvezetes", "taroloVan", "taroloTipus", "hossz", "szelesseg", "magassag", "terulet", "alap", "taroloMegjegyzes"]
     },
     {
         title: "Füvesítés",
@@ -151,11 +166,11 @@ const SUMMARY_SECTIONS = [
     },
     {
         title: "Anyagmozgatás és gépek",
-        fields: ["gepek", "egyebGepek", "bobcatTonna", "forgoKotroTonna", "anyagMozgatas", "mozgatasiTavGeppel", "mozgatasiTavTalicska", "mozgatasiTavVodor", "foldElszallitas", "termofold", "komposzt", "tragya", "anyagMozgatasMegjegyzes"]
+        fields: ["gepek", "egyebGepek", "bobcatTonna", "forgoKotroTonna", "bejaroSzelesseg", "bejutasMagassag", "anyagMozgatas", "mozgatasiTavGeppel", "mozgatasiTavTalicska", "mozgatasiTavVodor", "foldElszallitas", "termofold", "komposzt", "tragya", "anyagMozgatasMegjegyzes"]
     },
     {
         title: "Véglegesítés",
-        fields: ["dokumentumok", "egyebDokumentum", "projektCel", "foProblema", "megvalositasModja", "tervezettKezdes", "tervezettBefejezes", "heszEllenorzes", "megrendeloAlairasa", "egyebMegjegyzes"]
+        fields: ["dokumentumok", "egyebDokumentum", "projektCel", "foProblema", "megvalositasModja", "tervezettKezdes", "tervezettBefejezes", "kivitelezesiUtemezes", "prioritasok", "tervdokumentacioVan", "egyebMegjegyzes"]
     }
 ];
 
@@ -210,6 +225,31 @@ function validateCurrentStep() {
         if (!field.checkValidity()) {
             field.reportValidity();
             field.focus();
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function validateSubmitRequiredFields() {
+    const requiredFields = form.querySelectorAll("[data-submit-required='true']");
+
+    for (const field of requiredFields) {
+        const value = field.value.trim();
+
+        if (!value) {
+            showStep(0);
+            scrollToForm();
+            field.focus();
+            alert("Beküldés előtt kérlek add meg a nevedet, email-címedet és a helyszín címét.");
+            return false;
+        }
+
+        if (field.type === "email" && !field.checkValidity()) {
+            showStep(0);
+            scrollToForm();
+            field.reportValidity();
             return false;
         }
     }
@@ -320,12 +360,12 @@ function buildEmailPayloads(result) {
     };
 
     const customerSummary = [
-            `Név: ${formatFieldValue(result.nev)}`,
-            `Email: ${formatFieldValue(result.email)}`,
-            `Helyszín: ${formatFieldValue(result.cim)}`,
-            `Fő cél: ${formatFieldValue(result.projektCel)}`,
-            `Beküldés ideje: ${submittedAt}`
-        ].join("\n");
+        `Név: ${formatFieldValue(result.nev)}`,
+        `Email: ${formatFieldValue(result.email)}`,
+        `Helyszín: ${formatFieldValue(result.cim)}`,
+        `Fő cél: ${formatFieldValue(result.projektCel)}`,
+        `Beküldés ideje: ${submittedAt}`
+    ].join("\n");
 
     const internalPayload = {
         ...basePayload,
@@ -406,11 +446,11 @@ async function submitSurvey() {
         return;
     }
 
-    if (!form.reportValidity()) {
+    const result = collectFormData();
+
+    if (!validateSubmitRequiredFields()) {
         return;
     }
-
-    const result = collectFormData();
 
     if (!result.email || !result.email.includes("@")) {
         alert("Kérlek, adj meg egy érvényes email-címet.");

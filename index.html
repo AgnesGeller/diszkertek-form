@@ -36,17 +36,20 @@
                 ajánlatadás gördülékenyebben haladjon.
             </p>
 
-            <div class="hero-highlights">
-                <span class="hero-pill">átlátható lépések</span>
-                <span class="hero-pill">részletes igényfelmérés</span>
-                <span class="hero-pill">kertépítési projektekhez</span>
+            <div class="hero-support">
+                <p class="hero-support-title">Miben segít ez az űrlap?</p>
+                <ul class="hero-points">
+                    <li>Pontosabb képet ad a helyszínről és az igényekről.</li>
+                    <li>Gyorsítja a felmérési és ajánlatadási folyamatot.</li>
+                    <li>Segít, hogy a személyes egyeztetés már célzottabban induljon.</li>
+                </ul>
             </div>
 
             <div class="hero-actions">
                 <button type="button" onclick="startForm()" class="btn btn-success btn-lg hero-button">
                     Kezdjük el
                 </button>
-                <p class="hero-note">A kérdőív kitöltése csak néhány perc, de sokat gyorsít az előkészítésen.</p>
+                <p class="hero-note">A kitöltés részletességtől függően akár 10 percet is igénybe vehet.</p>
             </div>
         </div>
 
@@ -99,28 +102,29 @@
                         <span class="step-overline">1. lépés</span>
                         <h3>I. Alapadatok</h3>
                         <p>Az első körben összegyűjtjük a projekt alapvető adatait és a helyszín fő paramétereit.</p>
+                        <p class="soft-note">Nyugodtan nézd végig először a kérdéseket. A kapcsolattartási adatok megadása csak beküldéskor lesz igazán fontos.</p>
                     </div>
 
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label" for="nev">Név</label>
-                            <input id="nev" type="text" class="form-control" name="nev" placeholder="Teljes név" required>
+                            <input id="nev" type="text" class="form-control" name="nev" placeholder="Teljes név" data-submit-required="true">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="email">Email-cím</label>
-                            <input id="email" type="email" class="form-control" name="email" placeholder="pelda@email.hu" required>
+                            <input id="email" type="email" class="form-control" name="email" placeholder="pelda@email.hu" data-submit-required="true">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="datum">Dátum</label>
-                            <input id="datum" type="date" class="form-control" name="datum" required>
+                            <input id="datum" type="date" class="form-control" name="datum">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="cim">Helyszín címe</label>
-                            <input id="cim" type="text" class="form-control" name="cim" placeholder="Irányítószám, település, utca, házszám" required>
+                            <input id="cim" type="text" class="form-control" name="cim" placeholder="Irányítószám, település, utca, házszám" data-submit-required="true">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="ovezet">Lakóövezeti besorolás</label>
-                            <select id="ovezet" class="form-select" name="ovezet" required>
+                            <select id="ovezet" class="form-select" name="ovezet">
                                 <option value="">Válassz</option>
                                 <option>Kertváros</option>
                                 <option>Belváros</option>
@@ -131,7 +135,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="tavolsag">Kiszállási távolság a telephelytől (km)</label>
-                            <input id="tavolsag" type="number" min="0" class="form-control" name="tavolsag" placeholder="Például: 35" required>
+                            <input id="tavolsag" type="number" min="0" class="form-control" name="tavolsag" placeholder="Például: 35">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="szallas">Szállás biztosított?</label>
@@ -153,7 +157,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="telekMeret">Telek mérete (m²)</label>
-                            <input id="telekMeret" type="number" min="0" class="form-control" name="telekMeret" placeholder="Például: 820" required>
+                            <input id="telekMeret" type="number" min="0" class="form-control" name="telekMeret" placeholder="Például: 820">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="kertTerulet">Tervezési terület mérete (m²)</label>
@@ -251,6 +255,47 @@
                         <input id="egyediIgeny" type="text" class="form-control" name="egyediIgeny" placeholder="Például: kültéri szauna, tűzrakó, rejtett tárolás">
                     </div>
 
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label class="form-label" for="kiuloIgeny">Szeretnének fedett vagy nyitott kiülőt?</label>
+                            <select id="kiuloIgeny" class="form-select" name="kiuloIgeny">
+                                <option value="">Válassz</option>
+                                <option value="nyitott">Nyitott kiülő</option>
+                                <option value="fedett">Fedett kiülő vagy pergola</option>
+                                <option value="mindketto">Mindkettő érdekes lehet</option>
+                                <option value="nem-fontos">Nem fontos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="vizElemIgeny">Szeretnének vízfelületet?</label>
+                            <select id="vizElemIgeny" class="form-select" name="vizElemIgeny">
+                                <option value="">Válassz</option>
+                                <option value="medence">Medence</option>
+                                <option value="jacuzzi">Jacuzzi</option>
+                                <option value="to-vizjatek">Dísztó vagy vízjáték</option>
+                                <option value="nem">Nem</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="burkolatIgeny">Szükséges új burkolat vagy járda?</label>
+                            <select id="burkolatIgeny" class="form-select" name="burkolatIgeny">
+                                <option value="">Válassz</option>
+                                <option value="igen">Igen</option>
+                                <option value="nem">Nem</option>
+                                <option value="reszben">Részben</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="gyerekbiztonsag">Gyerek- vagy állatbiztos kialakítás mennyire fontos?</label>
+                            <select id="gyerekbiztonsag" class="form-select" name="gyerekbiztonsag">
+                                <option value="">Válassz</option>
+                                <option value="nagyon-fontos">Nagyon fontos</option>
+                                <option value="fontos">Fontos</option>
+                                <option value="nem-szempont">Nem elsődleges szempont</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="step-actions">
                         <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
                         <button type="button" class="btn btn-primary next-btn">Tovább</button>
@@ -334,6 +379,27 @@
                     <div class="form-block">
                         <label class="form-label" for="megjegyzes">Térkapcsolati megjegyzés</label>
                         <textarea id="megjegyzes" class="form-control" name="megjegyzes" rows="4" placeholder="Bármilyen további észrevétel a térkapcsolatokról vagy látványról"></textarea>
+                    </div>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label class="form-label" for="zajvedelem">Fontos a zajvédelem vagy a nagyobb intimitás?</label>
+                            <select id="zajvedelem" class="form-select" name="zajvedelem">
+                                <option value="">Válassz</option>
+                                <option value="igen">Igen</option>
+                                <option value="nem">Nem</option>
+                                <option value="reszben">Részben</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="panoramaFontos">Fontos a kilátás vagy panoráma megtartása?</label>
+                            <select id="panoramaFontos" class="form-select" name="panoramaFontos">
+                                <option value="">Válassz</option>
+                                <option value="igen">Igen</option>
+                                <option value="nem">Nem</option>
+                                <option value="ahol-lehet">Ahol lehet</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="step-actions">
@@ -459,6 +525,14 @@
                             <label class="form-label" for="lepcsofokDb">Lépcsőfokok száma</label>
                             <input id="lepcsofokDb" type="number" min="0" class="form-control" name="lepcsofokDb">
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="megtartandoElemek">Megtartandó elemek</label>
+                            <input id="megtartandoElemek" type="text" class="form-control" name="megtartandoElemek" placeholder="Például: meglévő fák, kerítés, terasz, kerti tó">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="bontandoElemek">Bontandó vagy átalakítandó elemek</label>
+                            <input id="bontandoElemek" type="text" class="form-control" name="bontandoElemek" placeholder="Például: régi járda, elöregedett ágyások, rossz gyeprész">
+                        </div>
                     </div>
 
                     <div class="form-block">
@@ -570,6 +644,46 @@
                     <div class="form-block">
                         <label class="form-label" for="fenntartasiMegjegyzes">Fenntartási megjegyzés</label>
                         <textarea id="fenntartasiMegjegyzes" class="form-control" name="fenntartasiMegjegyzes" rows="4" placeholder="Például: kevés idő jut gondozásra, fontos az automatizálás"></textarea>
+                    </div>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label class="form-label" for="ontozesForrasa">Öntözés vízforrása</label>
+                            <select id="ontozesForrasa" class="form-select" name="ontozesForrasa">
+                                <option value="">Válassz</option>
+                                <option value="halozati-viz">Hálózati víz</option>
+                                <option value="furt-kut">Fúrt kút</option>
+                                <option value="asott-kut">Ásott kút</option>
+                                <option value="nincs-meg">Még nincs kialakítva</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="vilagitasIgeny">Kültéri világítás igénye</label>
+                            <select id="vilagitasIgeny" class="form-select" name="vilagitasIgeny">
+                                <option value="">Válassz</option>
+                                <option value="igen">Igen</option>
+                                <option value="nem">Nem</option>
+                                <option value="kesobb">Később elképzelhető</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="aramKiallas">Van kültéri áramkiállás?</label>
+                            <select id="aramKiallas" class="form-select" name="aramKiallas">
+                                <option value="">Válassz</option>
+                                <option value="igen">Igen</option>
+                                <option value="nem">Nem</option>
+                                <option value="nem-tudom">Nem tudom</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="vizelvezetes">Szükséges vízelvezetési megoldás?</label>
+                            <select id="vizelvezetes" class="form-select" name="vizelvezetes">
+                                <option value="">Válassz</option>
+                                <option value="igen">Igen</option>
+                                <option value="nem">Nem</option>
+                                <option value="bizonytalan">Nem biztos</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="step-actions">
@@ -776,6 +890,14 @@
                             <label class="form-label" for="forgoKotroTonna">Forgó kotró tömege (T)</label>
                             <input id="forgoKotroTonna" type="number" min="0" class="form-control" name="forgoKotroTonna">
                         </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="bejaroSzelesseg">Bejáró szélessége (m)</label>
+                            <input id="bejaroSzelesseg" type="number" min="0" class="form-control" name="bejaroSzelesseg">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="bejutasMagassag">Bejutási magasságkorlát (m)</label>
+                            <input id="bejutasMagassag" type="number" min="0" class="form-control" name="bejutasMagassag">
+                        </div>
                     </div>
 
                     <div class="form-block">
@@ -867,16 +989,26 @@
                             <input id="tervezettBefejezes" type="text" class="form-control" name="tervezettBefejezes" placeholder="Például: 2027 tavasz">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label" for="heszEllenorzes">HÉSZ és előírások ellenőrzése</label>
-                            <select id="heszEllenorzes" class="form-select" name="heszEllenorzes">
+                            <label class="form-label" for="kivitelezesiUtemezes">Kivitelezési ütemezés</label>
+                            <select id="kivitelezesiUtemezes" class="form-select" name="kivitelezesiUtemezes">
                                 <option value="">Válassz</option>
-                                <option value="keri">Megrendelő kéri az ellenőrzést</option>
-                                <option value="nem-keri">Megrendelő nem kéri, vállalja a megfelelőséget</option>
+                                <option value="egy-utemben">Lehetőleg egy ütemben</option>
+                                <option value="szakaszosan">Szakaszosan is megvalósítható</option>
+                                <option value="meg-nyitott">Még nyitott kérdés</option>
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label" for="megrendeloAlairasa">Megrendelő aláírása</label>
-                            <input id="megrendeloAlairasa" type="text" class="form-control" name="megrendeloAlairasa" placeholder="Név vagy digitális aláírás megnevezése">
+                            <label class="form-label" for="prioritasok">Legfontosabb prioritások</label>
+                            <input id="prioritasok" type="text" class="form-control" name="prioritasok" placeholder="Például: kevés fenntartás, gyerekbarát használat, árnyékolás">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="tervdokumentacioVan">Van már tervrajz vagy helyszínrajz?</label>
+                            <select id="tervdokumentacioVan" class="form-select" name="tervdokumentacioVan">
+                                <option value="">Válassz</option>
+                                <option value="igen">Igen</option>
+                                <option value="reszben">Részben</option>
+                                <option value="nincs">Nincs még</option>
+                            </select>
                         </div>
                     </div>
 
