@@ -3,942 +3,905 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Díszkertek – Helyszíni felmérés</title>
+<title>Díszkertek | Helyszíni felmérés</title>
+<meta
+    name="description"
+    content="Többlépéses helyszíni felmérő űrlap kerttervezési és kertépítési projektekhez."
+>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Manrope:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+>
 <link rel="stylesheet" href="./css/style.css">
-<link rel="icon" href="./assets/favicon64.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon32.png">
-<link rel="icon" type="image/png" sizes="64x64" href="/assets/favicon64.png">
-
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="icon" type="image/png" href="./assets/favicon64.png">
+<link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+>
 </head>
 
 <body>
+<header class="hero">
+    <img src="./assets/hero1.jpg" class="hero-img" alt="Díszkertek kertépítési inspiráció">
+    <div class="hero-overlay"></div>
+    <div class="hero-content container">
+        <p class="hero-kicker">Díszkertek Kertépítés</p>
+        <h1>Helyszíni felmérő kérdőív</h1>
+        <p class="hero-lead">
+            Egy átgondolt, gördülékeny felmérés segít abban, hogy a kerttervezés már az első
+            beszélgetéstől pontosabb, élvezetesebb és gyorsabb legyen.
+        </p>
+        <button type="button" onclick="startForm()" class="btn btn-success btn-lg hero-button">
+            Kezdjük el
+        </button>
+    </div>
+</header>
 
-<section class="hero">
-    <img src="./assets/hero1.jpg" class="hero-img">
+<main class="page-shell">
+    <section class="survey-intro container">
+        <div class="intro-card">
+            <p class="eyebrow">Online felmérés</p>
+            <h2>Mondd el, milyen kertet képzeltél el</h2>
+            <p>
+                A kérdőív több rövid lépésből áll. A kötelező mezőket menet közben ellenőrizzük,
+                a kitöltés végén pedig automatikus visszaigazolást küldünk.
+            </p>
+        </div>
     </section>
 
+    <section class="progress-section container">
+        <div class="progress-wrapper">
+            <div class="progress" aria-hidden="true">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
 
-<div class="hero-cta">
-    <button onclick="startForm()" class="btn btn-success btn-lg">
-        Kezdés
-    </button>
-</div>
-
-<div class="progress-wrapper mb-4">
-    <div class="progress">
-        <div id="progressBar" class="progress-bar"></div>
-    </div>
-
-    <div class="step-indicator mt-2">
-        <span class="step active">1</span>
-        <span class="step">2</span>
-        <span class="step">3</span>
-        <span class="step">4</span>
-        <span class="step">5</span>
-        <span class="step">6</span>
-        <span class="step">7</span>
-        <span class="step">8</span>
-        <span class="step">9</span>
-        <span class="step">10</span>
-    </div>
-</div>
-
-<div class="container mt-5 mb-5">
-<form id="surveyForm">
-
-<!-- STEP 1 -->
-<div class="form-step active">
-<h3>I. Alapadatok</h3>
-
-<input type="text" class="form-control mb-3" name="nev" placeholder="Név" required>
-<input type="email" class="form-control mb-3" name="email" placeholder="Email" required>
-<label>Dátum (felmérés napja)</label>
-<input type="date" class="form-control mb-3" name="datum" required>
-<input type="text" class="form-control mb-3" name="cim" placeholder="Cím" required>
-
-<select class="form-select mb-3" name="ovezet" required>
-<option value="">Lakóövezet</option>
-<option>Kertváros</option>
-<option>Belváros</option>
-<option>Falusi</option>
-<option>Ipari</option>
-<option>Egyéb</option>
-</select>
-
-<input type="number" class="form-control mb-3" name="tavolsag" placeholder="Távolság Pomáztól (telephelyünk) (km)" required>
-<label>Szállás biztosított?</label>
-<select class="form-select mb-2" name="szallas" onchange="toggleSzallas(this.value)">
-<option value="nem">Nem</option>
-<option value="igen">Igen</option>
-<option value="talan">Talán</option>
-</select>
-
-<div id="szallasExtra" style="display:none;">
-<input type="text" class="form-control mb-3" name="szallasMegjegyzes" placeholder="Hány éj / hány fő / hány szoba?">
-</div>
-
-<input type="number" class="form-control mb-3" name="telekMeret" placeholder="Telek m²" required>
-
-<input type="number" class="form-control mb-3" name="kertTerulet" placeholder="Mekkora kertet szeretne kialakítani (m²)?">
-
-<button type="button" class="btn btn-primary next-btn">Tovább</button>
-</div>
-
-<!-- STEP 2 -->
-<div class="form-step">
-<h3>II. Funkcionális igények</h3>
-
-<input type="number" class="form-control mb-3" name="csaladLetszam" placeholder="Család létszáma">
-
-<label>Gyermek?</label>
-<select class="form-select mb-2" name="gyerek" onchange="toggleGyerek(this.value)">
-<option value="nem">Nem</option>
-<option value="igen">Igen</option>
-<option value="talan">Talán</option>
-</select>
-
-<div id="gyerekExtra" style="display:none;">
-<input type="text" class="form-control mb-3" name="gyerekKor" placeholder="Mennyi idősek a gyermekek?">
-</div>
-
-<label>Háziállat?</label>
-<select class="form-select mb-2" name="allat" onchange="toggleAllat(this.value)">
-<option value="nem">Nem</option>
-<option value="igen">Igen</option>
-<option value="talan">Talán</option>
-</select>
-
-<div id="allatExtra" style="display:none;">
-<input type="text" class="form-control mb-3" name="allatTipus" placeholder="Milyen állat(ok)?">
-</div>
-
-<!-- FUNKCIÓK -->
-<label class="mt-3">Mit szeretnének?</label>
-
-<div class="dropdown mb-3">
-<button class="btn btn-outline-secondary dropdown-toggle w-100"
-data-bs-toggle="dropdown"
-data-bs-auto-close="outside">
-Választás
-</button>
-
-<div class="dropdown-menu p-3 w-100" onclick="event.stopPropagation()">
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="f1" name="funkcio" value="pihenes">
-    <label class="form-check-label" for="f1">Pihenés</label>
-</div>
-
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="f2" name="funkcio" value="kozossegi">
-    <label class="form-check-label" for="f2">Közösségi tér</label>
-</div>
-
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="f3" name="funkcio" value="sutofőzes">
-    <label class="form-check-label" for="f3">Sütés-főzés</label>
-</div>
-
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="f4" name="funkcio" value="jatszo">
-    <label class="form-check-label" for="f4">Játszóhely</label>
-</div>
-
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="f5" name="funkcio" value="konyhakert">
-    <label class="form-check-label" for="f5">Konyhakert</label>
-</div>
-
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="f6" name="funkcio" value="tarolas">
-    <label class="form-check-label" for="f6">Tárolás</label>
-</div>
-
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="f7" name="funkcio" value="parkolas">
-    <label class="form-check-label" for="f7">Parkolás</label>
-</div>
-
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="f8" name="funkcio" value="arnyekolas">
-    <label class="form-check-label" for="f8">Árnyékolás</label>
-</div>
-
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="f9" name="funkcio" value="furdozes">
-    <label class="form-check-label" for="f9">Fürdőzés</label>
-</div>
-
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="f10" name="funkcio" value="ures">
-    <label class="form-check-label" for="f10">Üres tér</label>
-</div>
-
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="f11" name="funkcio" value="latvany">
-    <label class="form-check-label" for="f11">Szép látvány</label>
-</div>
-</div>
-</div> 
-
-
-<!-- STÍLUS -->
-<label>Esztétikai igény</label>
-
-<div class="dropdown mb-3">
-
-<button class="btn btn-outline-secondary dropdown-toggle w-100"
-data-bs-toggle="dropdown"
-data-bs-auto-close="outside">
-Stílus választás
-</button>
-
-<div class="dropdown-menu p-3 w-100" onclick="event.stopPropagation()">
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="s1" name="stilus" value="modern">
-<label class="form-check-label" for="s1">Modern</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="s2" name="stilus" value="mediterran">
-<label class="form-check-label" for="s2">Mediterrán</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="s3" name="stilus" value="japan">
-<label class="form-check-label" for="s3">Japán</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="s4" name="stilus" value="angol">
-<label class="form-check-label" for="s4">Angol</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="s5" name="stilus" value="tropusi">
-<label class="form-check-label" for="s5">Trópusi</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="s6" name="stilus" value="termeszetes">
-<label class="form-check-label" for="s6">Természetközeli</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="s7" name="stilus" value="minimalista">
-<label class="form-check-label" for="s7">Minimalista</label>
-</div>
-
-</div> <!-- dropdown-menu -->
-</div> <!-- dropdown -->
-
-
-<input type="text" class="form-control mb-3" name="egyediIgeny" placeholder="Egyedi igény">
-
-<button type="button" class="btn btn-secondary prev-btn">Vissza</button>
-<button type="button" class="btn btn-primary next-btn">Tovább</button>
-
-</div> <!-- form-step -->
-
-<!-- STEP 3 -->
-<div class="form-step">
-<h3>III. Vizuális</h3>
-
-<label>Szeretné, hogy a szomszédok ne lássanak be a kertbe?</label>
-<select class="form-select mb-3" name="oldalTakaras" onchange="toggleTakaras(this.value)">
-    <option value="nem">Nem</option>
-    <option value="igen">Igen</option>
-    <option value="talan">Talán</option>
-</select>
-
-<div id="takarasExtra" style="display:none;">
-
-    <label>Mivel szeretné eltakarni?</label>
-
-    <div class="dropdown mb-3">
-        <button class="btn btn-outline-secondary dropdown-toggle w-100"
-        data-bs-toggle="dropdown"
-        data-bs-auto-close="outside">
-        Választás
-        </button>
-
-        <div class="dropdown-menu p-3 w-100" onclick="event.stopPropagation()">
-
-           <div class="form-check">
-    <input class="form-check-input" type="checkbox" id="t1" name="takarasTipus" value="kerites">
-    <label class="form-check-label" for="t1">Kerítés</label>
-</div>
-
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="t2" name="takarasTipus" value="beton">
-    <label class="form-check-label" for="t2">Beton kerítés</label>
-</div>
-
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="t3" name="takarasTipus" value="halo">
-    <label class="form-check-label" for="t3">Árnyékoló háló</label>
-</div>
-
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="t4" name="takarasTipus" value="soveny">
-    <label class="form-check-label" for="t4">Sövény</label>
-</div>
-
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="t5" name="takarasTipus" value="fak">
-    <label class="form-check-label" for="t5">Fák</label>
-</div>
-
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="t6" name="takarasTipus" value="pergola">
-    <label class="form-check-label" for="t6">Pergola / árnyékoló</label>
-</div>
-
+            <div class="step-indicator mt-3" aria-label="Lépések">
+                <button type="button" class="step active" data-step-target="0">1</button>
+                <button type="button" class="step" data-step-target="1">2</button>
+                <button type="button" class="step" data-step-target="2">3</button>
+                <button type="button" class="step" data-step-target="3">4</button>
+                <button type="button" class="step" data-step-target="4">5</button>
+                <button type="button" class="step" data-step-target="5">6</button>
+                <button type="button" class="step" data-step-target="6">7</button>
+                <button type="button" class="step" data-step-target="7">8</button>
+                <button type="button" class="step" data-step-target="8">9</button>
+                <button type="button" class="step" data-step-target="9">10</button>
+            </div>
         </div>
-    </div>
-
-    <input type="text" class="form-control mb-3" name="takarasMegjegyzes" placeholder="Egyéb elképzelés (pl. magasság, típus)">
-
-</div>
-
-<textarea class="form-control mb-3" name="vizualMegjegyzes" placeholder="Egyéb megjegyzés (pl. zavaró látvány, kilátás, szomszédok)"></textarea>
-
-<!-- ===== VIZUÁLIS KIEGÉSZÍTÉS ===== -->
-<label class="mt-3">Vizuális és térkapcsolati megjegyzések</label>
-
-<select class="form-select mb-2" name="hatsoBelathato">
-<option value="">Hátsó telek belátható?</option>
-<option value="igen">Igen</option>
-<option value="nem">Nem</option>
-<option value="reszben">Részben</option>
-</select>
-
-<select class="form-select mb-2" name="kapcsolat">
-<option value="">Épület–kert kapcsolat</option>
-<option value="eros">Erős</option>
-<option value="kozepes">Közepes</option>
-<option value="gyenge">Gyenge</option>
-</select>
-
-<select class="form-select mb-2" name="zavar">
-<option value="">Zavart okozó látvány?</option>
-<option value="igen">Igen</option>
-<option value="nem">Nem</option>
-<option value="van_de_kezelheto">Van, de kezelhető</option>
-</select>
-
-<textarea class="form-control mb-3" name="megjegyzes" placeholder="Megjegyzés"></textarea>
-
-<button type="button" class="btn btn-secondary prev-btn">Vissza</button>
-<button type="button" class="btn btn-primary next-btn">Tovább</button>
-</div>
-<!-- STEP 4 KÖLTSÉG -->
-<div class="form-step">
-<h3>Költségkeret</h3>
-
-<select class="form-select" name="koltseg">
-<option>1M alatt</option>
-<option>1–2M</option>
-<option>2–4M</option>
-<option>4–7M</option>
-<option>7–10M</option>
-<option>10M+</option>
-</select>
-
-<button type="button" class="btn btn-secondary prev-btn">Vissza</button>
-<button type="button" class="btn btn-primary next-btn">Tovább</button>
-</div>
-
-<!-- STEP 5 -->
-<div class="form-step">
-<h3>IV. Tereprendezés</h3>
-
-<input type="number" class="form-control mb-2" name="terepHossz" placeholder="Hossz">
-<input type="number" class="form-control mb-2" name="terepSzelesseg" placeholder="Szélesség">
-
-<button type="button" class="btn btn-secondary prev-btn">Vissza</button>
-<button type="button" class="btn btn-primary next-btn">Tovább</button>
-</div>
-
-
-<!-- STEP 7 -->
-<div class="form-step">
-<h3>Fenntartás és tároló</h3>
-
-<!-- ===== FENNTARTÁS ===== -->
-<label>Fenntartási igény</label>
-<label class="mt-3">Fenntartási megoldások</label>
-
-<div class="dropdown mb-3">
-<button class="btn btn-outline-secondary dropdown-toggle w-100"
-data-bs-toggle="dropdown"
-data-bs-auto-close="outside">
-Választás
-</button>
-
-<div class="dropdown-menu p-3 w-100" onclick="event.stopPropagation()">
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fextra1" name="fenntartasExtra" value="ontozorendszer">
-<label class="form-check-label" for="fextra1">Automata öntözőrendszer</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fextra2" name="fenntartasExtra" value="robotfunyiro">
-<label class="form-check-label" for="fextra2">Robotfűnyíró</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fextra3" name="fenntartasExtra" value="sajat">
-<label class="form-check-label" for="fextra3">Saját fenntartás</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fextra4" name="fenntartasExtra" value="kertesz_rendszeres">
-<label class="form-check-label" for="fextra4">Kertész rendszeresen</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fextra5" name="fenntartasExtra" value="kertesz_alkalmi">
-<label class="form-check-label" for="fextra5">Kertész alkalmanként</label>
-</div>
-
-</div>
-</div>
-
-<div class="dropdown mb-3">
-<button class="btn btn-outline-secondary dropdown-toggle w-100"
-data-bs-toggle="dropdown"
-data-bs-auto-close="outside">
-Választás
-</button>
-
-<div class="dropdown-menu p-3 w-100" onclick="event.stopPropagation()">
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fen1" name="fenntartas" value="alacsony">
-<label class="form-check-label" for="fen1">Alacsony (kevés gondozás)</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fen2" name="fenntartas" value="kozepes">
-<label class="form-check-label" for="fen2">Közepes</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fen3" name="fenntartas" value="magas">
-<label class="form-check-label" for="fen3">Magas (sok gondozás)</label>
-</div>
-
-</div>
-</div>
-
-
-<!-- ===== TÁROLÓ ===== -->
-<label class="mt-3">Szeretne tárolót?</label>
-
-<select class="form-select mb-3" name="taroloVan" onchange="toggleTarolo(this.value)">
-<option value="nem">Nem</option>
-<option value="igen">Igen</option>
-<option value="talan">Talán</option>
-</select>
-
-
-<!-- TÁROLÓ RÉSZ -->
-<div id="taroloExtra" style="display:none;">
-
-<label>Tároló típusa</label>
-
-<div class="dropdown mb-3">
-<button class="btn btn-outline-secondary dropdown-toggle w-100"
-data-bs-toggle="dropdown"
-data-bs-auto-close="outside">
-Választás
-</button>
-
-<div class="dropdown-menu p-3 w-100" onclick="event.stopPropagation()">
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="tar1" name="taroloTipus" value="fa">
-<label class="form-check-label" for="tar1">Fa</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="tar2" name="taroloTipus" value="fem">
-<label class="form-check-label" for="tar2">Fém</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="tar3" name="taroloTipus" value="tegla">
-<label class="form-check-label" for="tar3">Tégla</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="tar4" name="taroloTipus" value="osszeszerelheto">
-<label class="form-check-label" for="tar4">Összeszerelhető</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="tar5" name="taroloTipus" value="konnyuszerkezetes">
-<label class="form-check-label" for="tar5">Könnyűszerkezetes</label>
-</div>
-
-</div>
-</div>
-
-
-<!-- MÉRETEK -->
-<input type="number" class="form-control mb-2" name="hossz" placeholder="Hossz (m)">
-<input type="number" class="form-control mb-2" name="szelesseg" placeholder="Szélesség (m)">
-<input type="number" class="form-control mb-2" name="magassag" placeholder="Magasság (m)">
-<input type="number" class="form-control mb-3" name="terulet" placeholder="Terület (m²)">
-
-
-<!-- ALAP -->
-<label>Alap típusa</label>
-
-<div class="dropdown mb-3">
-<button class="btn btn-outline-secondary dropdown-toggle w-100"
-data-bs-toggle="dropdown"
-data-bs-auto-close="outside">
-Választás
-</button>
-
-<div class="dropdown-menu p-3 w-100" onclick="event.stopPropagation()">
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="alap1" name="alap" value="beton">
-<label class="form-check-label" for="alap1">Beton</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="alap2" name="alap" value="terko">
-<label class="form-check-label" for="alap2">Térkő</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="alap3" name="alap" value="zuzalek">
-<label class="form-check-label" for="alap3">Zúzalék</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="alap4" name="alap" value="nincs">
-<label class="form-check-label" for="alap4">Nincs</label>
-</div>
-
-</div> <!-- dropdown-menu -->
-</div> <!-- dropdown -->
-
-<textarea class="form-control mb-3" name="taroloMegjegyzes" placeholder="Tároló megjegyzés"></textarea>
-
-</div> <!-- taroloExtra vége -->
-
-
-<!-- GOMBOK -->
-<button type="button" class="btn btn-secondary prev-btn">Vissza</button>
-<button type="button" class="btn btn-primary next-btn">Tovább</button>
-
-</div>
-
-<div class="form-step">
-<h3>Füvesítés</h3>
-
-<!-- MÉRETEK -->
-<input type="number" class="form-control mb-2" name="fuHossz" placeholder="Hossz (m)">
-<input type="number" class="form-control mb-2" name="fuSzelesseg" placeholder="Szélesség (m)">
-<input type="number" class="form-control mb-3" name="fuTerulet" placeholder="Terület (m²)">
-
-
-<!-- TÍPUS -->
-<label>Füvesítés típusa</label>
-
-<div class="dropdown mb-3">
-<button class="btn btn-outline-secondary dropdown-toggle w-100"
-data-bs-toggle="dropdown"
-data-bs-auto-close="outside">
-Választás
-</button>
-
-<div class="dropdown-menu p-3 w-100" onclick="event.stopPropagation()">
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fu1" name="fuTipus" value="fumag">
-<label class="form-check-label" for="fu1">Fűmagvetés</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fu2" name="fuTipus" value="gyep">
-<label class="form-check-label" for="fu2">Gyepszőnyeg</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fu3" name="fuTipus" value="aljnovenyzet">
-<label class="form-check-label" for="fu3">Aljnövényzet (geotextil)</label>
-</div>
-
-</div>
-</div>
-
-
-<!-- MUNKÁK -->
-<label>Füvesítési munkák</label>
-
-<div class="dropdown mb-3">
-<button class="btn btn-outline-secondary dropdown-toggle w-100"
-data-bs-toggle="dropdown"
-data-bs-auto-close="outside">
-Választás
-</button>
-
-<div class="dropdown-menu p-3 w-100" onclick="event.stopPropagation()">
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fm1" name="fuMunka" value="gyomirtas">
-<label class="form-check-label" for="fm1">Gyomirtás</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fm2" name="fuMunka" value="felso_maras">
-<label class="form-check-label" for="fm2">Felsőmarás (2 cm)</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fm3" name="fuMunka" value="rotalas">
-<label class="form-check-label" for="fm3">Rotálás</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fm4" name="fuMunka" value="tragya">
-<label class="form-check-label" for="fm4">Talajjavítás (trágya)</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fm5" name="fuMunka" value="komposzt">
-<label class="form-check-label" for="fm5">Talajjavítás (komposzt)</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fm6" name="fuMunka" value="talajcsere">
-<label class="form-check-label" for="fm6">Talajcsere</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fm7" name="fuMunka" value="durva_gep">
-<label class="form-check-label" for="fm7">Durva tereprendezés (gép)</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fm8" name="fuMunka" value="durva_kezzel">
-<label class="form-check-label" for="fm8">Durva tereprendezés (kézzel)</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fm9" name="fuMunka" value="finom_vas">
-<label class="form-check-label" for="fm9">Finom tereprendezés (szintező vas)</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fm10" name="fuMunka" value="finom_vizmertek">
-<label class="form-check-label" for="fm10">Finom tereprendezés (vízmérték)</label>
-</div>
-
-</div>
-</div>
-
-
-<textarea class="form-control mb-3" name="fuMegjegyzes" placeholder="Megjegyzés"></textarea>
-
-
-<button type="button" class="btn btn-secondary prev-btn">Vissza</button>
-<button type="button" class="btn btn-primary next-btn">Tovább</button>
-
-</div>
-
-
-<div class="form-step">
-<h3>Növényzet</h3>
-
-<!-- ===== FA ÜLTETÉS ===== -->
-<label>Fa ültetés</label>
-
-<input type="number" class="form-control mb-3" name="faDb" placeholder="Fa darabszám">
-
-<div class="dropdown mb-3">
-<button class="btn btn-outline-secondary dropdown-toggle w-100"
-data-bs-toggle="dropdown"
-data-bs-auto-close="outside">
-Fa jellemzők
-</button>
-
-<div class="dropdown-menu p-3 w-100">
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fa1" name="faJellemzo" value="orokzold">
-<label class="form-check-label" for="fa1">Örökzöld</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fa2" name="faJellemzo" value="napos">
-<label class="form-check-label" for="fa2">Napos</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fa3" name="faJellemzo" value="arnyekos">
-<label class="form-check-label" for="fa3">Árnyékos</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fa4" name="faJellemzo" value="felarnyek">
-<label class="form-check-label" for="fa4">Félárnyékos</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fa5" name="faJellemzo" value="homogen">
-<label class="form-check-label" for="fa5">Homogén</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="fa6" name="faJellemzo" value="tobbfajta">
-<label class="form-check-label" for="fa6">Több fajta</label>
-</div>
-
-</div>
-</div>
-
-
-<!-- ===== TALAJTAKARÁS ===== -->
-<label>Talajtakarás</label>
-
-<div class="dropdown mb-3">
-<button class="btn btn-outline-secondary dropdown-toggle w-100"
-data-bs-toggle="dropdown"
-data-bs-auto-close="outside">
-Talajtakarás
-</button>
-
-<div class="dropdown-menu p-3 w-100">
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="takar1" name="talajtakaro" value="geotextil">
-<label class="form-check-label" for="takar1">Geotextília</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="takar2" name="talajtakaro" value="fenyokereg">
-<label class="form-check-label" for="takar2">Fenyőkéreg</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="takar3" name="talajtakaro" value="faapritek">
-<label class="form-check-label" for="takar3">Faapríték</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="takar4" name="talajtakaro" value="diszkavics">
-<label class="form-check-label" for="takar4">Díszkavics</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="takar5" name="talajtakaro" value="murva">
-<label class="form-check-label" for="takar5">Murva / andezit</label>
-</div>
-
-</div>
-</div>
-
-
-<!-- ===== SÖVÉNY ===== -->
-<label>Sövény</label>
-
-<input type="number" class="form-control mb-2" name="sovenyHossz" placeholder="Hossz (m)">
-<input type="number" class="form-control mb-2" name="sovenyTotav" placeholder="Tőtáv (m)">
-<input type="number" class="form-control mb-3" name="sovenySortav" placeholder="Sortáv (m)">
-
-
-<!-- ===== ÁGYÁS ===== -->
-<label>Ágyás</label>
-
-<input type="number" class="form-control mb-2" name="agyasDb" placeholder="Ágyások száma">
-<input type="text" class="form-control mb-3" name="agyasMeret" placeholder="Méret (pl. 3x2m)">
-
-
-
-<!-- ===== KEDVELT NÖVÉNYEK ===== -->
-<textarea class="form-control mb-3" name="kedveltNovenyek" placeholder="Kedvelt növények"></textarea>
-
-
-<button type="button" class="btn btn-secondary prev-btn">Vissza</button>
-<button type="button" class="btn btn-primary next-btn">Tovább</button>
-
-</div>
-
-
-<!-- STEP 8 -->
-<div class="form-step">
-<h3>Anyagmozgatás és gépek</h3>
-
-<!-- ===== GÉPEK ===== -->
-<label>Szükséges gépek</label>
-
-<div class="dropdown mb-3">
-<button class="btn btn-outline-secondary dropdown-toggle w-100"
-data-bs-toggle="dropdown"
-data-bs-auto-close="outside">
-Választás
-</button>
-
-<div class="dropdown-menu p-3 w-100">
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="gep1" name="gepek" value="bobcat">
-<label class="form-check-label" for="gep1">Bobcat (kompakt rakodó)</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="gep2" name="gepek" value="kisteher">
-<label class="form-check-label" for="gep2">3.5t billencs kisteherautó</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="gep3" name="gepek" value="7t">
-<label class="form-check-label" for="gep3">7.5t billencs</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="gep4" name="gepek" value="12t">
-<label class="form-check-label" for="gep4">12t billencs</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="gep5" name="gepek" value="18t">
-<label class="form-check-label" for="gep5">18t billencs</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="gep6" name="gepek" value="26t">
-<label class="form-check-label" for="gep6">26t billencs</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="gep7" name="gepek" value="forgokotro">
-<label class="form-check-label" for="gep7">Forgó kotró</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="gep8" name="gepek" value="tuskomaro">
-<label class="form-check-label" for="gep8">Tuskómaró</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="gep9" name="gepek" value="agdaralo">
-<label class="form-check-label" for="gep9">Ágdaráló</label>
-</div>
-
-</div>
-</div>
-
-
-<!-- ===== EXTRA GÉP ===== -->
-<input type="text" class="form-control mb-3" name="egyebGepek" placeholder="Egyéb gép / jármű">
-
-
-<!-- ===== ANYAGMOZGATÁS ===== -->
-<label>Anyagmozgatás módja</label>
-
-<div class="dropdown mb-3">
-<button class="btn btn-outline-secondary dropdown-toggle w-100"
-data-bs-toggle="dropdown"
-data-bs-auto-close="outside">
-Választás
-</button>
-
-<div class="dropdown-menu p-3 w-100">
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="moz1" name="anyagMozgatas" value="geppel">
-<label class="form-check-label" for="moz1">Géppel</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="moz2" name="anyagMozgatas" value="talicska">
-<label class="form-check-label" for="moz2">Talicskával</label>
-</div>
-
-<div class="form-check">
-<input class="form-check-input" type="checkbox" id="moz3" name="anyagMozgatas" value="vodor">
-<label class="form-check-label" for="moz3">Vödörrel</label>
-</div>
-
-</div>
-</div>
-
-
-<!-- ===== TÁVOLSÁGOK ===== -->
-<input type="number" class="form-control mb-2" name="mozgatasiTavGeppel" placeholder="Mozgatás távolság (géppel) m">
-<input type="number" class="form-control mb-2" name="mozgatasiTavTalicska" placeholder="Mozgatás távolság (talicskával) m">
-<input type="number" class="form-control mb-3" name="mozgatasiTavVodor" placeholder="Mozgatás távolság (vödörrel) m">
-
-
-<!-- ===== FÖLD ===== -->
-<input type="number" class="form-control mb-2" name="foldElszallitas" placeholder="Föld elszállítás (m³)">
-<input type="number" class="form-control mb-2" name="termofold" placeholder="Termőföld (m³)">
-<input type="number" class="form-control mb-2" name="komposzt" placeholder="Komposzt (m³)">
-<input type="number" class="form-control mb-3" name="tragya" placeholder="Marhatrágya (L)">
-
-
-<textarea class="form-control mb-3" name="anyagMozgatasMegjegyzes" placeholder="Megjegyzés"></textarea>
-
-
-<!-- GOMBOK -->
-<button type="button" class="btn btn-secondary prev-btn">Vissza</button>
-<button type="button" class="btn btn-primary next-btn">Tovább</button>
-
-</div>
-
-
-
-<!-- STEP 6 -->
-<div class="form-step">
-<h3>Véglegesítés</h3>
-
-<button type="button" class="btn btn-secondary prev-btn">Vissza</button>
-<button type="button" id="submitBtn" class="btn btn-success">Küldés</button>
-</div>
-
-</form>
-</div>
-<div id="successModal" class="success-modal">
+    </section>
+
+    <section class="container form-shell">
+        <form id="surveyForm" novalidate>
+            <div class="form-step active">
+                <div class="step-card">
+                    <div class="step-heading">
+                        <span class="step-overline">1. lépés</span>
+                        <h3>I. Alapadatok</h3>
+                        <p>Az első körben összegyűjtjük a projekt alapvető adatait és a helyszín fő paramétereit.</p>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="nev">Név</label>
+                            <input id="nev" type="text" class="form-control" name="nev" placeholder="Teljes név" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="email">Email-cím</label>
+                            <input id="email" type="email" class="form-control" name="email" placeholder="pelda@email.hu" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="datum">Dátum</label>
+                            <input id="datum" type="date" class="form-control" name="datum" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="cim">Helyszín címe</label>
+                            <input id="cim" type="text" class="form-control" name="cim" placeholder="Irányítószám, település, utca, házszám" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="ovezet">Lakóövezeti besorolás</label>
+                            <select id="ovezet" class="form-select" name="ovezet" required>
+                                <option value="">Válassz</option>
+                                <option>Kertváros</option>
+                                <option>Belváros</option>
+                                <option>Falusi</option>
+                                <option>Ipari</option>
+                                <option>Egyéb</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="tavolsag">Kiszállási távolság a telephelytől (km)</label>
+                            <input id="tavolsag" type="number" min="0" class="form-control" name="tavolsag" placeholder="Például: 35" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="szallas">Szállás biztosított?</label>
+                            <select id="szallas" class="form-select" name="szallas" data-toggle-target="szallasExtra">
+                                <option value="nem">Nem</option>
+                                <option value="igen">Igen</option>
+                                <option value="talan">Talán</option>
+                            </select>
+                        </div>
+                        <div id="szallasExtra" class="col-md-6 conditional-block" hidden>
+                            <label class="form-label" for="szallasMegjegyzes">Szállás részletei</label>
+                            <input
+                                id="szallasMegjegyzes"
+                                type="text"
+                                class="form-control"
+                                name="szallasMegjegyzes"
+                                placeholder="Hány éj, hány fő, hány szoba?"
+                            >
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="telekMeret">Telek mérete (m²)</label>
+                            <input id="telekMeret" type="number" min="0" class="form-control" name="telekMeret" placeholder="Például: 820" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="kertTerulet">Tervezési terület mérete (m²)</label>
+                            <input id="kertTerulet" type="number" min="0" class="form-control" name="kertTerulet" placeholder="Például: 350">
+                        </div>
+                    </div>
+
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-primary next-btn">Tovább</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-step">
+                <div class="step-card">
+                    <div class="step-heading">
+                        <span class="step-overline">2. lépés</span>
+                        <h3>II. Funkcionális igények</h3>
+                        <p>Itt azt mérjük fel, hogyan szeretnétek használni a kertet a hétköznapokban.</p>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label" for="csaladLetszam">Család létszáma</label>
+                            <input id="csaladLetszam" type="number" min="0" class="form-control" name="csaladLetszam" placeholder="Például: 4">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="gyerek">Van gyermek?</label>
+                            <select id="gyerek" class="form-select" name="gyerek" data-toggle-target="gyerekExtra">
+                                <option value="nem">Nem</option>
+                                <option value="igen">Igen</option>
+                                <option value="talan">Talán</option>
+                            </select>
+                        </div>
+                        <div id="gyerekExtra" class="col-md-4 conditional-block" hidden>
+                            <label class="form-label" for="gyerekKor">Életkor</label>
+                            <input id="gyerekKor" type="text" class="form-control" name="gyerekKor" placeholder="Például: 5 és 8 éves">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="allat">Van háziállat?</label>
+                            <select id="allat" class="form-select" name="allat" data-toggle-target="allatExtra">
+                                <option value="nem">Nem</option>
+                                <option value="igen">Igen</option>
+                                <option value="talan">Talán</option>
+                            </select>
+                        </div>
+                        <div id="allatExtra" class="col-md-8 conditional-block" hidden>
+                            <label class="form-label" for="allatTipus">Milyen állat?</label>
+                            <input id="allatTipus" type="text" class="form-control" name="allatTipus" placeholder="Például: két kutya, egy macska">
+                        </div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label">Mit szeretnének?</label>
+                        <div class="dropdown mb-0">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                Funkciók kiválasztása
+                            </button>
+                            <div class="dropdown-menu p-3 w-100">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="f1" name="funkcio" value="pihenes"><label class="form-check-label" for="f1">Pihenés</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="f2" name="funkcio" value="kozossegi"><label class="form-check-label" for="f2">Közösségi tér</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="f3" name="funkcio" value="sutes-fozes"><label class="form-check-label" for="f3">Sütés-főzés</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="f4" name="funkcio" value="jatszohely"><label class="form-check-label" for="f4">Játszóhely</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="f5" name="funkcio" value="konyhakert"><label class="form-check-label" for="f5">Konyhakert</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="f6" name="funkcio" value="tarolas"><label class="form-check-label" for="f6">Tárolás</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="f7" name="funkcio" value="parkolas"><label class="form-check-label" for="f7">Parkolás</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="f8" name="funkcio" value="arnyekolas"><label class="form-check-label" for="f8">Árnyékolás</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="f9" name="funkcio" value="furdozes"><label class="form-check-label" for="f9">Fürdőzés</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="f10" name="funkcio" value="ures-ter"><label class="form-check-label" for="f10">Üres tér</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="f11" name="funkcio" value="szep-latvany"><label class="form-check-label" for="f11">Szép látvány</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label">Esztétikai igény</label>
+                        <div class="dropdown mb-0">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                Stílus kiválasztása
+                            </button>
+                            <div class="dropdown-menu p-3 w-100">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="s1" name="stilus" value="modern"><label class="form-check-label" for="s1">Modern</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="s2" name="stilus" value="mediterran"><label class="form-check-label" for="s2">Mediterrán</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="s3" name="stilus" value="japan"><label class="form-check-label" for="s3">Japán</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="s4" name="stilus" value="angol"><label class="form-check-label" for="s4">Angol</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="s5" name="stilus" value="tropusi"><label class="form-check-label" for="s5">Trópusi</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="s6" name="stilus" value="termeszetkozeli"><label class="form-check-label" for="s6">Természetközeli</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="s7" name="stilus" value="minimalista"><label class="form-check-label" for="s7">Minimalista</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label" for="egyediIgeny">Egyedi igény</label>
+                        <input id="egyediIgeny" type="text" class="form-control" name="egyediIgeny" placeholder="Például: kültéri szauna, tűzrakó, rejtett tárolás">
+                    </div>
+
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
+                        <button type="button" class="btn btn-primary next-btn">Tovább</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-step">
+                <div class="step-card">
+                    <div class="step-heading">
+                        <span class="step-overline">3. lépés</span>
+                        <h3>III. Vizuális és térkapcsolati megjegyzések</h3>
+                        <p>Segít pontosítani, mennyire nyitott, intimitást adó vagy látványcentrikus kertet szeretnétek.</p>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="oldalTakaras">Szükséges oldalsó takarás?</label>
+                            <select id="oldalTakaras" class="form-select" name="oldalTakaras" data-toggle-target="takarasExtra">
+                                <option value="nem">Nem</option>
+                                <option value="igen">Igen</option>
+                                <option value="talan">Talán</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="takarasExtra" class="form-block conditional-block" hidden>
+                        <label class="form-label">Mivel szeretné eltakarni?</label>
+                        <div class="dropdown mb-3">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                Takarási megoldások
+                            </button>
+                            <div class="dropdown-menu p-3 w-100">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="t1" name="takarasTipus" value="kerites"><label class="form-check-label" for="t1">Kerítés</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="t2" name="takarasTipus" value="beton-kerites"><label class="form-check-label" for="t2">Beton kerítés</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="t3" name="takarasTipus" value="arnyekolo-halo"><label class="form-check-label" for="t3">Árnyékoló háló</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="t4" name="takarasTipus" value="soveny"><label class="form-check-label" for="t4">Sövény</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="t5" name="takarasTipus" value="fak"><label class="form-check-label" for="t5">Fák</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="t6" name="takarasTipus" value="pergola"><label class="form-check-label" for="t6">Pergola vagy árnyékoló</label></div>
+                            </div>
+                        </div>
+                        <label class="form-label" for="takarasMegjegyzes">Megjegyzés</label>
+                        <input id="takarasMegjegyzes" type="text" class="form-control" name="takarasMegjegyzes" placeholder="Például: minél természetesebb, kb. 180 cm magas">
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label" for="hatsoBelathato">Hátsó telek belátható?</label>
+                            <select id="hatsoBelathato" class="form-select" name="hatsoBelathato">
+                                <option value="">Válassz</option>
+                                <option value="igen">Igen</option>
+                                <option value="nem">Nem</option>
+                                <option value="reszben">Részben</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="kapcsolat">Épület-kert kapcsolat</label>
+                            <select id="kapcsolat" class="form-select" name="kapcsolat">
+                                <option value="">Válassz</option>
+                                <option value="eros">Erős</option>
+                                <option value="kozepes">Közepes</option>
+                                <option value="gyenge">Gyenge</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="zavar">Zavart okozó látvány?</label>
+                            <select id="zavar" class="form-select" name="zavar">
+                                <option value="">Válassz</option>
+                                <option value="igen">Igen</option>
+                                <option value="nem">Nem</option>
+                                <option value="van-de-kezelheto">Van, de kezelhető</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label" for="vizualMegjegyzes">Vizuális megjegyzés</label>
+                        <textarea id="vizualMegjegyzes" class="form-control" name="vizualMegjegyzes" rows="4" placeholder="Például: zavaró szomszédos épület, szép panoráma, intimebb hátsó kert igénye"></textarea>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label" for="megjegyzes">Térkapcsolati megjegyzés</label>
+                        <textarea id="megjegyzes" class="form-control" name="megjegyzes" rows="4" placeholder="Bármilyen további észrevétel a térkapcsolatokról vagy látványról"></textarea>
+                    </div>
+
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
+                        <button type="button" class="btn btn-primary next-btn">Tovább</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-step">
+                <div class="step-card">
+                    <div class="step-heading">
+                        <span class="step-overline">4. lépés</span>
+                        <h3>Költségkeret</h3>
+                        <p>A tervezés szintje és a javasolt megoldások pontosabban belőhetők, ha látjuk a nagyságrendet.</p>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="koltseg">Költségsáv</label>
+                            <select id="koltseg" class="form-select" name="koltseg">
+                                <option value="">Válassz</option>
+                                <option value="1m-alatt">1M Ft alatt</option>
+                                <option value="1-2m">1-2M Ft</option>
+                                <option value="2-4m">2-4M Ft</option>
+                                <option value="4-7m">4-7M Ft</option>
+                                <option value="7-10m">7-10M Ft</option>
+                                <option value="10m-felett">10M Ft felett</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="koltsegPontosan">Pontos összeg vagy megjegyzés</label>
+                            <input id="koltsegPontosan" type="text" class="form-control" name="koltsegPontosan" placeholder="Például: kb. 6,5M Ft teljes kivitelezéssel">
+                        </div>
+                    </div>
+
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
+                        <button type="button" class="btn btn-primary next-btn">Tovább</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-step">
+                <div class="step-card">
+                    <div class="step-heading">
+                        <span class="step-overline">5. lépés</span>
+                        <h3>IV. Tereprendezés</h3>
+                        <p>A kivitelezési előkészítéshez fontos a terület mérete, mozgathatósága és a terep jellemzői.</p>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label" for="terepHossz">Hossz (m)</label>
+                            <input id="terepHossz" type="number" min="0" class="form-control" name="terepHossz">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="terepSzelesseg">Szélesség (m)</label>
+                            <input id="terepSzelesseg" type="number" min="0" class="form-control" name="terepSzelesseg">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="terepTerulet">Terület (m²)</label>
+                            <input id="terepTerulet" type="number" min="0" class="form-control" name="terepTerulet">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="szintkulonbseg">Szintkülönbség (cm)</label>
+                            <input id="szintkulonbseg" type="number" min="0" class="form-control" name="szintkulonbseg">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="teruletJellemzes">Terület jellemzése</label>
+                            <input id="teruletJellemzes" type="text" class="form-control" name="teruletJellemzes" placeholder="Például: sík, enyhén lejtős, tagolt">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="talajJellemzes">Talaj jellemzése</label>
+                            <input id="talajJellemzes" type="text" class="form-control" name="talajJellemzes" placeholder="Például: agyagos, homokos, kötött">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="tobbletFold">Többletföld a területen (m³)</label>
+                            <input id="tobbletFold" type="number" min="0" class="form-control" name="tobbletFold">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="foldHiany">Földhiány a területen (m³)</label>
+                            <input id="foldHiany" type="number" min="0" class="form-control" name="foldHiany">
+                        </div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label">Kivitelezési mód</label>
+                        <div class="dropdown mb-0">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                Tereprendezési kivitelezés
+                            </button>
+                            <div class="dropdown-menu p-3 w-100">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="terep1" name="terepMod" value="teljesen-gepesitett"><label class="form-check-label" for="terep1">Teljesen gépesített</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="terep2" name="terepMod" value="reszben-gepesitett"><label class="form-check-label" for="terep2">Részben gépesített</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="terep3" name="terepMod" value="kezi-erovel"><label class="form-check-label" for="terep3">Kézi erővel</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label" for="gepesitettTerulet">Gépesített terület (m²)</label>
+                            <input id="gepesitettTerulet" type="number" min="0" class="form-control" name="gepesitettTerulet">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="kezierosTerulet">Kézierős terület (m²)</label>
+                            <input id="kezierosTerulet" type="number" min="0" class="form-control" name="kezierosTerulet">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="foldhordasGeppel">Földhordás távolsága géppel (m)</label>
+                            <input id="foldhordasGeppel" type="number" min="0" class="form-control" name="foldhordasGeppel">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="foldhordasTalicskaval">Földhordás távolsága talicskával (m)</label>
+                            <input id="foldhordasTalicskaval" type="number" min="0" class="form-control" name="foldhordasTalicskaval">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="foldhordasVodorrel">Földhordás távolsága vödörrel (m)</label>
+                            <input id="foldhordasVodorrel" type="number" min="0" class="form-control" name="foldhordasVodorrel">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="lepcsofokDb">Lépcsőfokok száma</label>
+                            <input id="lepcsofokDb" type="number" min="0" class="form-control" name="lepcsofokDb">
+                        </div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label" for="terepMegjegyzes">Tereprendezési megjegyzés</label>
+                        <textarea id="terepMegjegyzes" class="form-control" name="terepMegjegyzes" rows="4" placeholder="Például: nehéz bejutás, jelentős szintkülönbség, kézi mozgatás szükséges"></textarea>
+                    </div>
+
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
+                        <button type="button" class="btn btn-primary next-btn">Tovább</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-step">
+                <div class="step-card">
+                    <div class="step-heading">
+                        <span class="step-overline">6. lépés</span>
+                        <h3>Fenntartás és tároló</h3>
+                        <p>Itt látjuk, milyen fenntarthatósági szint és tárolási megoldás lenne ideális számotokra.</p>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label">Fenntartási megoldások</label>
+                        <div class="dropdown mb-0">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                Fenntartási elemek
+                            </button>
+                            <div class="dropdown-menu p-3 w-100">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fextra1" name="fenntartasExtra" value="ontozorendszer"><label class="form-check-label" for="fextra1">Automata öntözőrendszer</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fextra2" name="fenntartasExtra" value="robotfunyiro"><label class="form-check-label" for="fextra2">Robotfűnyíró</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fextra3" name="fenntartasExtra" value="sajat"><label class="form-check-label" for="fextra3">Saját fenntartás</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fextra4" name="fenntartasExtra" value="kertesz-rendszeres"><label class="form-check-label" for="fextra4">Kertész rendszeresen</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fextra5" name="fenntartasExtra" value="kertesz-alkalmi"><label class="form-check-label" for="fextra5">Kertész alkalmanként</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label">Fenntartási szint</label>
+                        <div class="dropdown mb-0">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                Fenntartási szint
+                            </button>
+                            <div class="dropdown-menu p-3 w-100">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fen1" name="fenntartas" value="alacsony"><label class="form-check-label" for="fen1">Alacsony fenntartás</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fen2" name="fenntartas" value="kozepes"><label class="form-check-label" for="fen2">Közepes fenntartás</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fen3" name="fenntartas" value="magas"><label class="form-check-label" for="fen3">Magas fenntartás</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="taroloVan">Szeretne tárolót?</label>
+                            <select id="taroloVan" class="form-select" name="taroloVan" data-toggle-target="taroloExtra">
+                                <option value="nem">Nem</option>
+                                <option value="igen">Igen</option>
+                                <option value="talan">Talán</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="taroloExtra" class="conditional-block" hidden>
+                        <div class="form-block">
+                            <label class="form-label">Tároló típusa</label>
+                            <div class="dropdown mb-0">
+                                <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                    Tároló kiválasztása
+                                </button>
+                                <div class="dropdown-menu p-3 w-100">
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="tar1" name="taroloTipus" value="fa"><label class="form-check-label" for="tar1">Fa</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="tar2" name="taroloTipus" value="fem"><label class="form-check-label" for="tar2">Fém</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="tar3" name="taroloTipus" value="tegla"><label class="form-check-label" for="tar3">Tégla</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="tar4" name="taroloTipus" value="osszeszerelheto"><label class="form-check-label" for="tar4">Összeszerelhető</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="tar5" name="taroloTipus" value="konnyuszerkezetes"><label class="form-check-label" for="tar5">Könnyűszerkezetes</label></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-3"><label class="form-label" for="hossz">Hossz (m)</label><input id="hossz" type="number" min="0" class="form-control" name="hossz"></div>
+                            <div class="col-md-3"><label class="form-label" for="szelesseg">Szélesség (m)</label><input id="szelesseg" type="number" min="0" class="form-control" name="szelesseg"></div>
+                            <div class="col-md-3"><label class="form-label" for="magassag">Magasság (m)</label><input id="magassag" type="number" min="0" class="form-control" name="magassag"></div>
+                            <div class="col-md-3"><label class="form-label" for="terulet">Terület (m²)</label><input id="terulet" type="number" min="0" class="form-control" name="terulet"></div>
+                        </div>
+
+                        <div class="form-block">
+                            <label class="form-label">Alap típusa</label>
+                            <div class="dropdown mb-0">
+                                <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                    Alaptípus kiválasztása
+                                </button>
+                                <div class="dropdown-menu p-3 w-100">
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="alap1" name="alap" value="beton"><label class="form-check-label" for="alap1">Beton</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="alap2" name="alap" value="terko"><label class="form-check-label" for="alap2">Térkő</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="alap3" name="alap" value="zuzalek"><label class="form-check-label" for="alap3">Zúzalék</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="alap4" name="alap" value="nincs"><label class="form-check-label" for="alap4">Alap nélkül</label></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-block">
+                            <label class="form-label" for="taroloMegjegyzes">Tároló megjegyzés</label>
+                            <textarea id="taroloMegjegyzes" class="form-control" name="taroloMegjegyzes" rows="4" placeholder="Például: kerékpár, szerszámok, gépek tárolása"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label" for="fenntartasiMegjegyzes">Fenntartási megjegyzés</label>
+                        <textarea id="fenntartasiMegjegyzes" class="form-control" name="fenntartasiMegjegyzes" rows="4" placeholder="Például: kevés idő jut gondozásra, fontos az automatizálás"></textarea>
+                    </div>
+
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
+                        <button type="button" class="btn btn-primary next-btn">Tovább</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-step">
+                <div class="step-card">
+                    <div class="step-heading">
+                        <span class="step-overline">7. lépés</span>
+                        <h3>Füvesítés</h3>
+                        <p>A zöldfelületek kialakításához megadjuk a méreteket és a kívánt munkafolyamatokat.</p>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4"><label class="form-label" for="fuHossz">Hossz (m)</label><input id="fuHossz" type="number" min="0" class="form-control" name="fuHossz"></div>
+                        <div class="col-md-4"><label class="form-label" for="fuSzelesseg">Szélesség (m)</label><input id="fuSzelesseg" type="number" min="0" class="form-control" name="fuSzelesseg"></div>
+                        <div class="col-md-4"><label class="form-label" for="fuTerulet">Terület (m²)</label><input id="fuTerulet" type="number" min="0" class="form-control" name="fuTerulet"></div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label">Füvesítés típusa</label>
+                        <div class="dropdown mb-0">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                Füvesítési megoldások
+                            </button>
+                            <div class="dropdown-menu p-3 w-100">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fu1" name="fuTipus" value="fumag"><label class="form-check-label" for="fu1">Fűmagvetés</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fu2" name="fuTipus" value="gyep"><label class="form-check-label" for="fu2">Gyepszőnyeg</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fu3" name="fuTipus" value="aljnovenyzet"><label class="form-check-label" for="fu3">Aljnövényzet geotextillel</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fu4" name="fuTipus" value="gyomirtas"><label class="form-check-label" for="fu4">Gyomirtás</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label">Füvesítési munkák</label>
+                        <div class="dropdown mb-0">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                Munkafázisok kiválasztása
+                            </button>
+                            <div class="dropdown-menu p-3 w-100">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fm1" name="fuMunka" value="gyomirtas"><label class="form-check-label" for="fm1">Gyomirtás</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fm2" name="fuMunka" value="felso-maras"><label class="form-check-label" for="fm2">Felsőmarás (2 cm)</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fm3" name="fuMunka" value="rotalas"><label class="form-check-label" for="fm3">Rotálás</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fm4" name="fuMunka" value="tragya"><label class="form-check-label" for="fm4">Talajjavítás trágyával</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fm5" name="fuMunka" value="komposzt"><label class="form-check-label" for="fm5">Talajjavítás komposzttal</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fm6" name="fuMunka" value="talajcsere"><label class="form-check-label" for="fm6">Talajcsere</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fm7" name="fuMunka" value="durva-geppel"><label class="form-check-label" for="fm7">Durva tereprendezés géppel</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fm8" name="fuMunka" value="durva-kezzel"><label class="form-check-label" for="fm8">Durva tereprendezés kézzel</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fm9" name="fuMunka" value="finom-vas"><label class="form-check-label" for="fm9">Finom tereprendezés szintezővassal</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fm10" name="fuMunka" value="finom-vizmertek"><label class="form-check-label" for="fm10">Finom tereprendezés vízmértékkel</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fm11" name="fuMunka" value="talajcsere-atcsoportositassal"><label class="form-check-label" for="fm11">Talajcsere átcsoportosítással</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fm12" name="fuMunka" value="talajcsere-elszallitassal"><label class="form-check-label" for="fm12">Talajcsere földelszállítással</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label" for="fuMegjegyzes">Megjegyzés</label>
+                        <textarea id="fuMegjegyzes" class="form-control" name="fuMegjegyzes" rows="4" placeholder="Bármilyen további füvesítési vagy talajelőkészítési információ"></textarea>
+                    </div>
+
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
+                        <button type="button" class="btn btn-primary next-btn">Tovább</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-step">
+                <div class="step-card">
+                    <div class="step-heading">
+                        <span class="step-overline">8. lépés</span>
+                        <h3>Növényzet</h3>
+                        <p>A beültetések típusát, karakterét és a kedvelt növényeket is itt tudod összefoglalni.</p>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label" for="faDb">Fa darabszám</label>
+                            <input id="faDb" type="number" min="0" class="form-control" name="faDb">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="faTeruletHossz">Faültetés hossza (m)</label>
+                            <input id="faTeruletHossz" type="number" min="0" class="form-control" name="faTeruletHossz">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="faTeruletSzelesseg">Faültetés szélessége (m)</label>
+                            <input id="faTeruletSzelesseg" type="number" min="0" class="form-control" name="faTeruletSzelesseg">
+                        </div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label">Fa jellemzők</label>
+                        <div class="dropdown mb-0">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                Fa jellemzők kiválasztása
+                            </button>
+                            <div class="dropdown-menu p-3 w-100">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fa1" name="faJellemzo" value="orokzold"><label class="form-check-label" for="fa1">Örökzöld</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fa2" name="faJellemzo" value="napos"><label class="form-check-label" for="fa2">Napos</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fa3" name="faJellemzo" value="arnyekos"><label class="form-check-label" for="fa3">Árnyékos</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fa4" name="faJellemzo" value="felarnyekos"><label class="form-check-label" for="fa4">Félárnyékos</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fa5" name="faJellemzo" value="homogen"><label class="form-check-label" for="fa5">Homogén</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="fa6" name="faJellemzo" value="tobbfajta"><label class="form-check-label" for="fa6">Több fajta</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label">Talajtakarás</label>
+                        <div class="dropdown mb-0">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                Talajtakaró elemek
+                            </button>
+                            <div class="dropdown-menu p-3 w-100">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="takar1" name="talajtakaro" value="geotextil"><label class="form-check-label" for="takar1">Geotextília</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="takar2" name="talajtakaro" value="fenyokereg"><label class="form-check-label" for="takar2">Fenyőkéreg</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="takar3" name="talajtakaro" value="faapritek"><label class="form-check-label" for="takar3">Faapríték</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="takar4" name="talajtakaro" value="diszkavics"><label class="form-check-label" for="takar4">Díszkavics</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="takar5" name="talajtakaro" value="murva"><label class="form-check-label" for="takar5">Murva vagy andezit</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="takar6" name="talajtakaro" value="karton"><label class="form-check-label" for="takar6">Karton</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="takar7" name="talajtakaro" value="talajcsere"><label class="form-check-label" for="takar7">Talajcsere</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="takar8" name="talajtakaro" value="talajjavitas"><label class="form-check-label" for="takar8">Talajjavítás</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="takar9" name="talajtakaro" value="szegelybeton"><label class="form-check-label" for="takar9">Szegély betonba</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="takar10" name="talajtakaro" value="szegely-szarazon"><label class="form-check-label" for="takar10">Szegély szárazon</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4"><label class="form-label" for="sovenyHossz">Sövény hossza (m)</label><input id="sovenyHossz" type="number" min="0" class="form-control" name="sovenyHossz"></div>
+                        <div class="col-md-4"><label class="form-label" for="sovenyTotav">Tőtáv (m)</label><input id="sovenyTotav" type="number" min="0" class="form-control" name="sovenyTotav"></div>
+                        <div class="col-md-4"><label class="form-label" for="sovenySortav">Sortáv (m)</label><input id="sovenySortav" type="number" min="0" class="form-control" name="sovenySortav"></div>
+                        <div class="col-md-4"><label class="form-label" for="agyasDb">Ágyások száma</label><input id="agyasDb" type="number" min="0" class="form-control" name="agyasDb"></div>
+                        <div class="col-md-8"><label class="form-label" for="agyasMeret">Ágyás mérete</label><input id="agyasMeret" type="text" class="form-control" name="agyasMeret" placeholder="Például: 3 x 2 m, íves kialakítás"></div>
+                    </div>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-4"><label class="form-label" for="novenyekSzama">Növények száma</label><input id="novenyekSzama" type="number" min="0" class="form-control" name="novenyekSzama"></div>
+                        <div class="col-md-4"><label class="form-label" for="totav">Tőtáv (m)</label><input id="totav" type="number" min="0" class="form-control" name="totav"></div>
+                        <div class="col-md-4"><label class="form-label" for="sortav">Sortáv (m)</label><input id="sortav" type="number" min="0" class="form-control" name="sortav"></div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label" for="kedveltNovenyek">Kedvelt növények</label>
+                        <textarea id="kedveltNovenyek" class="form-control" name="kedveltNovenyek" rows="4" placeholder="Például: levendula, díszfüvek, örökzöldek, japán juhar"></textarea>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label" for="novenyzetMegjegyzes">Növényzeti megjegyzés</label>
+                        <textarea id="novenyzetMegjegyzes" class="form-control" name="novenyzetMegjegyzes" rows="4" placeholder="Például: sok örökzöldet szeretne, alacsony gondozási igény fontos"></textarea>
+                    </div>
+
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
+                        <button type="button" class="btn btn-primary next-btn">Tovább</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-step">
+                <div class="step-card">
+                    <div class="step-heading">
+                        <span class="step-overline">9. lépés</span>
+                        <h3>Anyagmozgatás és gépek</h3>
+                        <p>A kivitelezés technikai oldalát és a nagyobb munkagépek szükségességét itt tudjuk előre látni.</p>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label">Szükséges gépek</label>
+                        <div class="dropdown mb-0">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                Gépek kiválasztása
+                            </button>
+                            <div class="dropdown-menu p-3 w-100">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="gep1" name="gepek" value="bobcat"><label class="form-check-label" for="gep1">Bobcat</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="gep2" name="gepek" value="kisteher"><label class="form-check-label" for="gep2">3,5 tonnás billencs kisteherautó</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="gep3" name="gepek" value="7-5t"><label class="form-check-label" for="gep3">7,5 tonnás billencs</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="gep4" name="gepek" value="12t"><label class="form-check-label" for="gep4">12 tonnás billencs</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="gep5" name="gepek" value="18t"><label class="form-check-label" for="gep5">18 tonnás billencs</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="gep6" name="gepek" value="26t"><label class="form-check-label" for="gep6">26 tonnás billencs</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="gep7" name="gepek" value="forgokotro"><label class="form-check-label" for="gep7">Forgó kotró</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="gep8" name="gepek" value="tuskomaro"><label class="form-check-label" for="gep8">Tuskómaró</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="gep9" name="gepek" value="agdaralo"><label class="form-check-label" for="gep9">Ágdaráló</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="egyebGepek">Egyéb gép vagy jármű</label>
+                            <input id="egyebGepek" type="text" class="form-control" name="egyebGepek" placeholder="Például: darus autó, mini kotró">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="bobcatTonna">Bobcat tömege (T)</label>
+                            <input id="bobcatTonna" type="number" min="0" class="form-control" name="bobcatTonna">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="forgoKotroTonna">Forgó kotró tömege (T)</label>
+                            <input id="forgoKotroTonna" type="number" min="0" class="form-control" name="forgoKotroTonna">
+                        </div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label">Anyagmozgatás módja</label>
+                        <div class="dropdown mb-0">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                Anyagmozgatási módok
+                            </button>
+                            <div class="dropdown-menu p-3 w-100">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="moz1" name="anyagMozgatas" value="geppel"><label class="form-check-label" for="moz1">Géppel</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="moz2" name="anyagMozgatas" value="talicskaval"><label class="form-check-label" for="moz2">Talicskával</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="moz3" name="anyagMozgatas" value="vodorrel"><label class="form-check-label" for="moz3">Vödörrel</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4"><label class="form-label" for="mozgatasiTavGeppel">Mozgatás géppel (m)</label><input id="mozgatasiTavGeppel" type="number" min="0" class="form-control" name="mozgatasiTavGeppel"></div>
+                        <div class="col-md-4"><label class="form-label" for="mozgatasiTavTalicska">Mozgatás talicskával (m)</label><input id="mozgatasiTavTalicska" type="number" min="0" class="form-control" name="mozgatasiTavTalicska"></div>
+                        <div class="col-md-4"><label class="form-label" for="mozgatasiTavVodor">Mozgatás vödörrel (m)</label><input id="mozgatasiTavVodor" type="number" min="0" class="form-control" name="mozgatasiTavVodor"></div>
+                        <div class="col-md-3"><label class="form-label" for="foldElszallitas">Föld elszállítás (m³)</label><input id="foldElszallitas" type="number" min="0" class="form-control" name="foldElszallitas"></div>
+                        <div class="col-md-3"><label class="form-label" for="termofold">Termőföld (m³)</label><input id="termofold" type="number" min="0" class="form-control" name="termofold"></div>
+                        <div class="col-md-3"><label class="form-label" for="komposzt">Komposzt (m³)</label><input id="komposzt" type="number" min="0" class="form-control" name="komposzt"></div>
+                        <div class="col-md-3"><label class="form-label" for="tragya">Marhatrágya (L)</label><input id="tragya" type="number" min="0" class="form-control" name="tragya"></div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label" for="anyagMozgatasMegjegyzes">Megjegyzés</label>
+                        <textarea id="anyagMozgatasMegjegyzes" class="form-control" name="anyagMozgatasMegjegyzes" rows="4" placeholder="Például: szűk bejárat, hosszú hátsó kert, korlátozott gépi bejutás"></textarea>
+                    </div>
+
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
+                        <button type="button" class="btn btn-primary next-btn">Tovább</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-step">
+                <div class="step-card">
+                    <div class="step-heading">
+                        <span class="step-overline">10. lépés</span>
+                        <h3>Véglegesítés</h3>
+                        <p>Utolsó ellenőrzés előtt még megadhatsz plusz dokumentumokat vagy rövid összefoglalót a projektről.</p>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label">Átadott dokumentumok</label>
+                        <div class="dropdown mb-0">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                Dokumentumok kiválasztása
+                            </button>
+                            <div class="dropdown-menu p-3 w-100">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="d1" name="dokumentumok" value="tervrajz"><label class="form-check-label" for="d1">Tervrajz</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="d2" name="dokumentumok" value="geodeziai-felmeres"><label class="form-check-label" for="d2">Geodéziai felmérés</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="d3" name="dokumentumok" value="helyszinrajz"><label class="form-check-label" for="d3">Helyszínrajz</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="d4" name="dokumentumok" value="epitesi-engedely"><label class="form-check-label" for="d4">Építési engedély</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="d5" name="dokumentumok" value="latvanyterv"><label class="form-check-label" for="d5">Látványterv</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="d6" name="dokumentumok" value="fotok"><label class="form-check-label" for="d6">Fotók</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="d7" name="dokumentumok" value="inspiracios-kepek"><label class="form-check-label" for="d7">Inspirációs képek</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="d8" name="dokumentumok" value="kivitelezesi-terv"><label class="form-check-label" for="d8">Kivitelezési terv</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="egyebDokumentum">Egyéb dokumentum</label>
+                            <input id="egyebDokumentum" type="text" class="form-control" name="egyebDokumentum" placeholder="Például: közműterv, talajmechanika">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="projektCel">A megrendelő fő célja</label>
+                            <input id="projektCel" type="text" class="form-control" name="projektCel" placeholder="Például: családi pihenőkert kialakítása">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="foProblema">Legfontosabb megoldandó probléma</label>
+                            <input id="foProblema" type="text" class="form-control" name="foProblema" placeholder="Például: árnyéktalan kert, kevés privát zóna">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="megvalositasModja">Megvalósítás módja</label>
+                            <input id="megvalositasModja" type="text" class="form-control" name="megvalositasModja" placeholder="Például: teljes kivitelezés vagy részben önerő">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="tervezettKezdes">Tervezett kezdés</label>
+                            <input id="tervezettKezdes" type="text" class="form-control" name="tervezettKezdes" placeholder="Például: 2026 ősz">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="tervezettBefejezes">Tervezett befejezés</label>
+                            <input id="tervezettBefejezes" type="text" class="form-control" name="tervezettBefejezes" placeholder="Például: 2027 tavasz">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="heszEllenorzes">HÉSZ és előírások ellenőrzése</label>
+                            <select id="heszEllenorzes" class="form-select" name="heszEllenorzes">
+                                <option value="">Válassz</option>
+                                <option value="keri">Megrendelő kéri az ellenőrzést</option>
+                                <option value="nem-keri">Megrendelő nem kéri, vállalja a megfelelőséget</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="megrendeloAlairasa">Megrendelő aláírása</label>
+                            <input id="megrendeloAlairasa" type="text" class="form-control" name="megrendeloAlairasa" placeholder="Név vagy digitális aláírás megnevezése">
+                        </div>
+                    </div>
+
+                    <div class="form-block">
+                        <label class="form-label" for="egyebMegjegyzes">Egyéb megjegyzés</label>
+                        <textarea id="egyebMegjegyzes" class="form-control" name="egyebMegjegyzes" rows="4" placeholder="Bármi, amiről még nem volt szó, de fontos lehet a tervezéshez"></textarea>
+                    </div>
+
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-secondary prev-btn">Vissza</button>
+                        <button type="button" id="submitBtn" class="btn btn-success">Küldés</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+</main>
+
+<div id="successModal" class="success-modal" aria-hidden="true">
     <div class="success-box">
-        <h2>Köszönjük! 🌿</h2>
+        <p class="eyebrow">Sikeres beküldés</p>
+        <h2>Köszönjük a kitöltést</h2>
         <p>Sikeresen elküldted a felmérést.</p>
-        <p>Hamarosan felvesszük veled a kapcsolatot.</p>
-
-        <button onclick="closeModal()" class="btn btn-success mt-3">
-            Rendben
-        </button>
+        <p>Hamarosan felvesszük veled a kapcsolatot emailben.</p>
+        <button type="button" onclick="closeModal()" class="btn btn-success mt-3">Rendben</button>
     </div>
 </div>
 
-<footer class="bg-dark text-white text-center p-3">
-<p>+36706349630 | info@diszkertek.hu</p>
-<p>www.diszkertek.hu</p>
-<p>Copyright © 2026 by Malárik Tamás E.V. Minden jog fenntartva.</p>
+<footer class="site-footer">
+    <div class="container">
+        <p>+36 70 634 9630 | info@diszkertek.hu</p>
+        <p>www.diszkertek.hu</p>
+        <p>Copyright © 2026 by Malárik Tamás E.V. Minden jog fenntartva.</p>
+    </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-(function(){
-emailjs.init("qpVyaXcVPNpkX8yHa");
+(function () {
+    emailjs.init("qpVyaXcVPNpkX8yHa");
 })();
 </script>
-
 <script src="./js/app.js"></script>
-
 </body>
 </html>
