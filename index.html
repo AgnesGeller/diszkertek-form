@@ -25,18 +25,36 @@
 
 <body>
 <header class="hero">
-    <img src="./assets/hero1.jpg" class="hero-img" alt="Díszkertek kertépítési inspiráció">
-    <div class="hero-overlay"></div>
-    <div class="hero-content container">
-        <p class="hero-kicker">Díszkertek Kertépítés</p>
-        <h1>Helyszíni felmérő kérdőív</h1>
-        <p class="hero-lead">
-            Egy átgondolt, gördülékeny felmérés segít abban, hogy a kerttervezés már az első
-            beszélgetéstől pontosabb, élvezetesebb és gyorsabb legyen.
-        </p>
-        <button type="button" onclick="startForm()" class="btn btn-success btn-lg hero-button">
-            Kezdjük el
-        </button>
+    <div class="hero-backdrop"></div>
+    <div class="container hero-layout">
+        <div class="hero-copy">
+            <p class="hero-kicker">Díszkertek Kertépítés</p>
+            <h1>Helyszíni felmérő a gyorsabb és pontosabb ajánlatkészítéshez</h1>
+            <p class="hero-lead">
+                Kérjük, add meg a kerteddel és elképzeléseiddel kapcsolatos legfontosabb adatokat.
+                A kitöltött információk segítenek abban, hogy a felmérés, a tervezés és az
+                ajánlatadás gördülékenyebben haladjon.
+            </p>
+
+            <div class="hero-highlights">
+                <span class="hero-pill">átlátható lépések</span>
+                <span class="hero-pill">részletes igényfelmérés</span>
+                <span class="hero-pill">kertépítési projektekhez</span>
+            </div>
+
+            <div class="hero-actions">
+                <button type="button" onclick="startForm()" class="btn btn-success btn-lg hero-button">
+                    Kezdjük el
+                </button>
+                <p class="hero-note">A kérdőív kitöltése csak néhány perc, de sokat gyorsít az előkészítésen.</p>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="hero-image-frame">
+                <img src="./assets/hero1.jpg" class="hero-img" alt="Díszkertek kertépítési inspiráció">
+            </div>
+        </div>
     </div>
 </header>
 
