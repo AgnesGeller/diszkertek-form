@@ -27,6 +27,17 @@ const SERVICES = [
                 ]
             },
             {
+                id: "waterPressure",
+                type: "select",
+                label: "Víznyomás / vízhozam ismertsége",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "ismert-jo", label: "Ismert és megfelelő" },
+                    { value: "ismert-kerdeses", label: "Ismert, de kérdéses" },
+                    { value: "nem-ismert", label: "Még nem ismert" }
+                ]
+            },
+            {
                 id: "automation",
                 type: "choice",
                 label: "Vezérlés",
@@ -38,7 +49,33 @@ const SERVICES = [
                     { value: "okos", label: "Okos vezérlés", note: "Applikáció és időjárás alapú vezérlés" }
                 ]
             },
+            {
+                id: "zoneTypes",
+                type: "checklist",
+                label: "Milyen zónák lesznek?",
+                full: true,
+                options: [
+                    { value: "gyep", label: "Gyepzóna" },
+                    { value: "agyas", label: "Ágyászóna" },
+                    { value: "soveny", label: "Sövényzóna" },
+                    { value: "edeny", label: "Edényes növények" },
+                    { value: "kulonkor", label: "Külön érzékeny kör" }
+                ]
+            },
             { id: "drip", type: "toggle", label: "Csepegtető köröket is szeretnék az ágyásokhoz", full: true },
+            { id: "existingSystem", type: "toggle", label: "Meglévő öntözőrendszerhez kell csatlakozni vagy azt kell átalakítani", full: true },
+            { id: "trenchLength", type: "number", label: "Becsült csőárok hossza", suffix: "fm", min: 0, step: 1, placeholder: "pl. 70" },
+            {
+                id: "terrainDifficulty",
+                type: "select",
+                label: "Terepi nehézség",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "sima", label: "Sík, jól szervezhető" },
+                    { value: "tagolt", label: "Tagolt, több szintű" },
+                    { value: "szuk", label: "Szűk, nehezebben megközelíthető" }
+                ]
+            },
             { id: "rainSensor", type: "toggle", label: "Esőérzékelőt is kérek", showWhen: { field: "automation", oneOf: ["alap", "okos"] }, full: true },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Meglévő rendszer, kiállások, külön igények..." }
         ],
@@ -54,14 +91,37 @@ const SERVICES = [
                 kut: 90000,
                 ciszterna: 65000
             });
+            const pressureFee = lookupValue(values.waterPressure, {
+                "ismert-jo": 0,
+                "ismert-kerdeses": 25000,
+                "nem-ismert": 45000
+            });
             const automationFee = lookupValue(values.automation, {
                 nincs: 0,
                 alap: 38000,
                 okos: 76000
             });
+            const zoneTypeCount = Array.isArray(values.zoneTypes) ? values.zoneTypes.length : 0;
             const dripFee = isChecked(values.drip) ? 48000 : 0;
+            const existingFee = isChecked(values.existingSystem) ? 95000 : 0;
+            const trenchFee = numberValue(values.trenchLength) * 1800;
+            const terrainFee = lookupValue(values.terrainDifficulty, {
+                sima: 0,
+                tagolt: 55000,
+                szuk: 95000
+            });
             const rainFee = isChecked(values.rainSensor) ? 28000 : 0;
-            const raw = area * 2300 + zones * 16000 + sourceFee + automationFee + dripFee + rainFee;
+            const raw = area * 2300
+                + zones * 16000
+                + sourceFee
+                + pressureFee
+                + automationFee
+                + zoneTypeCount * 22000
+                + dripFee
+                + existingFee
+                + trenchFee
+                + terrainFee
+                + rainFee;
             return withStartingPrice(320000, raw);
         }
     },
@@ -74,6 +134,7 @@ const SERVICES = [
         note: "A burkolat végső ára a rétegrendtől, a választott terméktől és az alépítménytől is függ.",
         fields: [
             { id: "area", type: "number", label: "Burkolandó felület", suffix: "m²", min: 0, step: 1, placeholder: "pl. 85" },
+            { id: "thickness", type: "number", label: "Szerkezeti rétegvastagság", suffix: "cm", min: 0, step: 1, placeholder: "pl. 25" },
             {
                 id: "usage",
                 type: "select",
@@ -97,8 +158,41 @@ const SERVICES = [
                     { value: "termesko", label: "Terméskő vagy nagylap", note: "Magasabb anyagköltség" }
                 ]
             },
+            {
+                id: "subbase",
+                type: "select",
+                label: "Alépítmény állapota",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "uj", label: "Teljesen új alépítmény kell" },
+                    { value: "reszben", label: "Részben megtartható" },
+                    { value: "ismeretlen", label: "Még nem ismert" }
+                ]
+            },
+            {
+                id: "edgeCondition",
+                type: "choice",
+                label: "Csatlakozó szegély és befogás",
+                full: true,
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "egyszeru", label: "Egyszerű lezárás" },
+                    { value: "reszletes", label: "Több csatlakozás és irányváltás" },
+                    { value: "komplex", label: "Komplex befogás, szintek és ívek" }
+                ]
+            },
             { id: "edging", type: "toggle", label: "Szegélyezést is kérek", full: true },
             { id: "demolition", type: "toggle", label: "Meglévő burkolat bontása is szükséges", full: true },
+            {
+                id: "demolitionThickness",
+                type: "number",
+                label: "Bontandó szerkezet vastagsága",
+                suffix: "cm",
+                min: 0,
+                step: 1,
+                showWhen: { field: "demolition", equals: true },
+                placeholder: "pl. 18"
+            },
             { id: "drainage", type: "toggle", label: "Vízelvezetést is kérek a burkolathoz", full: true },
             {
                 id: "drainageType",
@@ -112,6 +206,19 @@ const SERVICES = [
                     { value: "komplex", label: "Komplex lejtés- és vízelvezetés" }
                 ]
             },
+            { id: "levelDifference", type: "number", label: "Szintkülönbség", suffix: "cm", min: 0, step: 1, placeholder: "pl. 20" },
+            {
+                id: "accessMode",
+                type: "select",
+                label: "Kivitelezési hozzáférés",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "gepi", label: "Jó gépi hozzáférés" },
+                    { value: "vegyes", label: "Vegyes hozzáférés" },
+                    { value: "kezi", label: "Főleg kézi kihordás" }
+                ]
+            },
+            { id: "carryDistance", type: "number", label: "Anyagmozgatási távolság", suffix: "m", min: 0, step: 1, placeholder: "pl. 18" },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Burkolattípus, meglévő szintkülönbség, képek..." }
         ],
         shopProducts: [
@@ -125,17 +232,48 @@ const SERVICES = [
                 premium: 36000,
                 termesko: 48000
             });
+            const thicknessFee = area * numberValue(values.thickness) * 65;
             const usageAdd = lookupValue(values.usage, {
                 setany: 0,
                 terasz: 2500,
                 beallo: 6500
             });
+            const subbaseFee = lookupValue(values.subbase, {
+                uj: 145000,
+                reszben: 65000,
+                ismeretlen: 85000
+            });
+            const edgeFee = lookupValue(values.edgeCondition, {
+                egyszeru: 0,
+                reszletes: 45000,
+                komplex: 92000
+            });
             const edgingFee = isChecked(values.edging) ? 65000 : 0;
-            const demolitionFee = isChecked(values.demolition) ? 115000 : 0;
+            const demolitionFee = isChecked(values.demolition) ? 115000 + numberValue(values.demolitionThickness) * area * 12 : 0;
             const drainageFee = isChecked(values.drainage)
                 ? lookupValue(values.drainageType, { pont: 85000, folyoka: 125000, komplex: 185000 }, 85000)
                 : 0;
-            const raw = area * (baseRate + usageAdd) + edgingFee + demolitionFee + drainageFee;
+            const levelFee = numberValue(values.levelDifference) * area * 9;
+            const accessFee = lookupValue(values.accessMode, {
+                gepi: 0,
+                vegyes: 45000,
+                kezi: 95000
+            });
+            const carryFee = numberValue(values.carryDistance) * lookupValue(values.accessMode, {
+                gepi: 60,
+                vegyes: 140,
+                kezi: 260
+            }, 60);
+            const raw = area * (baseRate + usageAdd)
+                + thicknessFee
+                + subbaseFee
+                + edgeFee
+                + edgingFee
+                + demolitionFee
+                + drainageFee
+                + levelFee
+                + accessFee
+                + carryFee;
             return withStartingPrice(220000, raw);
         }
     },
@@ -285,8 +423,68 @@ const SERVICES = [
                     { value: "suru", label: "Sűrű, gyorsabb összezárás" }
                 ]
             },
+            {
+                id: "sunExposure",
+                type: "select",
+                label: "Fekvés",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "napos", label: "Napos" },
+                    { value: "felarnyek", label: "Félárnyékos" },
+                    { value: "arnyek", label: "Árnyékos" }
+                ]
+            },
+            {
+                id: "soilState",
+                type: "select",
+                label: "Talajállapot",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "normal", label: "Normál kerti talaj" },
+                    { value: "kimerult", label: "Kimerült / gyenge talaj" },
+                    { value: "sittes", label: "Sittes / építési maradványos" },
+                    { value: "agyagos", label: "Agyagos, kötött" }
+                ]
+            },
+            { id: "soilReplacement", type: "toggle", label: "Talajcserét is kérek", full: true },
+            {
+                id: "soilReplacementQty",
+                type: "number",
+                label: "Talajcsere mennyisége",
+                suffix: "m³",
+                min: 0,
+                step: 0.5,
+                showWhen: { field: "soilReplacement", equals: true },
+                placeholder: "pl. 6"
+            },
             { id: "irrigationPrep", type: "toggle", label: "Öntözési előkészítést is kérek", full: true },
             { id: "mulch", type: "toggle", label: "Talajtakarást is kérek", full: true },
+            {
+                id: "mulchType",
+                type: "select",
+                label: "Talajtakarás típusa",
+                showWhen: { field: "mulch", equals: true },
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "fakereg", label: "Fakéreg" },
+                    { value: "dekor", label: "Dekorkavics" },
+                    { value: "vegyes", label: "Vegyes takarás" }
+                ]
+            },
+            { id: "edging", type: "toggle", label: "Ágyásszegély is szükséges", full: true },
+            { id: "existingPlants", type: "toggle", label: "Meglévő növényállományhoz kell illeszteni", full: true },
+            {
+                id: "maintenanceLevel",
+                type: "choice",
+                label: "Fenntartási elvárás",
+                full: true,
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "alacsony", label: "Alacsony fenntartás" },
+                    { value: "kozepes", label: "Közepes fenntartás" },
+                    { value: "intenziv", label: "Intenzív, gazdag ágyás" }
+                ]
+            },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Színvilág, kedvelt növények, meglévő állomány..." }
         ],
         calculate(values) {
@@ -301,9 +499,35 @@ const SERVICES = [
                 kozepes: 2200,
                 suru: 5200
             });
+            const sunAdd = lookupValue(values.sunExposure, {
+                napos: 0,
+                felarnyek: 600,
+                arnyek: 1200
+            });
+            const soilAdd = lookupValue(values.soilState, {
+                normal: 0,
+                kimerult: 1800,
+                sittes: 3200,
+                agyagos: 1400
+            });
+            const soilReplacementFee = isChecked(values.soilReplacement) ? numberValue(values.soilReplacementQty) * 18000 : 0;
             const irrigationFee = isChecked(values.irrigationPrep) ? 38000 : 0;
-            const mulchFee = isChecked(values.mulch) ? area * 1200 : 0;
-            const raw = area * (styleRate + densityAdd) + irrigationFee + mulchFee;
+            const mulchFee = isChecked(values.mulch)
+                ? area * lookupValue(values.mulchType, { fakereg: 1200, dekor: 2100, vegyes: 1700 }, 1200)
+                : 0;
+            const edgingFee = isChecked(values.edging) ? 55000 : 0;
+            const existingFee = isChecked(values.existingPlants) ? 35000 : 0;
+            const maintenanceAdd = lookupValue(values.maintenanceLevel, {
+                alacsony: 0,
+                kozepes: 1200,
+                intenziv: 2800
+            });
+            const raw = area * (styleRate + densityAdd + sunAdd + soilAdd + maintenanceAdd)
+                + soilReplacementFee
+                + irrigationFee
+                + mulchFee
+                + edgingFee
+                + existingFee;
             return withStartingPrice(160000, raw);
         }
     },
@@ -339,7 +563,33 @@ const SERVICES = [
                     { value: "magas", label: "Erős intimitás" }
                 ]
             },
+            {
+                id: "plantType",
+                type: "select",
+                label: "Növény jellege",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "orokzold", label: "Örökzöld" },
+                    { value: "lombhullato", label: "Lombhullató" },
+                    { value: "vegyes", label: "Vegyes" }
+                ]
+            },
+            { id: "finalHeight", type: "number", label: "Elvárt végmagasság", suffix: "m", min: 0, step: 0.1, placeholder: "pl. 2.2" },
+            {
+                id: "plantSpacing",
+                type: "select",
+                label: "Ültetési sűrűség",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "laza", label: "Lazább" },
+                    { value: "normal", label: "Normál" },
+                    { value: "suru", label: "Sűrűbb, gyors takaráshoz" }
+                ]
+            },
             { id: "doubleRow", type: "toggle", label: "Kétsoros ültetést is vállalhatunk", showWhen: { field: "privacy", equals: "magas" }, full: true },
+            { id: "soilReplacement", type: "toggle", label: "Talajcsere vagy javítás is szükséges", full: true },
+            { id: "rootBarrier", type: "toggle", label: "Gyökérterelő vagy védősáv is szükséges", full: true },
+            { id: "existingRemoval", type: "toggle", label: "Meglévő sövény vagy növényzet bontása is kell", full: true },
             { id: "drip", type: "toggle", label: "Csepegtető öntözést is kérek a sövényhez", full: true },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Örökzöld vagy lombhullató, milyen magasság, színek..." }
         ],
@@ -355,9 +605,28 @@ const SERVICES = [
                 kozepes: 2200,
                 magas: 4600
             });
+            const plantTypeAdd = lookupValue(values.plantType, {
+                orokzold: 3200,
+                lombhullato: 0,
+                vegyes: 1800
+            });
+            const heightAdd = numberValue(values.finalHeight) * 1800;
+            const spacingAdd = lookupValue(values.plantSpacing, {
+                laza: 0,
+                normal: 1200,
+                suru: 2800
+            });
             const doubleRowFee = isChecked(values.doubleRow) ? length * 7000 : 0;
+            const soilFee = isChecked(values.soilReplacement) ? length * 3500 : 0;
+            const barrierFee = isChecked(values.rootBarrier) ? length * 2600 : 0;
+            const removalFee = isChecked(values.existingRemoval) ? length * 2200 : 0;
             const dripFee = isChecked(values.drip) ? 42000 : 0;
-            const raw = length * (rate + privacyAdd) + doubleRowFee + dripFee;
+            const raw = length * (rate + privacyAdd + plantTypeAdd + heightAdd + spacingAdd)
+                + doubleRowFee
+                + soilFee
+                + barrierFee
+                + removalFee
+                + dripFee;
             return withStartingPrice(140000, raw);
         }
     },
@@ -382,9 +651,35 @@ const SERVICES = [
                     { value: "nagy", label: "Nagyobb, karakteresebb fa" }
                 ]
             },
+            {
+                id: "purpose",
+                type: "select",
+                label: "Telepítés célja",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "arnyek", label: "Árnyékadás" },
+                    { value: "disz", label: "Díszérték" },
+                    { value: "takaras", label: "Takarás / térhatárolás" },
+                    { value: "fasor", label: "Fasor vagy ismétlődő ültetés" }
+                ]
+            },
+            { id: "pitVolume", type: "number", label: "Ültetőgödör összes mennyisége", suffix: "m³", min: 0, step: 0.5, placeholder: "pl. 3" },
             { id: "anchoring", type: "toggle", label: "Karózást és rögzítést is kérek", full: true },
             { id: "wateringBag", type: "toggle", label: "Öntözőzsákot is szeretnék", full: true },
             { id: "soilImprovement", type: "toggle", label: "Talajjavítást is kérek", full: true },
+            { id: "rootBarrier", type: "toggle", label: "Gyökérterelő is szükséges", full: true },
+            { id: "existingStump", type: "toggle", label: "Régi tuskó vagy gyökér eltávolítása is kell", full: true },
+            {
+                id: "accessMode",
+                type: "select",
+                label: "Beemelés és hozzáférés",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "gepi", label: "Jó gépi hozzáférés" },
+                    { value: "vegyes", label: "Vegyes hozzáférés" },
+                    { value: "kezi", label: "Főleg kézi mozgatás" }
+                ]
+            },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Fafaj, meglévő közművek, ültetési hely..." }
         ],
         calculate(values) {
@@ -394,10 +689,31 @@ const SERVICES = [
                 kozepes: 135000,
                 nagy: 290000
             });
+            const purposeAdd = lookupValue(values.purpose, {
+                arnyek: 12000,
+                disz: 0,
+                takaras: 18000,
+                fasor: 24000
+            });
+            const pitFee = numberValue(values.pitVolume) * 18000;
             const anchoringFee = isChecked(values.anchoring) ? count * 12000 : 0;
             const wateringFee = isChecked(values.wateringBag) ? count * 9000 : 0;
             const soilFee = isChecked(values.soilImprovement) ? count * 20000 : 0;
-            const raw = count * unit + anchoringFee + wateringFee + soilFee;
+            const rootBarrierFee = isChecked(values.rootBarrier) ? count * 18000 : 0;
+            const stumpFee = isChecked(values.existingStump) ? count * 25000 : 0;
+            const accessFee = lookupValue(values.accessMode, {
+                gepi: 0,
+                vegyes: 45000,
+                kezi: 90000
+            });
+            const raw = count * (unit + purposeAdd)
+                + pitFee
+                + anchoringFee
+                + wateringFee
+                + soilFee
+                + rootBarrierFee
+                + stumpFee
+                + accessFee;
             return withStartingPrice(95000, raw);
         }
     },
@@ -463,6 +779,19 @@ const SERVICES = [
                 ]
             },
             {
+                id: "currentState",
+                type: "choice",
+                label: "Jelenlegi állapot",
+                full: true,
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "nyers", label: "Nyers föld, füvesítés nélkül" },
+                    { value: "ritkas", label: "Hiányos / ritkás gyep" },
+                    { value: "gyomos", label: "Erősen gyomos terület" },
+                    { value: "epitesi", label: "Építkezés utáni nyers terep" }
+                ]
+            },
+            {
                 id: "soilPrep",
                 type: "select",
                 label: "Talajelőkészítés mértéke",
@@ -473,8 +802,64 @@ const SERVICES = [
                     { value: "komplex", label: "Komplex talajjavítás" }
                 ]
             },
+            {
+                id: "subsoil",
+                type: "select",
+                label: "Altalaj / talajállapot",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "normal", label: "Normál kerti talaj" },
+                    { value: "agyagos", label: "Agyagos, kötött" },
+                    { value: "sittes", label: "Sittes / törmelékes" },
+                    { value: "homokos", label: "Homokos, laza" }
+                ]
+            },
+            { id: "weedTreatment", type: "toggle", label: "Gyomirtás vagy gyommentesítés is szükséges", full: true },
+            { id: "roughGrading", type: "toggle", label: "Durva tereprendezés is szükséges", full: true },
             { id: "irrigationPrep", type: "toggle", label: "Öntözési előkészítést is kérek", full: true },
             { id: "levelling", type: "toggle", label: "Külön finom tereprendezés is szükséges", full: true },
+            { id: "topsoil", type: "toggle", label: "Termőföld pótlásra is szükség lesz", full: true },
+            {
+                id: "topsoilQty",
+                type: "number",
+                label: "Termőföld mennyiség",
+                suffix: "m³",
+                min: 0,
+                step: 0.5,
+                showWhen: { field: "topsoil", equals: true },
+                placeholder: "pl. 10"
+            },
+            {
+                id: "topsoilDepth",
+                type: "number",
+                label: "Tervezett termőréteg vastagsága",
+                suffix: "cm",
+                min: 0,
+                step: 1,
+                showWhen: { field: "topsoil", equals: true },
+                placeholder: "pl. 15"
+            },
+            {
+                id: "accessMode",
+                type: "select",
+                label: "Kivitelezési hozzáférés",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "gepi", label: "Jó gépi hozzáférés" },
+                    { value: "vegyes", label: "Vegyes, részben kézi kihordás" },
+                    { value: "kezi", label: "Főleg kézi kihordás" }
+                ]
+            },
+            {
+                id: "carryDistance",
+                type: "number",
+                label: "Anyagmozgatási távolság",
+                suffix: "m",
+                min: 0,
+                step: 1,
+                placeholder: "pl. 25"
+            },
+            { id: "aftercare", type: "toggle", label: "Utókezelés / első nyírás / beállítás is szükséges", full: true },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Meglévő talaj, használat, gyerekek, állatok..." }
         ],
         calculate(values) {
@@ -489,9 +874,45 @@ const SERVICES = [
                 kozepes: 900,
                 komplex: 1600
             });
+            const stateRate = lookupValue(values.currentState, {
+                nyers: 0,
+                ritkas: 250,
+                gyomos: 550,
+                epitesi: 850
+            });
+            const subsoilRate = lookupValue(values.subsoil, {
+                normal: 0,
+                agyagos: 320,
+                sittes: 780,
+                homokos: 180
+            });
+            const weedFee = isChecked(values.weedTreatment) ? area * 280 : 0;
+            const roughFee = isChecked(values.roughGrading) ? 85000 : 0;
             const irrigationFee = isChecked(values.irrigationPrep) ? 45000 : 0;
             const levellingFee = isChecked(values.levelling) ? 65000 : 0;
-            const raw = area * (typeRate + prepRate) + irrigationFee + levellingFee;
+            const topsoilFee = isChecked(values.topsoil) ? numberValue(values.topsoilQty) * 18000 : 0;
+            const topsoilDepthFee = isChecked(values.topsoil) ? numberValue(values.topsoilDepth) * area * 8 : 0;
+            const accessFee = lookupValue(values.accessMode, {
+                gepi: 0,
+                vegyes: 45000,
+                kezi: 95000
+            });
+            const carryFee = numberValue(values.carryDistance) * lookupValue(values.accessMode, {
+                gepi: 80,
+                vegyes: 180,
+                kezi: 320
+            }, 80);
+            const aftercareFee = isChecked(values.aftercare) ? 35000 : 0;
+            const raw = area * (typeRate + prepRate + stateRate + subsoilRate)
+                + weedFee
+                + roughFee
+                + irrigationFee
+                + levellingFee
+                + topsoilFee
+                + topsoilDepthFee
+                + accessFee
+                + carryFee
+                + aftercareFee;
             return withStartingPrice(135000, raw);
         }
     },
@@ -517,7 +938,21 @@ const SERVICES = [
                     { value: "vegyes", label: "Vegyes bontás" }
                 ]
             },
+            { id: "thickness", type: "number", label: "Bontandó szerkezet vastagsága", suffix: "cm", min: 0, step: 1, placeholder: "pl. 15" },
+            {
+                id: "wasteType",
+                type: "select",
+                label: "Hulladék jellege",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "zold", label: "Főleg zöldhulladék" },
+                    { value: "inert", label: "Inert sitt / beton / tégla" },
+                    { value: "vegyes", label: "Vegyes hulladék" }
+                ]
+            },
             { id: "debris", type: "toggle", label: "Elszállítással együtt kérem", full: true },
+            { id: "sorting", type: "toggle", label: "Anyagválogatás vagy külön rakodás is szükséges", full: true },
+            { id: "cutting", type: "toggle", label: "Darabolás vagy vágás is szükséges", full: true },
             { id: "manualAccess", type: "toggle", label: "Nehezen megközelíthető, kézi kihordás kell", full: true },
             {
                 id: "carryDistance",
@@ -529,6 +964,17 @@ const SERVICES = [
                 showWhen: { field: "manualAccess", equals: true },
                 placeholder: "pl. 25"
             },
+            {
+                id: "machineAccess",
+                type: "select",
+                label: "Gépbejárás",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "jo", label: "Jó gépi hozzáférés" },
+                    { value: "korlatozott", label: "Korlátozott" },
+                    { value: "nincs", label: "Nincs gépi hozzáférés" }
+                ]
+            },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Milyen anyag, milyen vastagság, gépbejárás..." }
         ],
         calculate(values) {
@@ -539,10 +985,23 @@ const SERVICES = [
                 falazat: 18000,
                 vegyes: 15500
             });
+            const thicknessFee = numberValue(values.thickness) * area * 10;
+            const wasteFee = lookupValue(values.wasteType, {
+                zold: 0,
+                inert: 55000,
+                vegyes: 90000
+            });
             const debrisFee = isChecked(values.debris) ? 95000 : 0;
+            const sortingFee = isChecked(values.sorting) ? 45000 : 0;
+            const cuttingFee = isChecked(values.cutting) ? 60000 : 0;
             const manualFee = isChecked(values.manualAccess) ? 80000 : 0;
             const carryFee = isChecked(values.manualAccess) ? numberValue(values.carryDistance) * 600 : 0;
-            const raw = area * rate + debrisFee + manualFee + carryFee;
+            const machineFee = lookupValue(values.machineAccess, {
+                jo: 0,
+                korlatozott: 35000,
+                nincs: 75000
+            });
+            const raw = area * rate + thicknessFee + wasteFee + debrisFee + sortingFee + cuttingFee + manualFee + carryFee + machineFee;
             return withStartingPrice(180000, raw);
         }
     },
@@ -556,6 +1015,7 @@ const SERVICES = [
         fields: [
             { id: "length", type: "number", label: "Támfal hossza", suffix: "fm", min: 0, step: 1, placeholder: "pl. 12" },
             { id: "height", type: "number", label: "Átlagos magasság", suffix: "m", min: 0, step: 0.1, placeholder: "pl. 1.2" },
+            { id: "maxHeight", type: "number", label: "Legnagyobb magasság", suffix: "m", min: 0, step: 0.1, placeholder: "pl. 1.8" },
             {
                 id: "system",
                 type: "choice",
@@ -566,6 +1026,17 @@ const SERVICES = [
                     { value: "betonblokk", label: "Beton támfalblokk" },
                     { value: "termesko", label: "Terméskő" },
                     { value: "gabion", label: "Gabion rendszer" }
+                ]
+            },
+            {
+                id: "soilPressure",
+                type: "select",
+                label: "Megtámasztott földtömeg jellege",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "enyhe", label: "Kisebb földnyomás" },
+                    { value: "kozepes", label: "Átlagos földnyomás" },
+                    { value: "eros", label: "Erős földnyomás / meredek rézsű" }
                 ]
             },
             {
@@ -590,6 +1061,19 @@ const SERVICES = [
                     { value: "erositett", label: "Erősített háttöltés és geotextil" }
                 ]
             },
+            { id: "coping", type: "toggle", label: "Falzárás / fedkő is szükséges", full: true },
+            {
+                id: "accessMode",
+                type: "select",
+                label: "Kivitelezési hozzáférés",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "gepi", label: "Jó gépi hozzáférés" },
+                    { value: "vegyes", label: "Vegyes hozzáférés" },
+                    { value: "kezi", label: "Főleg kézi kivitelezés" }
+                ]
+            },
+            { id: "geogrid", type: "toggle", label: "Georács vagy megerősítés is szükséges", full: true },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Mennyire meredek a terep, van-e hely gépnek..." }
         ],
         shopProducts: [
@@ -605,6 +1089,12 @@ const SERVICES = [
                 termesko: 115000,
                 gabion: 92000
             });
+            const maxHeightFee = numberValue(values.maxHeight) * length * 12000;
+            const pressureFee = lookupValue(values.soilPressure, {
+                enyhe: 0,
+                kozepes: 85000,
+                eros: 165000
+            });
             const foundationFee = lookupValue(values.foundation, {
                 alap: 65000,
                 erositett: 140000
@@ -613,7 +1103,22 @@ const SERVICES = [
             const backfillFee = isChecked(values.drainage)
                 ? lookupValue(values.backfill, { normal: 45000, erositett: 92000 }, 45000)
                 : 0;
-            const raw = length * height * systemRate + foundationFee + drainageFee + backfillFee;
+            const copingFee = isChecked(values.coping) ? length * 18000 : 0;
+            const accessFee = lookupValue(values.accessMode, {
+                gepi: 0,
+                vegyes: 65000,
+                kezi: 135000
+            });
+            const geogridFee = isChecked(values.geogrid) ? 95000 : 0;
+            const raw = length * height * systemRate
+                + maxHeightFee
+                + pressureFee
+                + foundationFee
+                + drainageFee
+                + backfillFee
+                + copingFee
+                + accessFee
+                + geogridFee;
             return withStartingPrice(260000, raw);
         }
     },
@@ -780,6 +1285,7 @@ const SERVICES = [
         note: "A tereprendezés végleges díját a szintkülönbségek, a gépi hozzáférés és a földpótlás határozza meg.",
         fields: [
             { id: "area", type: "number", label: "Érintett terület", suffix: "m²", min: 0, step: 1, placeholder: "pl. 210" },
+            { id: "levelDifference", type: "number", label: "Becsült szintkülönbség", suffix: "cm", min: 0, step: 1, placeholder: "pl. 45" },
             {
                 id: "difficulty",
                 type: "choice",
@@ -790,6 +1296,19 @@ const SERVICES = [
                     { value: "enyhe", label: "Kisebb korrekció" },
                     { value: "kozepes", label: "Átlagos szintezés" },
                     { value: "eros", label: "Komolyabb földmunka" }
+                ]
+            },
+            {
+                id: "workType",
+                type: "checklist",
+                label: "Szükséges munkák",
+                full: true,
+                options: [
+                    { value: "durva", label: "Durva tereprendezés" },
+                    { value: "finom", label: "Finom tereprendezés" },
+                    { value: "rezu", label: "Rézsű kialakítás" },
+                    { value: "toltes", label: "Töltésépítés" },
+                    { value: "deponia", label: "Depóniák elsimítása" }
                 ]
             },
             { id: "topsoil", type: "toggle", label: "Termőföld pótlásra is szükség lesz", full: true },
@@ -804,6 +1323,27 @@ const SERVICES = [
                 placeholder: "pl. 12"
             },
             {
+                id: "soilBalance",
+                type: "select",
+                label: "Földmérleg",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "egyensuly", label: "Nagyjából egyensúlyban van" },
+                    { value: "hiany", label: "Földhiány várható" },
+                    { value: "tobblet", label: "Földtöbblet várható" }
+                ]
+            },
+            {
+                id: "excessSoilQty",
+                type: "number",
+                label: "Földhiány / többlet mennyiség",
+                suffix: "m³",
+                min: 0,
+                step: 0.5,
+                showWhen: { field: "soilBalance", oneOf: ["hiany", "tobblet"] },
+                placeholder: "pl. 8"
+            },
+            {
                 id: "machineAccess",
                 type: "select",
                 label: "Gépbejárás",
@@ -814,6 +1354,32 @@ const SERVICES = [
                     { value: "nehez", label: "Nehéz megközelítés" }
                 ]
             },
+            {
+                id: "earthmovingMode",
+                type: "choice",
+                label: "Anyagmozgatás módja",
+                full: true,
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "gepi", label: "Főleg gépi" },
+                    { value: "vegyes", label: "Vegyes, gépi és kézi" },
+                    { value: "kezi", label: "Főleg kézi / talicskás" }
+                ]
+            },
+            { id: "carryDistance", type: "number", label: "Hordási távolság", suffix: "m", min: 0, step: 1, placeholder: "pl. 30" },
+            {
+                id: "subsoil",
+                type: "select",
+                label: "Talajtípus",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "normal", label: "Normál kerti talaj" },
+                    { value: "agyagos", label: "Agyagos, kötött" },
+                    { value: "sittes", label: "Sittes / törmelékes" },
+                    { value: "koves", label: "Köves" }
+                ]
+            },
+            { id: "disposal", type: "toggle", label: "Elszállítás is szükséges", full: true },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Lejtés, töltés, rézsű, szűk átjáró, fal melletti sáv..." }
         ],
         calculate(values) {
@@ -823,13 +1389,41 @@ const SERVICES = [
                 kozepes: 5200,
                 eros: 8200
             });
+            const levelFee = numberValue(values.levelDifference) * area * 4;
+            const workCount = Array.isArray(values.workType) ? values.workType.length : 0;
+            const workFee = workCount * 38000;
             const topsoilFee = isChecked(values.topsoil) ? numberValue(values.topsoilQty) * 18000 : 0;
+            const soilBalanceFee = lookupValue(values.soilBalance, {
+                egyensuly: 0,
+                hiany: numberValue(values.excessSoilQty) * 16000,
+                tobblet: numberValue(values.excessSoilQty) * 12000
+            }, 0);
             const accessFee = lookupValue(values.machineAccess, {
                 jo: 0,
                 korlatozott: 65000,
                 nehez: 125000
             });
-            const raw = area * rate + topsoilFee + accessFee;
+            const movingFee = lookupValue(values.earthmovingMode, {
+                gepi: numberValue(values.carryDistance) * 120,
+                vegyes: numberValue(values.carryDistance) * 240,
+                kezi: numberValue(values.carryDistance) * 420
+            }, 0);
+            const subsoilFee = lookupValue(values.subsoil, {
+                normal: 0,
+                agyagos: area * 220,
+                sittes: area * 680,
+                koves: area * 540
+            }, 0);
+            const disposalFee = isChecked(values.disposal) ? 95000 : 0;
+            const raw = area * rate
+                + levelFee
+                + workFee
+                + topsoilFee
+                + soilBalanceFee
+                + accessFee
+                + movingFee
+                + subsoilFee
+                + disposalFee;
             return withStartingPrice(180000, raw);
         }
     },
@@ -950,6 +1544,7 @@ const SERVICES = [
         note: "A kerítés ára a típus, a hossz, a kapu és a bontási igény szerint változik.",
         fields: [
             { id: "length", type: "number", label: "Kerítés hossza", suffix: "fm", min: 0, step: 1, placeholder: "pl. 26" },
+            { id: "height", type: "number", label: "Kerítés magassága", suffix: "m", min: 0, step: 0.1, placeholder: "pl. 1.8" },
             {
                 id: "type",
                 type: "choice",
@@ -961,6 +1556,40 @@ const SERVICES = [
                     { value: "wpc", label: "WPC vagy kompozit" },
                     { value: "leces", label: "Léces vagy dizájnkerítés" },
                     { value: "falazott", label: "Falazott kerítés" }
+                ]
+            },
+            {
+                id: "privacyLevel",
+                type: "choice",
+                label: "Belátásvédelem szintje",
+                full: true,
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "reszleges", label: "Részleges belátásvédelem" },
+                    { value: "kozepes", label: "Közepes takarás" },
+                    { value: "teljes", label: "Teljes zárás" }
+                ]
+            },
+            {
+                id: "terrain",
+                type: "select",
+                label: "Telekhatár és terepviszony",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "sik", label: "Sík terep" },
+                    { value: "lejtos", label: "Lejtős vagy szinteltéréses" },
+                    { value: "bizonytalan", label: "Telekhatár / szint még pontosítandó" }
+                ]
+            },
+            {
+                id: "foundation",
+                type: "select",
+                label: "Alapozási igény",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "pont", label: "Pontszerű oszlopalapok" },
+                    { value: "savalap", label: "Sávalap" },
+                    { value: "erositett", label: "Erősített alapozás" }
                 ]
             },
             { id: "gate", type: "toggle", label: "Kaput is kérek", full: true },
@@ -976,7 +1605,9 @@ const SERVICES = [
                     { value: "tolokapu", label: "Tolókapu" }
                 ]
             },
+            { id: "automation", type: "toggle", label: "Kapunyitó automatika is szükséges", showWhen: { field: "gate", equals: true }, full: true },
             { id: "demolition", type: "toggle", label: "Meglévő kerítés bontása is kell", full: true },
+            { id: "manualAccess", type: "toggle", label: "Korlátozott hozzáférés, részben kézi kivitelezéssel", full: true },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Belátásvédelem, stílus, szomszédos oldal, alapozás..." }
         ],
         shopProducts: [
@@ -985,17 +1616,41 @@ const SERVICES = [
         ],
         calculate(values) {
             const length = numberValue(values.length);
+            const height = numberValue(values.height);
             const rate = lookupValue(values.type, {
                 panel: 24000,
                 wpc: 42000,
                 leces: 38000,
                 falazott: 65000
             });
+            const privacyAdd = lookupValue(values.privacyLevel, {
+                reszleges: 0,
+                kozepes: 3200,
+                teljes: 7600
+            });
+            const terrainFee = lookupValue(values.terrain, {
+                sik: 0,
+                lejtos: 95000,
+                bizonytalan: 55000
+            });
+            const foundationFee = lookupValue(values.foundation, {
+                pont: 0,
+                savalap: 95000,
+                erositett: 165000
+            });
             const gateFee = isChecked(values.gate)
                 ? lookupValue(values.gateType, { szemely: 180000, kert: 260000, tolokapu: 420000 }, 180000)
                 : 0;
+            const automationFee = isChecked(values.automation) ? 180000 : 0;
             const demolitionFee = isChecked(values.demolition) ? 95000 : 0;
-            const raw = length * rate + gateFee + demolitionFee;
+            const manualFee = isChecked(values.manualAccess) ? 85000 : 0;
+            const raw = length * (rate + privacyAdd + height * 3800)
+                + terrainFee
+                + foundationFee
+                + gateFee
+                + automationFee
+                + demolitionFee
+                + manualFee;
             return withStartingPrice(240000, raw);
         }
     },
@@ -1169,15 +1824,425 @@ const SERVICES = [
     }
 ];
 
-const CONTACT_FIELDS = [
-    { id: "fullName", type: "text", label: "Név", placeholder: "Teljes név", required: true },
-    { id: "email", type: "email", label: "Email-cím", placeholder: "pelda@email.hu", required: true },
-    { id: "phone", type: "tel", label: "Telefonszám", placeholder: "+36 30 123 4567", required: true },
-    { id: "siteAddress", type: "text", label: "Helyszín címe", placeholder: "Irányítószám, település, utca, házszám", required: true, full: true },
-    { id: "settlement", type: "text", label: "Település", placeholder: "pl. Biatorbágy" },
-    { id: "desiredStart", type: "date", label: "Tervezett kezdés" },
+const COMMON_SERVICE_FIELDS = [
+    {
+        id: "projectStage",
+        type: "select",
+        label: "Munka jellege",
+        options: [
+            { value: "", label: "Válassz" },
+            { value: "uj", label: "Új kialakítás" },
+            { value: "atalakitas", label: "Meglévő átalakítása" },
+            { value: "felujitas", label: "Részleges felújítás" },
+            { value: "helyreallitas", label: "Helyreállítás / javítás" }
+        ]
+    },
+    {
+        id: "solutionLevel",
+        type: "choice",
+        label: "Megoldási szint",
+        full: true,
+        options: [
+            { value: "", label: "Még nem döntöttem" },
+            { value: "koltseghatekony", label: "Költséghatékony / megtakarításra optimalizált", note: "Egyszerűbb, takarékosabb megoldás" },
+            { value: "kiegyensulyozott", label: "Kiegyensúlyozott", note: "Ár-érték arányban átgondolt megoldás" },
+            { value: "premium", label: "Teljes műszaki tartalom / magasabb esztétikai szint", note: "Erősebb műszaki és vizuális tartalom" }
+        ]
+    },
+    {
+        id: "siteAccess",
+        type: "choice",
+        label: "Megközelítés és helyszíni nehézség",
+        full: true,
+        options: [
+            { value: "", label: "Még nem tudom" },
+            { value: "konnyu", label: "Könnyű megközelítés", note: "Jól behajtható, könnyen szervezhető" },
+            { value: "korlatozott", label: "Korlátozott megközelítés", note: "Szűkebb vagy részben kézi kihordás" },
+            { value: "nehez", label: "Nehéz megközelítés", note: "Szűk, meredek vagy kézi mozgatást igénylő helyszín" }
+        ]
+    }
+];
+
+const EXTRA_SERVICES = [
+    {
+        id: "vizelvezetes-csapadekviz",
+        name: "Vízelvezetés és csapadékvíz-kezelés",
+        badge: "Folyóka, drén, szikkasztás",
+        description: "Burkolatok, falsávok és terepszintek vízelvezetési problémáinak előkészítő felmérése.",
+        fields: [
+            { id: "affectedArea", type: "number", label: "Érintett felület", suffix: "m²", min: 0, step: 1, placeholder: "pl. 85" },
+            { id: "drainLength", type: "number", label: "Folyóka vagy drénhossz", suffix: "fm", min: 0, step: 1, placeholder: "pl. 24" },
+            {
+                id: "problemType",
+                type: "choice",
+                label: "Fő probléma",
+                full: true,
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "pango", label: "Pangó víz" },
+                    { value: "sar", label: "Sárosodás" },
+                    { value: "fal", label: "Fal vagy épület melletti visszafröccsenés" },
+                    { value: "burkolat", label: "Burkolat melletti lefolyási gond" }
+                ]
+            },
+            {
+                id: "solutionType",
+                type: "checklist",
+                label: "Kért megoldások",
+                full: true,
+                options: [
+                    { value: "folyoka", label: "Folyóka" },
+                    { value: "drencso", label: "Dréncső" },
+                    { value: "szikkaszto", label: "Szikkasztó" },
+                    { value: "eso", label: "Esővízgyűjtő" },
+                    { value: "lejtesszabalyzas", label: "Lejtésszabályzás" }
+                ]
+            },
+            { id: "existingUtilities", type: "toggle", label: "Közmű vagy gyökér nehezíti a kivitelezést", full: true },
+            { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Pangó pontok, lejtések, jelenlegi kifolyás..." }
+        ],
+        calculate(values) {
+            const area = numberValue(values.affectedArea);
+            const length = numberValue(values.drainLength);
+            const problemFee = lookupValue(values.problemType, {
+                pango: 65000,
+                sar: 45000,
+                fal: 85000,
+                burkolat: 75000
+            });
+            const solutionCount = Array.isArray(values.solutionType) ? values.solutionType.length : 0;
+            const utilityFee = isChecked(values.existingUtilities) ? 70000 : 0;
+            return Math.round(area * 4200 + length * 6800 + problemFee + solutionCount * 38000 + utilityFee);
+        }
+    },
+    {
+        id: "parkolo-gepkocsibeallo",
+        name: "Parkoló és gépkocsi-beálló",
+        badge: "Beálló és manőverterület",
+        description: "Autóbeállók, parkolók és kapcsolódó burkolati csomópontok felmérése.",
+        fields: [
+            { id: "slots", type: "number", label: "Parkolóhelyek száma", suffix: "db", min: 0, step: 1, placeholder: "pl. 2" },
+            { id: "area", type: "number", label: "Burkolt felület", suffix: "m²", min: 0, step: 1, placeholder: "pl. 52" },
+            {
+                id: "trafficType",
+                type: "choice",
+                label: "Terhelés",
+                full: true,
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "szemelyauto", label: "Személyautó" },
+                    { value: "suv", label: "SUV vagy nagyobb autó" },
+                    { value: "teher", label: "Teherautó / utánfutó is" }
+                ]
+            },
+            { id: "turningArea", type: "toggle", label: "Forduló- vagy manőverterületet is kérek", full: true },
+            { id: "lighting", type: "toggle", label: "Kapcsolódó világítás is szükséges", full: true },
+            { id: "drainage", type: "toggle", label: "Vízelvezetés is szükséges", full: true },
+            { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Kapcsolódó kapu, járda, fordulás, használati gyakoriság..." }
+        ],
+        calculate(values) {
+            const area = numberValue(values.area);
+            const slots = numberValue(values.slots);
+            const trafficRate = lookupValue(values.trafficType, {
+                szemelyauto: 36000,
+                suv: 40500,
+                teher: 52000
+            });
+            const turningFee = isChecked(values.turningArea) ? 180000 : 0;
+            const lightingFee = isChecked(values.lighting) ? 95000 : 0;
+            const drainageFee = isChecked(values.drainage) ? 145000 : 0;
+            return Math.round(area * trafficRate + slots * 40000 + turningFee + lightingFee + drainageFee);
+        }
+    },
+    {
+        id: "kulteri-lepcso-rampa",
+        name: "Kültéri lépcső és rámpa",
+        badge: "Szintkülönbség kezelése",
+        description: "Kültéri lépcsők, rámpák és kapcsolódó közlekedőelemek felmérése.",
+        fields: [
+            { id: "stepCount", type: "number", label: "Lépcsőfokok száma", suffix: "db", min: 0, step: 1, placeholder: "pl. 6" },
+            { id: "heightDifference", type: "number", label: "Szintkülönbség", suffix: "cm", min: 0, step: 1, placeholder: "pl. 95" },
+            {
+                id: "material",
+                type: "choice",
+                label: "Kialakítás",
+                full: true,
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "terko", label: "Térkő vagy lapburkolat" },
+                    { value: "monolit", label: "Monolit beton" },
+                    { value: "termesko", label: "Terméskő" },
+                    { value: "kombinalt", label: "Kombinált lépcső és rámpa" }
+                ]
+            },
+            { id: "handrail", type: "toggle", label: "Korlát vagy oldalfal is szükséges", full: true },
+            { id: "lighting", type: "toggle", label: "Világítás is szükséges", full: true },
+            { id: "antiSlip", type: "toggle", label: "Kiemelt csúszásmentesség szükséges", full: true },
+            { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Kapcsolódó szintek, idősek vagy gyermekek használata, vízelvezetés..." }
+        ],
+        calculate(values) {
+            const steps = numberValue(values.stepCount);
+            const height = numberValue(values.heightDifference);
+            const materialFee = lookupValue(values.material, {
+                terko: 260000,
+                monolit: 320000,
+                termesko: 420000,
+                kombinalt: 510000
+            });
+            const railFee = isChecked(values.handrail) ? 135000 : 0;
+            const lightingFee = isChecked(values.lighting) ? 85000 : 0;
+            const antiSlipFee = isChecked(values.antiSlip) ? 45000 : 0;
+            return Math.round(materialFee + steps * 22000 + height * 850 + railFee + lightingFee + antiSlipFee);
+        }
+    },
+    {
+        id: "tarolok-kiszolgalo-elemek",
+        name: "Tárolók és kiszolgáló elemek",
+        badge: "Szerszámtároló, kuka, géptároló",
+        description: "Kerti tárolók, kukaelrejtők és kiszolgáló építmények előkészítő felmérése.",
+        fields: [
+            {
+                id: "storageType",
+                type: "checklist",
+                label: "Kért elemek",
+                full: true,
+                options: [
+                    { value: "szerszam", label: "Szerszámtároló" },
+                    { value: "gep", label: "Géptároló" },
+                    { value: "kuka", label: "Kukatároló" },
+                    { value: "fa", label: "Tűzifatároló" },
+                    { value: "kerekpar", label: "Kerékpártároló" }
+                ]
+            },
+            { id: "area", type: "number", label: "Összes alapterület", suffix: "m²", min: 0, step: 1, placeholder: "pl. 12" },
+            {
+                id: "material",
+                type: "select",
+                label: "Szerkezet",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "fa", label: "Fa" },
+                    { value: "fem", label: "Fém" },
+                    { value: "konnyuszerkezet", label: "Könnyűszerkezet" },
+                    { value: "falazott", label: "Falazott" }
+                ]
+            },
+            { id: "power", type: "toggle", label: "Áramkiállás is szükséges", full: true },
+            { id: "water", type: "toggle", label: "Vízkiállás is szükséges", full: true },
+            { id: "foundation", type: "toggle", label: "Alapozás vagy burkolat is kell alá", full: true },
+            { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Mire kell, mekkora ajtó, milyen homlokzathoz illeszkedjen..." }
+        ],
+        calculate(values) {
+            const area = numberValue(values.area);
+            const typeCount = Array.isArray(values.storageType) ? values.storageType.length : 0;
+            const materialRate = lookupValue(values.material, {
+                fa: 165000,
+                fem: 210000,
+                konnyuszerkezet: 245000,
+                falazott: 340000
+            });
+            const powerFee = isChecked(values.power) ? 70000 : 0;
+            const waterFee = isChecked(values.water) ? 65000 : 0;
+            const foundationFee = isChecked(values.foundation) ? 115000 : 0;
+            return Math.round(area * 42000 + typeCount * 55000 + materialRate + powerFee + waterFee + foundationFee);
+        }
+    },
+    {
+        id: "vetemenyes-emelt-agyas",
+        name: "Veteményes és emelt ágyás",
+        badge: "Haszonkert",
+        description: "Veteményes, fűszerkert és emelt ágyások kialakításának felmérése.",
+        fields: [
+            { id: "bedCount", type: "number", label: "Ágyások száma", suffix: "db", min: 0, step: 1, placeholder: "pl. 4" },
+            { id: "area", type: "number", label: "Összes terület", suffix: "m²", min: 0, step: 1, placeholder: "pl. 18" },
+            {
+                id: "construction",
+                type: "choice",
+                label: "Kialakítás",
+                full: true,
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "talajszint", label: "Talajszintű veteményes" },
+                    { value: "magasagyas", label: "Emelt ágyás" },
+                    { value: "vegyes", label: "Vegyes rendszer" }
+                ]
+            },
+            { id: "irrigation", type: "toggle", label: "Öntözést is kérek hozzá", full: true },
+            { id: "soilReplacement", type: "toggle", label: "Talajcsere vagy komposztfeltöltés is szükséges", full: true },
+            { id: "shading", type: "toggle", label: "Árnyékolás vagy védelem is szükséges", full: true },
+            { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Mit termesztenétek, mennyire intenzív használattal..." }
+        ],
+        calculate(values) {
+            const area = numberValue(values.area);
+            const beds = numberValue(values.bedCount);
+            const constructionRate = lookupValue(values.construction, {
+                talajszint: 18500,
+                magasagyas: 52000,
+                vegyes: 36500
+            });
+            const irrigationFee = isChecked(values.irrigation) ? 95000 : 0;
+            const soilFee = isChecked(values.soilReplacement) ? 120000 : 0;
+            const shadingFee = isChecked(values.shading) ? 75000 : 0;
+            return Math.round(area * constructionRate + beds * 24000 + irrigationFee + soilFee + shadingFee);
+        }
+    },
+    {
+        id: "medence-jacuzzi-elokeszites",
+        name: "Medence és jacuzzi előkészítés",
+        badge: "Gépészet és környezet",
+        description: "Medence, jacuzzi vagy dézsa előkészítésének terepi és műszaki felmérése.",
+        fields: [
+            {
+                id: "unitType",
+                type: "choice",
+                label: "Mi készülne?",
+                full: true,
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "medence", label: "Medence" },
+                    { value: "jacuzzi", label: "Jacuzzi" },
+                    { value: "tobb", label: "Több funkció együtt" }
+                ]
+            },
+            { id: "area", type: "number", label: "Érintett felület", suffix: "m²", min: 0, step: 1, placeholder: "pl. 35" },
+            { id: "machineRoom", type: "toggle", label: "Gépészeti akna vagy kiszolgáló zóna is kell", full: true },
+            { id: "waterPower", type: "toggle", label: "Víz- és áramkiállás előkészítés is kell", full: true },
+            { id: "decking", type: "toggle", label: "Kapcsolódó burkolat vagy pihenőterasz is kell", full: true },
+            { id: "safety", type: "toggle", label: "Kiemelt gyermekbiztonság szükséges", full: true },
+            { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Mélyítés, gépészet helye, takarás, környező burkolatok..." }
+        ],
+        calculate(values) {
+            const area = numberValue(values.area);
+            const unitFee = lookupValue(values.unitType, {
+                medence: 520000,
+                jacuzzi: 280000,
+                tobb: 760000
+            });
+            const machineFee = isChecked(values.machineRoom) ? 180000 : 0;
+            const utilitiesFee = isChecked(values.waterPower) ? 150000 : 0;
+            const deckingFee = isChecked(values.decking) ? 220000 : 0;
+            const safetyFee = isChecked(values.safety) ? 95000 : 0;
+            return Math.round(unitFee + area * 18500 + machineFee + utilitiesFee + deckingFee + safetyFee);
+        }
+    },
+    {
+        id: "kerti-konyha-grillezo-tuzrako",
+        name: "Kerti konyha, grillező és tűzrakó",
+        badge: "Kerti vendéglátás",
+        description: "Kerti konyhák, grillezők, kemencék és tűzrakóhelyek előkészítő felmérése.",
+        fields: [
+            {
+                id: "unitType",
+                type: "checklist",
+                label: "Kért elemek",
+                full: true,
+                options: [
+                    { value: "grill", label: "Grillező" },
+                    { value: "konyha", label: "Komplett kerti konyha" },
+                    { value: "kemence", label: "Kemence" },
+                    { value: "tuzrako", label: "Tűzrakó" },
+                    { value: "barpult", label: "Bárpult / pult" }
+                ]
+            },
+            { id: "counterLength", type: "number", label: "Pult hossza", suffix: "fm", min: 0, step: 0.5, placeholder: "pl. 4" },
+            { id: "seating", type: "number", label: "Ülőhelyek száma", suffix: "db", min: 0, step: 1, placeholder: "pl. 8" },
+            { id: "waterPoint", type: "toggle", label: "Vízkiállás vagy mosogató is kell", full: true },
+            { id: "powerPoint", type: "toggle", label: "Áramkiállás és világítás is kell", full: true },
+            { id: "cover", type: "toggle", label: "Fedés vagy pergolakapcsolat is kell", full: true },
+            { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Milyen főzési mód, milyen vendégforgalom, milyen környezethez..." }
+        ],
+        calculate(values) {
+            const counter = numberValue(values.counterLength);
+            const seating = numberValue(values.seating);
+            const unitCount = Array.isArray(values.unitType) ? values.unitType.length : 0;
+            const waterFee = isChecked(values.waterPoint) ? 115000 : 0;
+            const powerFee = isChecked(values.powerPoint) ? 95000 : 0;
+            const coverFee = isChecked(values.cover) ? 280000 : 0;
+            return Math.round(unitCount * 145000 + counter * 180000 + seating * 12000 + waterFee + powerFee + coverFee);
+        }
+    },
+    {
+        id: "okoskert-automatika-biztonsag",
+        name: "Okoskert, automatika és biztonság",
+        badge: "Vezérlés és előkészítés",
+        description: "Robotfűnyíró, automatika, világításvezérlés és biztonsági előkészítés felmérése.",
+        fields: [
+            {
+                id: "systems",
+                type: "checklist",
+                label: "Milyen rendszerek érdekelnek?",
+                full: true,
+                options: [
+                    { value: "robotfukasza", label: "Robotfűnyíró előkészítés" },
+                    { value: "kapu", label: "Automata kapu" },
+                    { value: "vilagitas", label: "Világításvezérlés" },
+                    { value: "kamera", label: "Kamerák vagy érzékelők" },
+                    { value: "kozpont", label: "Központi vezérlés" }
+                ]
+            },
+            { id: "cableLength", type: "number", label: "Becsült kábelhossz", suffix: "fm", min: 0, step: 1, placeholder: "pl. 60" },
+            { id: "controlPoints", type: "number", label: "Vezérlési pontok száma", suffix: "db", min: 0, step: 1, placeholder: "pl. 5" },
+            { id: "network", type: "toggle", label: "Külön hálózati vagy wifi előkészítés is kell", full: true },
+            { id: "futureExpansion", type: "toggle", label: "Későbbi bővíthetőséget is kérünk", full: true },
+            { id: "security", type: "toggle", label: "Biztonsági és riasztási funkciók is kellenek", full: true },
+            { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Melyik rendszer mihez kapcsolódjon, mi a fő cél..." }
+        ],
+        calculate(values) {
+            const systems = Array.isArray(values.systems) ? values.systems.length : 0;
+            const cable = numberValue(values.cableLength);
+            const controls = numberValue(values.controlPoints);
+            const networkFee = isChecked(values.network) ? 95000 : 0;
+            const expansionFee = isChecked(values.futureExpansion) ? 65000 : 0;
+            const securityFee = isChecked(values.security) ? 125000 : 0;
+            return Math.round(systems * 85000 + cable * 2400 + controls * 18000 + networkFee + expansionFee + securityFee);
+        }
+    }
+];
+
+const CONTACT_SECTION_META = {
+    contact: {
+        title: "Kapcsolattartás",
+        description: "Ki tölti ki a felmérőt, és hogyan tudunk a legjobban visszajelezni."
+    },
+    site: {
+        title: "Helyszín és megközelítés",
+        description: "A kivitelezéshez és a helyszíni felméréshez szükséges cím- és megközelítési adatok."
+    },
+    docs: {
+        title: "Dokumentumok és előkészítés",
+        description: "Milyen tervanyag, fotó vagy előkészítő információ áll már rendelkezésre."
+    },
+    budget: {
+        title: "Projektkeret és ütemezés",
+        description: "Költségszint, ütemezés és kivitelezési keret meghatározása."
+    },
+    summary: {
+        title: "Összefoglalás",
+        description: "A fő célok, a használati szempontok és a végső beküldéshez szükséges megerősítés."
+    }
+};
+
+const CONTACT_FIELDS_RUNTIME = [
+    {
+        id: "requestRole",
+        section: "contact",
+        type: "select",
+        label: "Ki tölti ki a felmérőt?",
+        required: true,
+        options: [
+            { value: "", label: "Válassz" },
+            { value: "megrendelo", label: "Megrendelő" },
+            { value: "kerttervezo", label: "Kerttervező" },
+            { value: "kivitelezo", label: "Kivitelező / felmérő" },
+            { value: "egyeb", label: "Egyéb közreműködő" }
+        ]
+    },
+    { id: "fullName", section: "contact", type: "text", label: "Név", placeholder: "Teljes név", required: true },
+    { id: "email", section: "contact", type: "email", label: "Email-cím", placeholder: "pelda@email.hu", required: true },
+    { id: "phone", section: "contact", type: "tel", label: "Telefonszám", placeholder: "+36 30 123 4567", required: true },
     {
         id: "contactMode",
+        section: "contact",
         type: "choice",
         label: "Milyen módon keressünk?",
         full: true,
@@ -1188,73 +2253,176 @@ const CONTACT_FIELDS = [
             { value: "mindegy", label: "Mindkettő megfelel" }
         ]
     },
-    { id: "availableTime", type: "text", label: "Mikor vagy elérhető?", placeholder: "pl. hétköznap 14:00 után" },
+    { id: "availableTime", section: "contact", type: "text", label: "Mikor vagy elérhető?", placeholder: "pl. hétköznap 14:00 után" },
+
+    { id: "postalCode", section: "site", type: "text", label: "Irányítószám", placeholder: "pl. 2051", required: true, inputMode: "numeric", maxLength: 4 },
+    { id: "settlement", section: "site", type: "text", label: "Település", placeholder: "Automatikusan kitöltjük", required: true },
+    { id: "siteAddress", section: "site", type: "text", label: "Utca, házszám, egyéb címadat", placeholder: "pl. Tópark utca 12.", required: true, full: true },
+    { id: "propertySize", section: "site", type: "number", label: "Telek teljes mérete", suffix: "m²", min: 0, step: 1, placeholder: "pl. 850" },
+    { id: "designArea", section: "site", type: "number", label: "Tervezési terület mérete", suffix: "m²", min: 0, step: 1, placeholder: "pl. 320" },
+    { id: "zoning", section: "site", type: "text", label: "Lakóövezeti besorolás / HÉSZ megjegyzés", placeholder: "ha ismert" },
     {
-        id: "planStatus",
+        id: "accessType",
+        section: "site",
         type: "select",
-        label: "Van már előkészített anyagod?",
+        label: "Megközelítés típusa",
         options: [
             { value: "", label: "Válassz" },
-            { value: "nincs", label: "Még nincs" },
-            { value: "meretek", label: "Méretek vagy skicc már van" },
-            { value: "terv", label: "Van terv vagy látványterv" },
-            { value: "helyszin", label: "Helyszíni bejárás után pontosítanánk" }
+            { value: "utcafront", label: "Közvetlen utcafronti" },
+            { value: "oldalkert", label: "Oldalkerten keresztül" },
+            { value: "belso", label: "Belső udvar / átjárón keresztül" },
+            { value: "korlatozott", label: "Korlátozott megközelítés" }
         ]
     },
-    { id: "projectGoal", type: "textarea", label: "Röviden: mit szeretnél megvalósítani?", full: true, placeholder: "Mi a legfontosabb cél, milyen stílust vagy használatot szeretnél?" },
-    { id: "notes", type: "textarea", label: "További megjegyzés", full: true, placeholder: "Bármi, ami segíti a pontosabb ajánlatadást." },
+    { id: "gateWidth", section: "site", type: "number", label: "Kapuszélesség", suffix: "m", min: 0, step: 0.1, placeholder: "pl. 2.8" },
+    { id: "distanceFromRoad", section: "site", type: "number", label: "Anyagmozgatási távolság az utcától", suffix: "m", min: 0, step: 1, placeholder: "pl. 35" },
+    { id: "machineAccess", section: "site", type: "toggle", label: "Gépbejárás biztosítható", full: true },
+
+    {
+        id: "planStatus",
+        section: "docs",
+        type: "select",
+        label: "Milyen előkészítettségi szinten tart a projekt?",
+        options: [
+            { value: "", label: "Válassz" },
+            { value: "nincs", label: "Még nincs előkészített anyag" },
+            { value: "skicc", label: "Skicc, kézi méret vagy rövid brief van" },
+            { value: "terv", label: "Van terv vagy látványterv" },
+            { value: "helyszini", label: "Helyszíni felmérés után pontosítanánk" }
+        ]
+    },
+    {
+        id: "documents",
+        section: "docs",
+        type: "checklist",
+        label: "Milyen anyagok állnak rendelkezésre?",
+        full: true,
+        options: [
+            { value: "helyszinrajz", label: "Helyszínrajz" },
+            { value: "geodezia", label: "Geodéziai felmérés" },
+            { value: "fotok", label: "Fotók a jelenlegi állapotról" },
+            { value: "inspiracio", label: "Inspirációs képek" },
+            { value: "tervrajz", label: "Tervrajz" },
+            { value: "latvanyterv", label: "Látványterv" },
+            { value: "kozmuterv", label: "Közműterv" }
+        ]
+    },
+    { id: "documentsNote", section: "docs", type: "textarea", label: "Dokumentumokkal kapcsolatos megjegyzés", full: true, placeholder: "Mi van már meg, mi hiányzik, mit kell majd pontosítani..." },
+
+    { id: "desiredStart", section: "budget", type: "date", label: "Tervezett kezdés" },
+    { id: "desiredFinish", section: "budget", type: "date", label: "Tervezett befejezés" },
+    {
+        id: "budgetLevel",
+        section: "budget",
+        type: "choice",
+        label: "Költségszint",
+        full: true,
+        options: [
+            { value: "", label: "Még nem döntöttem" },
+            { value: "koltseghatekony", label: "Költséghatékony / megtakarításra optimalizált" },
+            { value: "kiegyensulyozott", label: "Kiegyensúlyozott" },
+            { value: "premium", label: "Teljes műszaki tartalom / magasabb esztétikai szint" }
+        ]
+    },
+    { id: "exactBudget", section: "budget", type: "text", label: "Konkrét költségkeret", placeholder: "pl. 3–4 millió Ft" },
+    {
+        id: "phasePriority",
+        section: "budget",
+        type: "select",
+        label: "Ütemezés",
+        options: [
+            { value: "", label: "Válassz" },
+            { value: "egyuttem", label: "Egy ütemben készülne" },
+            { value: "ketutem", label: "Két ütemben készülne" },
+            { value: "tobb", label: "Több ütemben készülne" },
+            { value: "felmeres", label: "Először felmérés és tervezés kell" }
+        ]
+    },
+
+    { id: "projectGoal", section: "summary", type: "textarea", label: "Mi a projekt fő célja?", full: true, placeholder: "Röviden írd le, mit szeretnétek létrehozni és mi a legfontosabb eredmény." },
+    { id: "mainProblem", section: "summary", type: "textarea", label: "Mi a legfontosabb jelenlegi probléma?", full: true, placeholder: "pl. nincs használható teraszkapcsolat, nincs vízelvezetés, rendezetlen kert..." },
+    {
+        id: "useCases",
+        section: "summary",
+        type: "checklist",
+        label: "Használati és életmódbeli szempontok",
+        full: true,
+        options: [
+            { value: "gyermek", label: "Gyermekbarát kialakítás" },
+            { value: "allat", label: "Háziállat-barát kialakítás" },
+            { value: "alacsonyfenntartas", label: "Alacsony fenntartási igény" },
+            { value: "esti", label: "Esti használat is fontos" },
+            { value: "vendegek", label: "Vendégfogadás / reprezentatív használat" },
+            { value: "intenziv", label: "Intenzív mindennapi használat" }
+        ]
+    },
+    { id: "notes", section: "summary", type: "textarea", label: "További megjegyzés", full: true, placeholder: "Bármi, ami segíti a pontosabb ajánlatadást vagy felmérést." },
     {
         id: "consent",
+        section: "summary",
         type: "toggle",
-        label: "Elfogadom, hogy az itt megjelenő összeg tájékoztató jellegű, és a végleges ajánlat a helyszíni felmérés, a műszaki részletek, a mennyiségek és az anyagválasztás alapján módosulhat.",
+        label: "Elfogadom a tájékoztató kalkulációt.",
         required: true,
         full: true
     }
 ];
 
-const CONTACT_FIELDS_RUNTIME = [
-    { id: "fullName", type: "text", label: "Név", placeholder: "Teljes név", required: true },
-    { id: "email", type: "email", label: "Email-cím", placeholder: "pelda@email.hu", required: true },
-    { id: "phone", type: "tel", label: "Telefonszám", placeholder: "+36 30 123 4567", required: true },
-    { id: "postalCode", type: "text", label: "Irányítószám", placeholder: "pl. 2051", required: true },
-    { id: "settlement", type: "text", label: "Település", placeholder: "Automatikusan kitöltjük", required: true },
-    { id: "siteAddress", type: "text", label: "Utca, házszám, egyéb címadat", placeholder: "pl. Tópark utca 12.", required: true, full: true },
-    { id: "desiredStart", type: "date", label: "Tervezett kezdés" },
-    {
-        id: "contactMode",
-        type: "choice",
-        label: "Milyen módon keressünk?",
-        full: true,
-        options: [
-            { value: "", label: "Válassz" },
-            { value: "telefon", label: "Telefonon" },
-            { value: "email", label: "Emailben" },
-            { value: "mindegy", label: "Mindkettő megfelel" }
-        ]
-    },
-    { id: "availableTime", type: "text", label: "Mikor vagy elérhető?", placeholder: "pl. hétköznap 14:00 után" },
-    {
-        id: "planStatus",
-        type: "select",
-        label: "Van már előkészített anyagod?",
-        options: [
-            { value: "", label: "Válassz" },
-            { value: "nincs", label: "Még nincs" },
-            { value: "meretek", label: "Méretek vagy skicc már van" },
-            { value: "terv", label: "Van terv vagy látványterv" },
-            { value: "helyszin", label: "Helyszíni bejárás után pontosítanánk" }
-        ]
-    },
-    { id: "projectGoal", type: "textarea", label: "Röviden: mit szeretnél megvalósítani?", full: true, placeholder: "Mi a legfontosabb cél, milyen stílust vagy használatot szeretnél?" },
-    { id: "notes", type: "textarea", label: "További megjegyzés", full: true, placeholder: "Bármi, ami segíti a pontosabb ajánlatadást." },
-    {
-        id: "consent",
-        type: "toggle",
-        label: "Elfogadom, hogy az itt megjelenő összeg tájékoztató jellegű, és a végleges ajánlat a helyszíni felmérés, a műszaki részletek, a mennyiségek és az anyagválasztás alapján módosulhat.",
-        required: true,
-        full: true
+function cloneField(field) {
+    return {
+        ...field,
+        options: Array.isArray(field.options)
+            ? field.options.map((option) => ({ ...option }))
+            : undefined
+    };
+}
+
+function enhanceServiceDefinition(service) {
+    if (service.__enhanced) {
+        return service;
     }
-];
+
+    const originalCalculate = service.calculate.bind(service);
+    const fieldIds = new Set(service.fields.map((field) => field.id));
+
+    COMMON_SERVICE_FIELDS.forEach((field) => {
+        if (!fieldIds.has(field.id)) {
+            service.fields.push(cloneField(field));
+        }
+    });
+
+    service.calculate = (values) => {
+        const base = originalCalculate(values);
+
+        if (base <= 0) {
+            return 0;
+        }
+
+        const stageMultiplier = lookupValue(values.projectStage, {
+            uj: 1,
+            atalakitas: 1.08,
+            felujitas: 1.12,
+            helyreallitas: 1.15
+        }, 1);
+        const solutionMultiplier = lookupValue(values.solutionLevel, {
+            koltseghatekony: 0.92,
+            kiegyensulyozott: 1,
+            premium: 1.18
+        }, 1);
+        const accessMultiplier = lookupValue(values.siteAccess, {
+            konnyu: 1,
+            korlatozott: 1.06,
+            nehez: 1.14
+        }, 1);
+
+        return Math.round(base * stageMultiplier * solutionMultiplier * accessMultiplier);
+    };
+
+    service.__enhanced = true;
+    return service;
+}
+
+SERVICES.push(...EXTRA_SERVICES);
+SERVICES.forEach(enhanceServiceDefinition);
 
 const SERVICE_LOOKUP = Object.fromEntries(SERVICES.map((service) => [service.id, service]));
 const CONTACT_LOOKUP = Object.fromEntries(CONTACT_FIELDS_RUNTIME.map((field) => [field.id, field]));
@@ -1277,9 +2445,9 @@ const totalPriceElement = document.getElementById("totalPrice");
 const selectedServicesElement = document.getElementById("selectedServices");
 const feedback = document.getElementById("feedback");
 const startButton = document.getElementById("startButton");
-const editSelectionButton = document.getElementById("editSelectionButton");
 const successModal = document.getElementById("successModal");
 const closeSuccessButton = document.getElementById("closeSuccessButton");
+const STORAGE_KEY = "diszkertek-form-state-v1";
 
 const state = {
     currentStep: 0,
@@ -1291,22 +2459,28 @@ const state = {
     postalLookupState: "idle"
 };
 
+function storageAvailable() {
+    try {
+        return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+    } catch (error) {
+        return false;
+    }
+}
+
 function createDefaultContactState() {
-    return {
-        fullName: "",
-        email: "",
-        phone: "",
-        postalCode: "",
-        siteAddress: "",
-        settlement: "",
-        desiredStart: "",
-        contactMode: "",
-        availableTime: "",
-        planStatus: "",
-        projectGoal: "",
-        notes: "",
-        consent: false
-    };
+    return CONTACT_FIELDS_RUNTIME.reduce((accumulator, field) => {
+        if (Object.prototype.hasOwnProperty.call(field, "defaultValue")) {
+            accumulator[field.id] = field.defaultValue;
+        } else if (field.type === "toggle") {
+            accumulator[field.id] = false;
+        } else if (field.type === "checklist") {
+            accumulator[field.id] = [];
+        } else {
+            accumulator[field.id] = "";
+        }
+
+        return accumulator;
+    }, {});
 }
 
 const POSTAL_CODE_OVERRIDES = {
@@ -1316,11 +2490,124 @@ const POSTAL_CODE_OVERRIDES = {
 
 let postalLookupTimer = null;
 
-CONTACT_FIELDS_RUNTIME.forEach((field) => {
-    if (field.id === "consent") {
-        field.label = "Elfogadom a tájékoztató kalkulációt.";
+function sanitizeFieldValue(field, value) {
+    if (field.type === "toggle") {
+        return isChecked(value);
     }
-});
+
+    if (field.type === "checklist") {
+        if (!Array.isArray(value)) {
+            return [];
+        }
+
+        const allowed = new Set((field.options || []).map((option) => option.value));
+        return value.filter((item) => allowed.has(item));
+    }
+
+    if (field.type === "choice" || field.type === "select") {
+        const allowed = new Set((field.options || []).map((option) => option.value));
+        return allowed.has(value) ? value : "";
+    }
+
+    if (field.type === "number") {
+        return value === "" || value == null ? "" : String(value);
+    }
+
+    return value == null ? "" : String(value);
+}
+
+function buildPersistableContactState(rawValues = {}) {
+    const defaults = createDefaultContactState();
+
+    CONTACT_FIELDS_RUNTIME.forEach((field) => {
+        defaults[field.id] = sanitizeFieldValue(field, rawValues[field.id]);
+    });
+
+    return defaults;
+}
+
+function buildPersistableServiceState(selectedServices, rawServiceValues = {}) {
+    return selectedServices.reduce((accumulator, serviceId) => {
+        const service = getService(serviceId);
+        if (!service) {
+            return accumulator;
+        }
+
+        const sourceValues = rawServiceValues[serviceId] || {};
+        accumulator[serviceId] = service.fields.reduce((fieldAccumulator, field) => {
+            const fallback = defaultValueForField(field);
+            const rawValue = Object.prototype.hasOwnProperty.call(sourceValues, field.id)
+                ? sourceValues[field.id]
+                : fallback;
+            fieldAccumulator[field.id] = sanitizeFieldValue(field, rawValue);
+            return fieldAccumulator;
+        }, {});
+
+        return accumulator;
+    }, {});
+}
+
+function persistState() {
+    if (!storageAvailable()) {
+        return;
+    }
+
+    const payload = {
+        currentStep: state.currentStep,
+        selectedServices: [...state.selectedServices],
+        serviceValues: state.serviceValues,
+        contactValues: state.contactValues
+    };
+
+    try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    } catch (error) {
+        console.warn("Nem sikerült elmenteni a helyi állapotot.", error);
+    }
+}
+
+function clearPersistedState() {
+    if (!storageAvailable()) {
+        return;
+    }
+
+    try {
+        window.localStorage.removeItem(STORAGE_KEY);
+    } catch (error) {
+        console.warn("Nem sikerült törölni a helyi állapotot.", error);
+    }
+}
+
+function restorePersistedState() {
+    if (!storageAvailable()) {
+        return;
+    }
+
+    try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+            return;
+        }
+
+        const parsed = JSON.parse(raw);
+        const selectedServices = Array.isArray(parsed?.selectedServices)
+            ? parsed.selectedServices.filter((serviceId) => Boolean(getService(serviceId)))
+            : [];
+
+        state.selectedServices = selectedServices;
+        state.serviceValues = buildPersistableServiceState(selectedServices, parsed?.serviceValues || {});
+        state.contactValues = buildPersistableContactState(parsed?.contactValues || {});
+
+        const steps = getFlowSteps();
+        const savedStep = Number(parsed?.currentStep);
+        state.currentStep = Number.isFinite(savedStep)
+            ? Math.max(0, Math.min(savedStep, steps.length - 1))
+            : 0;
+    } catch (error) {
+        console.warn("Nem sikerült visszaállítani a helyi állapotot.", error);
+        clearPersistedState();
+    }
+}
 
 function defaultValueForField(field) {
     if (Object.prototype.hasOwnProperty.call(field, "defaultValue")) {
@@ -1329,6 +2616,10 @@ function defaultValueForField(field) {
 
     if (field.type === "toggle") {
         return false;
+    }
+
+    if (field.type === "checklist") {
+        return [];
     }
 
     return "";
@@ -1438,6 +2729,18 @@ function getFieldDisplayValue(field, rawValue) {
         return "";
     }
 
+    if (field.type === "checklist") {
+        if (!Array.isArray(rawValue) || !rawValue.length) {
+            return "";
+        }
+
+        const labels = rawValue
+            .map((value) => (field.options || []).find((item) => item.value === value)?.label || null)
+            .filter(Boolean);
+
+        return labels.join(", ");
+    }
+
     if (field.type === "toggle") {
         return isChecked(rawValue) ? "Igen" : "";
     }
@@ -1466,7 +2769,7 @@ function getFieldHelperText(field, scope) {
 
     if (scope === "contact" && field.id === "settlement") {
         if (state.postalLookupState === "success") {
-            return "Az irányítószám alapján kitöltve, de szükség esetén módosítható.";
+            return "Az irányítószám alapján kitöltve, szükség esetén módosítható.";
         }
 
         return "Ha nem sikerül automatikusan, kézzel is megadható.";
@@ -1526,6 +2829,7 @@ function renderApp() {
     renderHeader(steps);
     renderSummary();
     renderCurrentStep(steps[state.currentStep]);
+    persistState();
 }
 
 function renderHeader(steps) {
@@ -1558,27 +2862,27 @@ function renderSummary() {
     totalPriceElement.textContent = formatCurrency(total);
 
     if (!state.selectedServices.length) {
-        selectedServicesElement.innerHTML = `
-            <div class="selected-service-card">
-                <p>Még nincs kiválasztott tétel. Az első lépésben választhatsz szolgáltatásokat.</p>
-            </div>
-        `;
-        editSelectionButton.disabled = true;
+        selectedServicesElement.innerHTML = "";
         return;
     }
 
-    editSelectionButton.disabled = false;
     selectedServicesElement.innerHTML = state.selectedServices
         .map((serviceId) => {
             const service = getService(serviceId);
             const meta = buildServiceMeta(service, ensureServiceState(serviceId));
             const serviceStepIndex = getFlowSteps().findIndex((step) => step.id === serviceId);
             return `
-                <div class="selected-service-card" style="${getServiceToneStyle(serviceId)}">
+                <div
+                    class="selected-service-card is-clickable"
+                    style="${getServiceToneStyle(serviceId)}"
+                    data-action="jump-step"
+                    data-step-index="${serviceStepIndex}"
+                    tabindex="0"
+                    role="button"
+                    aria-label="${escapeHtml(service.name)} megnyitása"
+                >
                     <div class="selected-service-header">
-                        <button type="button" data-action="jump-step" data-step-index="${serviceStepIndex}">
-                            ${escapeHtml(service.name)}
-                        </button>
+                        <span class="selected-service-linkish">${escapeHtml(service.name)}</span>
                         <span class="selected-service-price">${formatCurrency(subtotals[serviceId])}</span>
                     </div>
                     <p class="selected-service-meta">${escapeHtml(meta)}</p>
@@ -1624,14 +2928,6 @@ function renderSelectionStep() {
                 </div>
             </div>
 
-            ${selectedCount
-                ? `
-                    <div class="selection-summary">
-                        <strong>${selectedCount} tétel kiválasztva</strong>
-                    </div>
-                `
-                : ""}
-
             <div class="service-picker-shell">
                 <div class="service-picker-row">
                     <div class="field service-picker-field">
@@ -1652,43 +2948,17 @@ function renderSelectionStep() {
                         Tétel hozzáadása
                     </button>
                 </div>
-            </div>
-
-            <div class="selected-list">
-                ${selectedCount
-                    ? state.selectedServices.map((serviceId) => renderSelectedSelectionCard(serviceId)).join("")
-                    : `<div class="empty-selection">Még nem adtál hozzá tételt.</div>`}
-            </div>
+                </div>
 
             <div class="nav-actions">
-                <div class="left-actions"></div>
+                <div class="left-actions">
+                    <button type="button" class="ghost-btn" data-action="clear-form">Kitöltött mezők törlése</button>
+                </div>
                 <div class="right-actions">
-                    <button type="button" class="primary-btn primary-btn-alt" data-action="next-step">Tovább a kiválasztott tételekhez</button>
+                    <button type="button" class="primary-btn primary-btn-alt" data-action="next-step" ${selectedCount ? "" : "disabled"}>Tovább a kiválasztott tételekhez</button>
                 </div>
             </div>
         </section>
-    `;
-}
-
-function renderSelectedSelectionCard(serviceId) {
-    const service = getService(serviceId);
-    const serviceStepIndex = getFlowSteps().findIndex((step) => step.id === serviceId);
-
-    return `
-        <article class="selection-item-card" style="${getServiceToneStyle(serviceId)}">
-            <div class="selection-item-top">
-                <span class="selection-item-name">${escapeHtml(service.name)}</span>
-                <span class="selection-item-status">Hozzáadva</span>
-            </div>
-            <div class="selection-item-actions">
-                <button type="button" class="secondary-btn compact-btn" data-action="jump-step" data-step-index="${serviceStepIndex}">
-                    Kitöltés
-                </button>
-                <button type="button" class="ghost-btn compact-btn" data-action="remove-service" data-service-id="${service.id}">
-                    Eltávolítás
-                </button>
-            </div>
-        </article>
     `;
 }
 
@@ -1704,12 +2974,20 @@ function renderServiceStep(service) {
                 <div>
                     <p class="eyebrow">${currentIndex + 1}. lépés</p>
                     <h2>${escapeHtml(service.name)}</h2>
+                    ${service.description ? `<p>${escapeHtml(service.description)}</p>` : ""}
                 </div>
                 <div class="inline-price">
                     <span>Részösszeg</span>
                     <strong id="currentSubtotal">${formatCurrency(subtotal)}</strong>
                 </div>
             </div>
+
+            ${service.note ? `
+                <div class="service-note">
+                    <strong>Megjegyzés</strong>
+                    <p>${escapeHtml(service.note)}</p>
+                </div>
+            ` : ""}
 
             <div class="field-grid">
                 ${service.fields.map((field) => renderContextField({
@@ -1726,6 +3004,7 @@ function renderServiceStep(service) {
             <div class="nav-actions">
                 <div class="left-actions">
                     <button type="button" class="secondary-btn" data-action="prev-step">Vissza</button>
+                    <button type="button" class="ghost-btn" data-action="clear-form">Kitöltött mezők törlése</button>
                     <button type="button" class="ghost-btn" data-action="remove-service" data-service-id="${service.id}">Tétel eltávolítása</button>
                 </div>
                 <div class="right-actions">
@@ -1769,9 +3048,38 @@ function renderShopProducts(products) {
     `;
 }
 
+function renderContactSections() {
+    const sections = Object.entries(CONTACT_SECTION_META);
+
+    return sections.map(([sectionId, meta]) => {
+        const fields = CONTACT_FIELDS_RUNTIME.filter((field) => field.section === sectionId);
+
+        if (!fields.length) {
+            return "";
+        }
+
+        return `
+            <section class="contact-section">
+                <div class="section-heading">
+                    <p class="eyebrow">${escapeHtml(meta.title)}</p>
+                    <p class="section-intro">${escapeHtml(meta.description)}</p>
+                </div>
+                <div class="field-grid">
+                    ${fields.map((field) => renderContextField({
+                        field,
+                        values: state.contactValues,
+                        scope: "contact",
+                        scopeId: "contact",
+                        fields: CONTACT_FIELDS_RUNTIME
+                    })).join("")}
+                </div>
+            </section>
+        `;
+    }).join("");
+}
+
 function renderContactStep() {
     const total = getGrandTotal();
-    const subtotals = getSelectedServiceTotals();
 
     return `
         <section class="step-card">
@@ -1779,7 +3087,7 @@ function renderContactStep() {
                 <div>
                     <p class="eyebrow">${state.currentStep + 1}. lépés</p>
                     <h2>Kapcsolat és küldés</h2>
-                    <p>Itt add meg az alapadataidat. Az előzetes kalkuláció tájékoztató jellegű, a végleges ajánlat helyszíni egyeztetés után készül.</p>
+                    <p>Itt add meg a végleges helyszíni felmérő és az ajánlatadás szempontjából fontos adatokat.</p>
                 </div>
                 <div class="inline-price">
                     <span>Tájékoztató végösszeg</span>
@@ -1787,43 +3095,15 @@ function renderContactStep() {
                 </div>
             </div>
 
-            <div class="summary-grid">
-                ${state.selectedServices.map((serviceId) => {
-                    const service = getService(serviceId);
-                    const meta = buildServiceMeta(service, ensureServiceState(serviceId));
-                    return `
-                        <article class="quote-line">
-                            <div>
-                                <h3>${escapeHtml(service.name)}</h3>
-                                <p>${escapeHtml(meta)}</p>
-                            </div>
-                            <span class="quote-line-price">${formatCurrency(subtotals[serviceId])}</span>
-                        </article>
-                    `;
-                }).join("")}
-            </div>
-
-            <div class="field-grid">
-                ${CONTACT_FIELDS_RUNTIME.map((field) => renderContextField({
-                    field,
-                    values: state.contactValues,
-                    scope: "contact",
-                    scopeId: "contact",
-                    fields: CONTACT_FIELDS_RUNTIME
-                })).join("")}
-            </div>
-
-            <div class="disclaimer">
-                <strong>Tájékoztató ajánlat:</strong>
-                <p>
-                    Az itt megjelenő összeg előzetes kalkuláció. A végleges ár a helyszín pontos felmérése, a mennyiségek, a választott anyagok, a megközelíthetőség, az esetleges bontási és földmunkák, valamint a műszaki részletek alapján módosulhat. A változtatás jogát fenntartjuk.
-                </p>
+            <div class="contact-section-grid">
+                ${renderContactSections()}
             </div>
 
             <div class="nav-actions">
                 <div class="left-actions">
                     <button type="button" class="secondary-btn" data-action="prev-step">Vissza</button>
-                    <button type="button" class="ghost-btn" data-action="jump-step" data-step-index="0">Tételek módosítása</button>
+                    <button type="button" class="ghost-btn" data-action="clear-form">Kitöltött mezők törlése</button>
+                    <button type="button" class="ghost-btn" data-action="jump-step" data-step-index="0">Új tétel hozzáadása</button>
                 </div>
                 <div class="right-actions">
                     <button type="button" class="primary-btn" data-action="submit-quote" ${state.isSubmitting ? "disabled" : ""}>
@@ -1913,6 +3193,42 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
         `;
     }
 
+    if (field.type === "checklist") {
+        const selectedValues = Array.isArray(value) ? value : [];
+
+        return `
+            <fieldset class="${fieldClass}">
+                <legend>${escapeHtml(getFieldLabel(field))}</legend>
+                ${helperText ? `<p class="field-helper">${escapeHtml(helperText)}</p>` : ""}
+                <div class="choice-grid">
+                    ${(field.options || []).map((option, index) => {
+                        const optionId = `${inputId}-${index}`;
+                        const checked = selectedValues.includes(option.value);
+                        return `
+                            <div class="option-card">
+                                <label for="${optionId}">
+                                    <div class="option-title-row">
+                                        <div>
+                                            <input
+                                                id="${optionId}"
+                                                type="checkbox"
+                                                ${checked ? "checked" : ""}
+                                                data-multi-value="${escapeHtml(option.value)}"
+                                                ${commonAttributes}
+                                            >
+                                            <span class="option-title">${escapeHtml(option.label)}</span>
+                                        </div>
+                                    </div>
+                                    ${option.note ? `<span class="option-note">${escapeHtml(option.note)}</span>` : ""}
+                                </label>
+                            </div>
+                        `;
+                    }).join("")}
+                </div>
+            </fieldset>
+        `;
+    }
+
     if (field.type === "toggle") {
         return `
             <fieldset class="${fieldClass}">
@@ -1927,7 +3243,7 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
                                 ${commonAttributes}
                             >
                             <span class="option-title">${escapeHtml(field.label)}</span>
-                            ${field.required ? `<span class="option-note">Ez a megerősítés szükséges a beküldéshez. A kalkuláció tájékoztató jellegű, nem minősül végleges ajánlatnak. A Díszkertek a változtatás jogát fenntartja, különösen a helyszíni adottságok, a pontos mennyiségek, az anyagválasztás, a megközelíthetőség és az esetleges rejtett műszaki körülmények függvényében.</span>` : ""}
+                            ${field.required ? `<span class="option-note">Ez a megerősítés szükséges a beküldéshez.</span>` : ""}
                         </label>
                     </div>
                 </div>
@@ -1944,6 +3260,9 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
             placeholder="${escapeHtml(field.placeholder || "")}"
             ${field.min != null ? `min="${field.min}"` : ""}
             ${field.step != null ? `step="${field.step}"` : ""}
+            ${field.inputMode ? `inputmode="${field.inputMode}"` : ""}
+            ${field.maxLength ? `maxlength="${field.maxLength}"` : ""}
+            ${field.pattern ? `pattern="${field.pattern}"` : ""}
             ${commonAttributes}
         >
     `;
@@ -2094,6 +3413,19 @@ function getFieldValueFromInput(input) {
     }
 
     return input.value;
+}
+
+function getScopedFieldDefinition(input) {
+    if (input.dataset.scope === "service") {
+        const service = getService(input.dataset.serviceId);
+        return service?.fields.find((field) => field.id === input.dataset.fieldId) || null;
+    }
+
+    if (input.dataset.scope === "contact") {
+        return CONTACT_LOOKUP[input.dataset.contactField] || null;
+    }
+
+    return null;
 }
 
 function updateLiveTotals() {
@@ -2319,8 +3651,19 @@ function resetApp() {
     state.serviceValues = {};
     state.contactValues = createDefaultContactState();
     state.isSubmitting = false;
+    state.postalLookupMessage = "";
+    state.postalLookupState = "idle";
+    clearPersistedState();
     renderApp();
     scrollToCalculator();
+}
+
+function clearFilledValues() {
+    state.serviceValues = buildPersistableServiceState(state.selectedServices, {});
+    state.contactValues = createDefaultContactState();
+    state.postalLookupMessage = "";
+    state.postalLookupState = "idle";
+    renderApp();
 }
 
 function handleActionClick(event) {
@@ -2363,7 +3706,30 @@ function handleActionClick(event) {
 
     if (action === "submit-quote") {
         handleSubmit();
+        return;
     }
+
+    if (action === "clear-form") {
+        clearFilledValues();
+    }
+}
+
+function handleActionKeydown(event) {
+    const target = event.target.closest("[data-action]");
+    if (!target) {
+        return;
+    }
+
+    if (event.key !== "Enter" && event.key !== " ") {
+        return;
+    }
+
+    if (target.tagName === "BUTTON") {
+        return;
+    }
+
+    event.preventDefault();
+    target.click();
 }
 
 function handleFieldUpdate(event, shouldRerender) {
@@ -2378,7 +3744,24 @@ function handleFieldUpdate(event, shouldRerender) {
         return;
     }
 
-    const value = getFieldValueFromInput(input);
+    const field = getScopedFieldDefinition(input);
+    let value = getFieldValueFromInput(input);
+
+    if (field?.id === "postalCode") {
+        value = String(value || "").replace(/\D/g, "").slice(0, 4);
+        input.value = value;
+    }
+
+    if (field?.type === "checklist" && input.dataset.multiValue) {
+        const currentValue = scope === "service"
+            ? ensureServiceState(input.dataset.serviceId)[input.dataset.fieldId]
+            : state.contactValues[input.dataset.contactField];
+        const currentValues = Array.isArray(currentValue) ? currentValue : [];
+
+        value = input.checked
+            ? [...new Set([...currentValues, input.dataset.multiValue])]
+            : currentValues.filter((item) => item !== input.dataset.multiValue);
+    }
 
     if (scope === "service") {
         updateServiceField(input.dataset.serviceId, input.dataset.fieldId, value);
@@ -2426,6 +3809,7 @@ function addSelectedServiceFromPicker() {
 }
 
 stepContainer.addEventListener("click", handleActionClick);
+stepContainer.addEventListener("keydown", handleActionKeydown);
 stepContainer.addEventListener("change", (event) => handleFieldUpdate(event, true));
 stepContainer.addEventListener("input", (event) => {
     const target = event.target;
@@ -2441,14 +3825,16 @@ stepContainer.addEventListener("input", (event) => {
 });
 
 stepPills.addEventListener("click", handleActionClick);
+stepPills.addEventListener("keydown", handleActionKeydown);
 selectedServicesElement.addEventListener("click", handleActionClick);
+selectedServicesElement.addEventListener("keydown", handleActionKeydown);
 
 startButton.addEventListener("click", startForm);
-editSelectionButton.addEventListener("click", () => goToStep(0));
 closeSuccessButton.addEventListener("click", closeSuccessModal);
 
 window.startForm = startForm;
 
+restorePersistedState();
 renderApp();
 
 

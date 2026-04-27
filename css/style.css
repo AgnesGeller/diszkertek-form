@@ -254,7 +254,7 @@ a {
 .step-panel {
     padding: 1.6rem;
     background:
-        linear-gradient(180deg, rgba(239, 246, 240, 0.92) 0%, rgba(255, 252, 247, 0.96) 100%);
+        linear-gradient(180deg, rgba(232, 241, 233, 0.96) 0%, rgba(255, 252, 247, 0.98) 100%);
 }
 
 .summary-panel {
@@ -306,6 +306,19 @@ a {
     padding: 0.9rem;
 }
 
+.selected-service-card.is-clickable {
+    cursor: pointer;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+.selected-service-card.is-clickable:hover,
+.selected-service-card.is-clickable:focus-visible {
+    transform: translateY(-1px);
+    border-color: var(--service-accent);
+    box-shadow: var(--shadow-sm);
+    outline: none;
+}
+
 .selected-service-header {
     display: flex;
     align-items: start;
@@ -313,14 +326,11 @@ a {
     gap: 0.75rem;
 }
 
-.selected-service-header button {
-    border: 0;
-    background: transparent;
+.selected-service-linkish {
     color: var(--service-text);
     font-size: 0.97rem;
     font-weight: 800;
     text-align: left;
-    padding: 0;
     overflow-wrap: anywhere;
 }
 
@@ -437,67 +447,9 @@ a {
     min-width: 200px;
 }
 
-.selected-list {
-    display: none;
-}
-
-.selection-item-card {
-    --service-surface: #edf5ef;
-    --service-border: #b9d5c0;
-    --service-accent: #2f6b45;
-    --service-text: #214a31;
-    display: grid;
-    gap: 0.85rem;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--service-border);
-    background: linear-gradient(135deg, var(--service-surface) 0%, rgba(255, 255, 255, 0.92) 100%);
-    padding: 1rem;
-    box-shadow: var(--shadow-sm);
-}
-
-.selection-item-top {
-    display: flex;
-    align-items: start;
-    justify-content: space-between;
-    gap: 0.8rem;
-}
-
-.selection-item-name {
-    color: var(--service-text);
-    font-size: 1.05rem;
-    font-weight: 800;
-    overflow-wrap: anywhere;
-}
-
-.selection-item-status {
-    flex-shrink: 0;
-    border-radius: 999px;
-    padding: 0.38rem 0.75rem;
-    background: var(--service-accent);
-    color: #fff;
-    font-size: 0.76rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-.selection-item-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.7rem;
-}
-
 .compact-btn {
     width: auto;
     padding: 0.75rem 1rem;
-}
-
-.empty-selection {
-    border-radius: var(--radius-lg);
-    border: 1px dashed rgba(47, 107, 69, 0.2);
-    background: rgba(255, 255, 255, 0.56);
-    padding: 1rem;
-    color: var(--muted);
 }
 
 .selection-summary,
@@ -529,6 +481,29 @@ a {
     display: grid;
     gap: 1rem;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.contact-section-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.contact-section {
+    display: grid;
+    gap: 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(72, 57, 35, 0.1);
+    background: rgba(255, 255, 255, 0.7);
+    padding: 1rem;
+}
+
+.section-heading {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.section-intro {
+    font-size: 0.92rem;
 }
 
 .field {
@@ -795,11 +770,6 @@ fieldset.field {
     transform: none;
 }
 
-.summary-edit-btn {
-    width: 100%;
-    margin-top: 1rem;
-}
-
 .success-modal {
     position: fixed;
     inset: 0;
@@ -881,6 +851,7 @@ fieldset.field {
     }
 
     .service-picker-row,
+    .contact-section-grid,
     .field-grid,
     .choice-grid,
     .toggle-grid,
@@ -889,7 +860,6 @@ fieldset.field {
         grid-template-columns: minmax(0, 1fr);
     }
 
-    .selection-item-top,
     .selected-service-header,
     .quote-line,
     .option-title-row {
@@ -903,7 +873,6 @@ fieldset.field {
         white-space: normal;
     }
 
-    .selection-item-actions > *,
     .service-add-btn,
     .compact-btn {
         width: 100%;
@@ -945,7 +914,7 @@ fieldset.field {
     }
 
     .service-picker-shell,
-    .selection-item-card,
+    .contact-section,
     .product-card,
     .selected-service-card,
     .quote-line,
@@ -1015,11 +984,11 @@ fieldset.field {
     }
 
     .product-card,
+    .contact-section,
     .selected-service-card,
     .quote-line,
     .option-card label,
     .toggle-card label,
-    .selection-item-card,
     .service-picker-shell {
         padding: 0.9rem;
     }
