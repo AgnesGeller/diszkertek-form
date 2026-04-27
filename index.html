@@ -37,17 +37,9 @@
     <main class="app-shell" id="calculator">
         <section class="wizard-shell">
             <div class="wizard-header">
-                <div class="wizard-copy">
-                    <p class="eyebrow">Díszkertek Kertépítés</p>
-                    <h1>Kertépítési előkészítő kalkulátor</h1>
-                    <p class="wizard-lead">
-                        Külön tételek, gyors kiválasztás, alapadatok csak a végén.
-                    </p>
-                </div>
-
                 <div class="wizard-meta">
-                    <span id="stepCounter" class="step-counter">1 / 3</span>
-                    <strong id="stepTitle" class="step-title">Tételek kiválasztása</strong>
+                    <span id="stepCounter" class="step-counter"></span>
+                    <strong id="stepTitle" class="step-title"></strong>
                 </div>
             </div>
 
@@ -72,22 +64,12 @@
                             <span>Végösszeg</span>
                             <strong id="totalPrice">0 Ft</strong>
                         </div>
-                        <p class="summary-caption">
-                            Tájékoztató kalkuláció.
-                        </p>
 
                         <div id="selectedServices" class="selected-services"></div>
 
                         <button type="button" class="secondary-btn summary-edit-btn" id="editSelectionButton">
                             Tételek módosítása
                         </button>
-                    </div>
-
-                    <div class="summary-card compact-card">
-                        <h2>Fontos tudnivaló</h2>
-                        <p>
-                            A kalkuláció tájékoztató jellegű, a végleges ajánlat a helyszín és a pontos műszaki tartalom alapján készül.
-                        </p>
                     </div>
                 </aside>
             </div>

@@ -1,4 +1,4 @@
-const EMAILJS_SERVICE_ID = "service_gi1vj2r";
+﻿const EMAILJS_SERVICE_ID = "service_gi1vj2r";
 const EMAILJS_TEMPLATE_CUSTOMER = "template_m0utevq";
 const EMAILJS_TEMPLATE_INTERNAL = "template_ciz2tq2";
 
@@ -1212,8 +1212,52 @@ const CONTACT_FIELDS = [
     }
 ];
 
+const CONTACT_FIELDS_RUNTIME = [
+    { id: "fullName", type: "text", label: "Név", placeholder: "Teljes név", required: true },
+    { id: "email", type: "email", label: "Email-cím", placeholder: "pelda@email.hu", required: true },
+    { id: "phone", type: "tel", label: "Telefonszám", placeholder: "+36 30 123 4567", required: true },
+    { id: "postalCode", type: "text", label: "Irányítószám", placeholder: "pl. 2051", required: true },
+    { id: "settlement", type: "text", label: "Település", placeholder: "Automatikusan kitöltjük", required: true },
+    { id: "siteAddress", type: "text", label: "Utca, házszám, egyéb címadat", placeholder: "pl. Tópark utca 12.", required: true, full: true },
+    { id: "desiredStart", type: "date", label: "Tervezett kezdés" },
+    {
+        id: "contactMode",
+        type: "choice",
+        label: "Milyen módon keressünk?",
+        full: true,
+        options: [
+            { value: "", label: "Válassz" },
+            { value: "telefon", label: "Telefonon" },
+            { value: "email", label: "Emailben" },
+            { value: "mindegy", label: "Mindkettő megfelel" }
+        ]
+    },
+    { id: "availableTime", type: "text", label: "Mikor vagy elérhető?", placeholder: "pl. hétköznap 14:00 után" },
+    {
+        id: "planStatus",
+        type: "select",
+        label: "Van már előkészített anyagod?",
+        options: [
+            { value: "", label: "Válassz" },
+            { value: "nincs", label: "Még nincs" },
+            { value: "meretek", label: "Méretek vagy skicc már van" },
+            { value: "terv", label: "Van terv vagy látványterv" },
+            { value: "helyszin", label: "Helyszíni bejárás után pontosítanánk" }
+        ]
+    },
+    { id: "projectGoal", type: "textarea", label: "Röviden: mit szeretnél megvalósítani?", full: true, placeholder: "Mi a legfontosabb cél, milyen stílust vagy használatot szeretnél?" },
+    { id: "notes", type: "textarea", label: "További megjegyzés", full: true, placeholder: "Bármi, ami segíti a pontosabb ajánlatadást." },
+    {
+        id: "consent",
+        type: "toggle",
+        label: "Elfogadom, hogy az itt megjelenő összeg tájékoztató jellegű, és a végleges ajánlat a helyszíni felmérés, a műszaki részletek, a mennyiségek és az anyagválasztás alapján módosulhat.",
+        required: true,
+        full: true
+    }
+];
+
 const SERVICE_LOOKUP = Object.fromEntries(SERVICES.map((service) => [service.id, service]));
-const CONTACT_LOOKUP = Object.fromEntries(CONTACT_FIELDS.map((field) => [field.id, field]));
+const CONTACT_LOOKUP = Object.fromEntries(CONTACT_FIELDS_RUNTIME.map((field) => [field.id, field]));
 const SERVICE_TONES = [
     { surface: "#edf5ef", border: "#b9d5c0", accent: "#2f6b45", text: "#214a31" },
     { surface: "#f7efe6", border: "#e3caa8", accent: "#bb7c37", text: "#6f461d" },
@@ -1242,7 +1286,9 @@ const state = {
     selectedServices: [],
     serviceValues: {},
     contactValues: createDefaultContactState(),
-    isSubmitting: false
+    isSubmitting: false,
+    postalLookupMessage: "",
+    postalLookupState: "idle"
 };
 
 function createDefaultContactState() {
@@ -1250,6 +1296,7 @@ function createDefaultContactState() {
         fullName: "",
         email: "",
         phone: "",
+        postalCode: "",
         siteAddress: "",
         settlement: "",
         desiredStart: "",
@@ -1261,6 +1308,19 @@ function createDefaultContactState() {
         consent: false
     };
 }
+
+const POSTAL_CODE_OVERRIDES = {
+    "2011": "Budakal\u00e1sz",
+    "2013": "Pom\u00e1z"
+};
+
+let postalLookupTimer = null;
+
+CONTACT_FIELDS_RUNTIME.forEach((field) => {
+    if (field.id === "consent") {
+        field.label = "Elfogadom a tájékoztató kalkulációt.";
+    }
+});
 
 function defaultValueForField(field) {
     if (Object.prototype.hasOwnProperty.call(field, "defaultValue")) {
@@ -1399,6 +1459,22 @@ function getFieldLabel(field) {
     return field.suffix ? `${field.label} (${field.suffix})` : field.label;
 }
 
+function getFieldHelperText(field, scope) {
+    if (scope === "contact" && field.id === "postalCode") {
+        return state.postalLookupMessage || "";
+    }
+
+    if (scope === "contact" && field.id === "settlement") {
+        if (state.postalLookupState === "success") {
+            return "Az irányítószám alapján kitöltve, de szükség esetén módosítható.";
+        }
+
+        return "Ha nem sikerül automatikusan, kézzel is megadható.";
+    }
+
+    return field.helper || "";
+}
+
 function getVisibleFieldLines(fields, values) {
     return fields
         .filter((field) => shouldShowField(fields, field, values))
@@ -1506,6 +1582,11 @@ function renderSummary() {
                         <span class="selected-service-price">${formatCurrency(subtotals[serviceId])}</span>
                     </div>
                     <p class="selected-service-meta">${escapeHtml(meta)}</p>
+                    <div class="selected-service-actions">
+                        <button type="button" class="ghost-btn compact-btn" data-action="remove-service" data-service-id="${service.id}">
+                            Eltávolítás
+                        </button>
+                    </div>
                 </div>
             `;
         })
@@ -1535,7 +1616,6 @@ function renderSelectionStep() {
             <div class="card-top">
                 <div>
                     <p class="eyebrow">1. lépés</p>
-                    <h2>Mit szeretnél kikalkulálni?</h2>
                     <p>Válassz tételt a listából.</p>
                 </div>
                 <div class="inline-price">
@@ -1544,9 +1624,13 @@ function renderSelectionStep() {
                 </div>
             </div>
 
-            <div class="selection-summary">
-                <strong>${selectedCount ? `${selectedCount} tétel kiválasztva` : ""}</strong>
-            </div>
+            ${selectedCount
+                ? `
+                    <div class="selection-summary">
+                        <strong>${selectedCount} tétel kiválasztva</strong>
+                    </div>
+                `
+                : ""}
 
             <div class="service-picker-shell">
                 <div class="service-picker-row">
@@ -1579,7 +1663,7 @@ function renderSelectionStep() {
             <div class="nav-actions">
                 <div class="left-actions"></div>
                 <div class="right-actions">
-                    <button type="button" class="primary-btn" data-action="next-step">Tovább a kiválasztott tételekhez</button>
+                    <button type="button" class="primary-btn primary-btn-alt" data-action="next-step">Tovább a kiválasztott tételekhez</button>
                 </div>
             </div>
         </section>
@@ -1720,12 +1804,12 @@ function renderContactStep() {
             </div>
 
             <div class="field-grid">
-                ${CONTACT_FIELDS.map((field) => renderContextField({
+                ${CONTACT_FIELDS_RUNTIME.map((field) => renderContextField({
                     field,
                     values: state.contactValues,
                     scope: "contact",
                     scopeId: "contact",
-                    fields: CONTACT_FIELDS
+                    fields: CONTACT_FIELDS_RUNTIME
                 })).join("")}
             </div>
 
@@ -1759,6 +1843,7 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
     const fieldClass = ["field", field.full ? "is-full" : ""].filter(Boolean).join(" ");
     const value = values[field.id];
     const inputId = `${scopeId}-${field.id}`;
+    const helperText = getFieldHelperText(field, scope);
     const commonAttributes = scope === "service"
         ? `data-scope="service" data-service-id="${scopeId}" data-field-id="${field.id}"`
         : `data-scope="contact" data-contact-field="${field.id}"`;
@@ -1767,7 +1852,7 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
         return `
             <div class="${fieldClass}">
                 <label for="${inputId}">${escapeHtml(getFieldLabel(field))}</label>
-                ${field.helper ? `<p class="field-helper">${escapeHtml(field.helper)}</p>` : ""}
+                ${helperText ? `<p class="field-helper">${escapeHtml(helperText)}</p>` : ""}
                 <textarea
                     id="${inputId}"
                     placeholder="${escapeHtml(field.placeholder || "")}"
@@ -1781,7 +1866,7 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
         return `
             <div class="${fieldClass}">
                 <label for="${inputId}">${escapeHtml(getFieldLabel(field))}</label>
-                ${field.helper ? `<p class="field-helper">${escapeHtml(field.helper)}</p>` : ""}
+                ${helperText ? `<p class="field-helper">${escapeHtml(helperText)}</p>` : ""}
                 <select id="${inputId}" ${commonAttributes}>
                     ${(field.options || []).map((option) => `
                         <option value="${escapeHtml(option.value)}" ${option.value === value ? "selected" : ""}>
@@ -1797,7 +1882,7 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
         return `
             <fieldset class="${fieldClass}">
                 <legend>${escapeHtml(getFieldLabel(field))}</legend>
-                ${field.helper ? `<p class="field-helper">${escapeHtml(field.helper)}</p>` : ""}
+                ${helperText ? `<p class="field-helper">${escapeHtml(helperText)}</p>` : ""}
                 <div class="choice-grid">
                     ${(field.options || []).map((option, index) => {
                         const optionId = `${inputId}-${index}`;
@@ -1866,7 +1951,7 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
     return `
         <div class="${fieldClass}">
             <label for="${inputId}">${escapeHtml(getFieldLabel(field))}</label>
-            ${field.helper ? `<p class="field-helper">${escapeHtml(field.helper)}</p>` : ""}
+            ${helperText ? `<p class="field-helper">${escapeHtml(helperText)}</p>` : ""}
             ${inputMarkup}
         </div>
     `;
@@ -1955,6 +2040,54 @@ function updateContactField(fieldId, value) {
     state.contactValues[fieldId] = value;
 }
 
+async function lookupSettlementByPostalCode(postalCode) {
+    const cleanPostalCode = String(postalCode || "").trim();
+
+    if (!/^\d{4}$/.test(cleanPostalCode)) {
+        state.postalLookupState = "idle";
+        state.postalLookupMessage = "";
+        state.contactValues.settlement = "";
+        renderApp();
+        return;
+    }
+
+    state.postalLookupState = "loading";
+    state.postalLookupMessage = "Telep\u00fcl\u00e9s keres\u00e9se...";
+    renderApp();
+
+    if (POSTAL_CODE_OVERRIDES[cleanPostalCode]) {
+        state.contactValues.settlement = POSTAL_CODE_OVERRIDES[cleanPostalCode];
+        state.postalLookupState = "success";
+        state.postalLookupMessage = `Telep\u00fcl\u00e9s kit\u00f6ltve: ${POSTAL_CODE_OVERRIDES[cleanPostalCode]}`;
+        renderApp();
+        return;
+    }
+
+    try {
+        const response = await fetch(`https://api.zippopotam.us/HU/${cleanPostalCode}`);
+
+        if (!response.ok) {
+            throw new Error("Postal lookup failed");
+        }
+
+        const data = await response.json();
+        const placeName = data?.places?.[0]?.["place name"] || "";
+
+        if (!placeName) {
+            throw new Error("No place name found");
+        }
+
+        state.contactValues.settlement = placeName;
+        state.postalLookupState = "success";
+        state.postalLookupMessage = `Telep\u00fcl\u00e9s kit\u00f6ltve: ${placeName}`;
+        renderApp();
+    } catch (error) {
+        state.postalLookupState = "error";
+        state.postalLookupMessage = "A telep\u00fcl\u00e9st most nem tudtuk automatikusan kit\u00f6lteni, k\u00e9rlek \u00edrd be k\u00e9zzel.";
+        renderApp();
+    }
+}
+
 function getFieldValueFromInput(input) {
     if (input.type === "checkbox") {
         return input.checked;
@@ -1993,7 +2126,7 @@ function validateContactStep() {
         return false;
     }
 
-    const requiredFields = CONTACT_FIELDS.filter((field) => field.required);
+    const requiredFields = CONTACT_FIELDS_RUNTIME.filter((field) => field.required);
 
     for (const field of requiredFields) {
         const value = state.contactValues[field.id];
@@ -2060,7 +2193,7 @@ function buildSubmissionPayloads() {
         return `- ${service.name}: ${formatCurrency(subtotals[serviceId])} (${buildServiceMeta(service, values)})`;
     });
 
-    const contactLines = CONTACT_FIELDS
+    const contactLines = CONTACT_FIELDS_RUNTIME
         .map((field) => {
             if (field.id === "consent") {
                 return null;
@@ -2096,7 +2229,11 @@ function buildSubmissionPayloads() {
 
     const customerName = state.contactValues.fullName || "Érdeklődő";
     const customerEmail = (state.contactValues.email || "").trim().toLowerCase();
-    const projectAddress = state.contactValues.siteAddress || "nincs megadva";
+    const projectAddress = [
+        state.contactValues.postalCode,
+        state.contactValues.settlement,
+        state.contactValues.siteAddress
+    ].filter(Boolean).join(", ") || "nincs megadva";
 
     const basePayload = {
         customer_name: customerName,
@@ -2249,6 +2386,16 @@ function handleFieldUpdate(event, shouldRerender) {
 
     if (scope === "contact") {
         updateContactField(input.dataset.contactField, value);
+
+        if (input.dataset.contactField === "postalCode") {
+            if (postalLookupTimer) {
+                clearTimeout(postalLookupTimer);
+            }
+
+            postalLookupTimer = window.setTimeout(() => {
+                lookupSettlementByPostalCode(value);
+            }, 350);
+        }
     }
 
     if (shouldRerender) {
@@ -2266,7 +2413,7 @@ function addSelectedServiceFromPicker() {
 
     const serviceId = picker.value;
     if (!serviceId) {
-        showFeedback("Válassz ki egy tételt a hozzáadáshoz.");
+        showFeedback("V\u00e1lassz ki egy t\u00e9telt a hozz\u00e1ad\u00e1shoz.");
         return;
     }
 
@@ -2303,3 +2450,5 @@ closeSuccessButton.addEventListener("click", closeSuccessModal);
 window.startForm = startForm;
 
 renderApp();
+
+

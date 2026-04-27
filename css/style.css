@@ -140,10 +140,9 @@ a {
 }
 
 .wizard-header {
-    display: grid;
-    gap: 1.5rem;
-    grid-template-columns: minmax(0, 1.2fr) minmax(250px, 0.6fr);
-    padding: 1.7rem;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.9rem 1.1rem;
     border-radius: var(--radius-xl);
 }
 
@@ -162,15 +161,7 @@ a {
 }
 
 .wizard-meta {
-    align-self: end;
-    justify-self: end;
-    display: grid;
-    gap: 0.35rem;
-    padding: 1rem 1.1rem;
-    min-width: min(100%, 260px);
-    border-radius: var(--radius-lg);
-    background: rgba(47, 107, 69, 0.08);
-    border: 1px solid rgba(47, 107, 69, 0.12);
+    display: none;
 }
 
 .step-counter {
@@ -262,6 +253,8 @@ a {
 
 .step-panel {
     padding: 1.6rem;
+    background:
+        linear-gradient(180deg, rgba(239, 246, 240, 0.92) 0%, rgba(255, 252, 247, 0.96) 100%);
 }
 
 .summary-panel {
@@ -344,6 +337,10 @@ a {
     overflow-wrap: anywhere;
 }
 
+.selected-service-actions {
+    margin-top: 0.7rem;
+}
+
 .compact-card h2 {
     margin-bottom: 0.55rem;
     font-size: 1.55rem;
@@ -372,6 +369,8 @@ a {
 .step-card {
     display: grid;
     gap: 1.45rem;
+    padding-left: 0.2rem;
+    border-left: 6px solid rgba(47, 107, 69, 0.18);
 }
 
 .card-top {
@@ -439,8 +438,7 @@ a {
 }
 
 .selected-list {
-    display: grid;
-    gap: 0.9rem;
+    display: none;
 }
 
 .selection-item-card {
@@ -512,6 +510,10 @@ a {
     background: rgba(255, 255, 255, 0.56);
 }
 
+.disclaimer {
+    display: none;
+}
+
 .selection-summary strong,
 .disclaimer strong,
 .service-note strong,
@@ -533,6 +535,10 @@ a {
     display: grid;
     gap: 0.45rem;
     min-width: 0;
+    padding: 0.9rem;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(72, 57, 35, 0.08);
+    background: rgba(255, 255, 255, 0.6);
 }
 
 .field.is-full {
@@ -698,7 +704,7 @@ fieldset.field {
 }
 
 .summary-grid {
-    margin-top: 0.5rem;
+    display: none;
 }
 
 .quote-line {
@@ -762,6 +768,11 @@ fieldset.field {
     background: linear-gradient(135deg, var(--brand) 0%, #4f8f64 100%);
     color: #fff;
     box-shadow: 0 16px 30px rgba(47, 107, 69, 0.22);
+}
+
+.primary-btn-alt {
+    background: linear-gradient(135deg, #bb7c37 0%, #d19a57 100%);
+    box-shadow: 0 16px 30px rgba(187, 124, 55, 0.24);
 }
 
 .secondary-btn {
