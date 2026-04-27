@@ -43,8 +43,8 @@ const SERVICES = [
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Meglévő rendszer, kiállások, külön igények..." }
         ],
         shopProducts: [
-            { name: "Hunter vezérlő", priceLabel: "induló ár: 69 900 Ft", description: "Időzített vagy okos vezérléshez.", url: "" },
-            { name: "Csepegtető csomag", priceLabel: "induló ár: 24 900 Ft", description: "Ágyások és sövények célzott öntözéséhez.", url: "" }
+            { name: "Hunter vezérlő", priceLabel: "induló ár: 69 900 Ft", description: "Időzített vagy okos vezérléshez.", url: "https://agnesgeller.github.io/katalogus/" },
+            { name: "Csepegtető csomag", priceLabel: "induló ár: 24 900 Ft", description: "Ágyások és sövények célzott öntözéséhez.", url: "https://agnesgeller.github.io/katalogus/" }
         ],
         calculate(values) {
             const area = numberValue(values.area);
@@ -115,8 +115,8 @@ const SERVICES = [
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Burkolattípus, meglévő szintkülönbség, képek..." }
         ],
         shopProducts: [
-            { name: "Prémium térkő", priceLabel: "induló ár: 12 900 Ft / m²", description: "Teraszhoz és közlekedőhöz.", url: "" },
-            { name: "Kerti lap", priceLabel: "induló ár: 16 500 Ft / m²", description: "Nagyobb formátumú kültéri lap.", url: "" }
+            { name: "Prémium térkő", priceLabel: "induló ár: 12 900 Ft / m²", description: "Teraszhoz és közlekedőhöz.", url: "https://agnesgeller.github.io/katalogus/" },
+            { name: "Kerti lap", priceLabel: "induló ár: 16 500 Ft / m²", description: "Nagyobb formátumú kültéri lap.", url: "https://agnesgeller.github.io/katalogus/" }
         ],
         calculate(values) {
             const area = numberValue(values.area);
@@ -178,7 +178,7 @@ const SERVICES = [
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Elhelyezés, homlokzati csatlakozás, egyedi elképzelés..." }
         ],
         shopProducts: [
-            { name: "Alumínium pergola rendszer", priceLabel: "induló ár: 1 190 000 Ft", description: "Közepes méretű modern pergola csomag.", url: "" },
+            { name: "Alumínium pergola rendszer", priceLabel: "induló ár: 1 190 000 Ft", description: "Közepes méretű modern pergola csomag.", url: "https://agnesgeller.github.io/katalogus/" },
             { name: "Zip-screen árnyékoló", priceLabel: "induló ár: 189 000 Ft / oldal", description: "Oldalárnyékoló kiegészítő pergolához.", url: "" }
         ],
         calculate(values) {
@@ -233,8 +233,8 @@ const SERVICES = [
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Korosztály, kedvenc elemek, elhelyezés..." }
         ],
         shopProducts: [
-            { name: "Játszótorony csomag", priceLabel: "induló ár: 299 000 Ft", description: "Hinta és csúszda kombináció.", url: "" },
-            { name: "Prémium hintaállvány", priceLabel: "induló ár: 169 000 Ft", description: "Kisebb kertekhez is jól illeszthető.", url: "" }
+            { name: "Játszótorony csomag", priceLabel: "induló ár: 299 000 Ft", description: "Hinta és csúszda kombináció.", url: "https://agnesgeller.github.io/katalogus/" },
+            { name: "Prémium hintaállvány", priceLabel: "induló ár: 169 000 Ft", description: "Kisebb kertekhez is jól illeszthető.", url: "https://agnesgeller.github.io/katalogus/" }
         ],
         calculate(values) {
             const packageFee = lookupValue(values.package, {
@@ -593,9 +593,9 @@ const SERVICES = [
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Mennyire meredek a terep, van-e hely gépnek..." }
         ],
         shopProducts: [
-            { name: "Támfalblokk rendszer", priceLabel: "induló ár: 18 500 Ft / m²", description: "Rendszerkő támfal építéshez.", url: "" },
-            { name: "Gabion kosár", priceLabel: "induló ár: 42 000 Ft / db", description: "Modern, szellős támfalszerkezethez.", url: "" },
-            { name: "Dréncső csomag", priceLabel: "induló ár: 19 900 Ft", description: "Vízelvezetéshez és háttöltéshez.", url: "" }
+            { name: "Támfalblokk rendszer", priceLabel: "induló ár: 18 500 Ft / m²", description: "Rendszerkő támfal építéshez.", url: "https://agnesgeller.github.io/katalogus/" },
+            { name: "Gabion kosár", priceLabel: "induló ár: 42 000 Ft / db", description: "Modern, szellős támfalszerkezethez.", url: "https://agnesgeller.github.io/katalogus/" },
+            { name: "Dréncső csomag", priceLabel: "induló ár: 19 900 Ft", description: "Vízelvezetéshez és háttöltéshez.", url: "https://agnesgeller.github.io/katalogus/" }
         ],
         calculate(values) {
             const length = numberValue(values.length);
@@ -653,8 +653,8 @@ const SERVICES = [
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Milyen hangulatot, milyen zónákat szeretnél kiemelni..." }
         ],
         shopProducts: [
-            { name: "Kerti leszúrható lámpa", priceLabel: "induló ár: 14 900 Ft", description: "Ágyások és kis fák kiemeléséhez.", url: "" },
-            { name: "Járdavilágító oszlop", priceLabel: "induló ár: 22 900 Ft", description: "Biztonságos közlekedéshez.", url: "" }
+            { name: "Kerti leszúrható lámpa", priceLabel: "induló ár: 14 900 Ft", description: "Ágyások és kis fák kiemeléséhez.", url: "https://agnesgeller.github.io/katalogus/" },
+            { name: "Járdavilágító oszlop", priceLabel: "induló ár: 22 900 Ft", description: "Biztonságos közlekedéshez.", url: "https://agnesgeller.github.io/katalogus/" }
         ],
         calculate(values) {
             const points = numberValue(values.points);
@@ -923,8 +923,8 @@ const SERVICES = [
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Szín, szemcseméret, növényekkel vagy anélkül..." }
         ],
         shopProducts: [
-            { name: "Fehér díszkavics", priceLabel: "induló ár: 8 900 Ft / zsák", description: "Világos, dekoratív felületekhez.", url: "" },
-            { name: "Bazalt dekor", priceLabel: "induló ár: 9 900 Ft / zsák", description: "Kontrasztos, modern megjelenéshez.", url: "" }
+            { name: "Fehér díszkavics", priceLabel: "induló ár: 8 900 Ft / zsák", description: "Világos, dekoratív felületekhez.", url: "https://agnesgeller.github.io/katalogus/" },
+            { name: "Bazalt dekor", priceLabel: "induló ár: 9 900 Ft / zsák", description: "Kontrasztos, modern megjelenéshez.", url: "https://agnesgeller.github.io/katalogus/" }
         ],
         calculate(values) {
             const area = numberValue(values.area);
@@ -980,8 +980,8 @@ const SERVICES = [
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Belátásvédelem, stílus, szomszédos oldal, alapozás..." }
         ],
         shopProducts: [
-            { name: "Panelkerítés szett", priceLabel: "induló ár: 24 900 Ft / panel", description: "Gyorsan telepíthető klasszikus rendszer.", url: "" },
-            { name: "WPC kerítésrendszer", priceLabel: "induló ár: 39 900 Ft / panel", description: "Magasabb privát szinthez.", url: "" }
+            { name: "Panelkerítés szett", priceLabel: "induló ár: 24 900 Ft / panel", description: "Gyorsan telepíthető klasszikus rendszer.", url: "https://agnesgeller.github.io/katalogus/" },
+            { name: "WPC kerítésrendszer", priceLabel: "induló ár: 39 900 Ft / panel", description: "Magasabb privát szinthez.", url: "https://agnesgeller.github.io/katalogus/" }
         ],
         calculate(values) {
             const length = numberValue(values.length);
