@@ -1927,7 +1927,7 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
                                 ${commonAttributes}
                             >
                             <span class="option-title">${escapeHtml(field.label)}</span>
-                            ${field.required ? `<span class="option-note">Ez a megerősítés szükséges a beküldéshez.</span>` : ""}
+                            ${field.required ? `<span class="option-note">Ez a megerősítés szükséges a beküldéshez. A kalkuláció tájékoztató jellegű, nem minősül végleges ajánlatnak. A Díszkertek a változtatás jogát fenntartja, különösen a helyszíni adottságok, a pontos mennyiségek, az anyagválasztás, a megközelíthetőség és az esetleges rejtett műszaki körülmények függvényében.</span>` : ""}
                         </label>
                     </div>
                 </div>
