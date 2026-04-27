@@ -44,6 +44,16 @@ img {
     max-width: 100%;
 }
 
+main,
+section,
+article,
+aside,
+div,
+form,
+fieldset {
+    min-width: 0;
+}
+
 button,
 input,
 select,
@@ -83,6 +93,7 @@ a {
 .footer-inner {
     width: min(1200px, 100%);
     margin: 0 auto;
+    min-width: 0;
 }
 
 .hero-inner {
@@ -199,16 +210,18 @@ a {
 }
 
 .step-pills {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(132px, 1fr);
+    display: flex;
     gap: 0.75rem;
     overflow-x: auto;
     padding-bottom: 0.2rem;
+    scrollbar-width: thin;
+    scroll-snap-type: x proximity;
 }
 
 .step-pill {
-    min-width: 0;
+    flex: 0 0 auto;
+    min-width: 132px;
+    max-width: 220px;
     border: 1px solid transparent;
     border-radius: 999px;
     padding: 0.78rem 1rem;
@@ -217,7 +230,9 @@ a {
     font-size: 0.92rem;
     font-weight: 700;
     text-align: center;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    scroll-snap-align: start;
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -309,6 +324,7 @@ a {
     font-weight: 800;
     text-align: left;
     padding: 0;
+    overflow-wrap: anywhere;
 }
 
 .selected-service-price {
@@ -321,6 +337,7 @@ a {
 .selected-service-meta {
     margin-top: 0.45rem;
     font-size: 0.88rem;
+    overflow-wrap: anywhere;
 }
 
 .compact-card h2 {
@@ -368,6 +385,7 @@ a {
 .card-top p {
     margin-top: 0.4rem;
     max-width: 48rem;
+    overflow-wrap: anywhere;
 }
 
 .inline-price {
@@ -431,6 +449,7 @@ a {
 
 .tile-head h3 {
     font-size: 1.6rem;
+    overflow-wrap: anywhere;
 }
 
 .tile-price {
@@ -438,6 +457,7 @@ a {
     color: var(--brand-deep);
     font-size: 0.95rem;
     font-weight: 800;
+    text-align: right;
 }
 
 .service-tag {
@@ -458,13 +478,14 @@ a {
 }
 
 .tile-toggle {
-    width: fit-content;
+    width: 100%;
     border: 1px solid rgba(47, 107, 69, 0.18);
     border-radius: 999px;
     padding: 0.68rem 1rem;
     background: #fff;
     color: var(--brand-deep);
     font-weight: 800;
+    text-align: center;
 }
 
 .service-tile.is-selected .tile-toggle {
@@ -517,6 +538,7 @@ fieldset.field {
     color: var(--text);
     font-size: 0.95rem;
     font-weight: 800;
+    overflow-wrap: anywhere;
 }
 
 .field legend {
@@ -555,6 +577,7 @@ fieldset.field {
 
 .field-helper {
     font-size: 0.84rem;
+    overflow-wrap: anywhere;
 }
 
 .choice-grid,
@@ -607,6 +630,7 @@ fieldset.field {
 .option-title {
     color: var(--text);
     font-weight: 800;
+    overflow-wrap: anywhere;
 }
 
 .option-price {
@@ -614,10 +638,12 @@ fieldset.field {
     font-size: 0.9rem;
     font-weight: 800;
     text-align: right;
+    overflow-wrap: anywhere;
 }
 
 .option-note {
     font-size: 0.85rem;
+    overflow-wrap: anywhere;
 }
 
 .product-card {
@@ -628,6 +654,7 @@ fieldset.field {
 
 .product-card h3 {
     font-size: 1.4rem;
+    overflow-wrap: anywhere;
 }
 
 .product-price {
@@ -654,6 +681,8 @@ fieldset.field {
     font-size: 0.88rem;
     font-weight: 800;
     text-decoration: none;
+    text-align: center;
+    overflow-wrap: anywhere;
 }
 
 .product-link.is-disabled {
@@ -675,6 +704,7 @@ fieldset.field {
 
 .quote-line h3 {
     font-size: 1.35rem;
+    overflow-wrap: anywhere;
 }
 
 .quote-line-price {
@@ -687,6 +717,7 @@ fieldset.field {
 .quote-line p {
     margin-top: 0.3rem;
     font-size: 0.87rem;
+    overflow-wrap: anywhere;
 }
 
 .nav-actions {
@@ -793,6 +824,7 @@ fieldset.field {
 
 .footer-inner p {
     font-size: 0.9rem;
+    overflow-wrap: anywhere;
 }
 
 .hidden {
@@ -838,6 +870,21 @@ fieldset.field {
     .summary-grid {
         grid-template-columns: minmax(0, 1fr);
     }
+
+    .tile-head,
+    .selected-service-header,
+    .quote-line,
+    .option-title-row {
+        flex-direction: column;
+    }
+
+    .tile-price,
+    .selected-service-price,
+    .quote-line-price,
+    .option-price {
+        text-align: left;
+        white-space: normal;
+    }
 }
 
 @media (max-width: 640px) {
@@ -868,12 +915,25 @@ fieldset.field {
     }
 
     .step-pills {
-        grid-auto-columns: minmax(120px, 1fr);
+        gap: 0.6rem;
+        padding-bottom: 0.35rem;
     }
 
     .step-pill {
-        padding: 0.72rem 0.9rem;
+        min-width: min(150px, calc(100vw - 4rem));
+        max-width: calc(100vw - 4rem);
+        padding: 0.72rem 0.85rem;
         font-size: 0.88rem;
+    }
+
+    .hero-note,
+    .wizard-lead,
+    .summary-caption,
+    .selection-summary p,
+    .service-note p,
+    .highlight-box p,
+    .disclaimer p {
+        font-size: 0.93rem;
     }
 
     .nav-actions,
@@ -909,5 +969,22 @@ fieldset.field {
     .selected-service-price,
     .quote-line-price {
         white-space: normal;
+    }
+
+    .step-panel {
+        padding: 1rem;
+    }
+
+    .summary-card {
+        padding: 1rem;
+    }
+
+    .service-tile,
+    .product-card,
+    .selected-service-card,
+    .quote-line,
+    .option-card label,
+    .toggle-card label {
+        padding: 0.9rem;
     }
 }
