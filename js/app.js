@@ -1214,6 +1214,14 @@ const CONTACT_FIELDS = [
 
 const SERVICE_LOOKUP = Object.fromEntries(SERVICES.map((service) => [service.id, service]));
 const CONTACT_LOOKUP = Object.fromEntries(CONTACT_FIELDS.map((field) => [field.id, field]));
+const SERVICE_TONES = [
+    { surface: "#edf5ef", border: "#b9d5c0", accent: "#2f6b45", text: "#214a31" },
+    { surface: "#f7efe6", border: "#e3caa8", accent: "#bb7c37", text: "#6f461d" },
+    { surface: "#eef2fb", border: "#c3d0ef", accent: "#4367b1", text: "#29416f" },
+    { surface: "#f4ecf8", border: "#d4c1e4", accent: "#8a5ca8", text: "#56386c" },
+    { surface: "#fef1ef", border: "#efc6bd", accent: "#c86a58", text: "#7a3b2f" },
+    { surface: "#edf6f7", border: "#bbdbe0", accent: "#3b8390", text: "#25535c" }
+];
 
 const form = document.getElementById("quoteForm");
 const stepContainer = document.getElementById("stepContainer");
@@ -1282,6 +1290,16 @@ function getService(serviceId) {
     return SERVICE_LOOKUP[serviceId];
 }
 
+function getServiceTone(serviceId) {
+    const index = SERVICES.findIndex((service) => service.id === serviceId);
+    return SERVICE_TONES[index % SERVICE_TONES.length];
+}
+
+function getServiceToneStyle(serviceId) {
+    const tone = getServiceTone(serviceId);
+    return `--service-surface:${tone.surface}; --service-border:${tone.border}; --service-accent:${tone.accent}; --service-text:${tone.text};`;
+}
+
 function getFlowSteps() {
     return [
         { id: "selection", kind: "selection", title: "Tételek kiválasztása", pillLabel: "Tételek" },
@@ -1310,10 +1328,10 @@ function lookupValue(value, map, fallback = 0) {
 
 function withStartingPrice(startingPrice, raw) {
     if (raw <= 0) {
-        return startingPrice;
+        return 0;
     }
 
-    return Math.max(startingPrice, Math.round(raw));
+    return Math.round(raw);
 }
 
 function formatCurrency(value) {
@@ -1377,6 +1395,10 @@ function getFieldDisplayValue(field, rawValue) {
     return String(rawValue).trim();
 }
 
+function getFieldLabel(field) {
+    return field.suffix ? `${field.label} (${field.suffix})` : field.label;
+}
+
 function getVisibleFieldLines(fields, values) {
     return fields
         .filter((field) => shouldShowField(fields, field, values))
@@ -1412,7 +1434,7 @@ function buildServiceMeta(service, values) {
         .slice(0, 2);
 
     if (!lines.length) {
-        return "Kiinduló ár alapján";
+        return "Még nincs megadott részlet";
     }
 
     return lines.join(" • ");
@@ -1476,7 +1498,7 @@ function renderSummary() {
             const meta = buildServiceMeta(service, ensureServiceState(serviceId));
             const serviceStepIndex = getFlowSteps().findIndex((step) => step.id === serviceId);
             return `
-                <div class="selected-service-card">
+                <div class="selected-service-card" style="${getServiceToneStyle(serviceId)}">
                     <div class="selected-service-header">
                         <button type="button" data-action="jump-step" data-step-index="${serviceStepIndex}">
                             ${escapeHtml(service.name)}
@@ -1506,6 +1528,7 @@ function renderCurrentStep(step) {
 
 function renderSelectionStep() {
     const selectedCount = state.selectedServices.length;
+    const availableServices = SERVICES.filter((service) => !state.selectedServices.includes(service.id));
 
     return `
         <section class="step-card">
@@ -1513,7 +1536,7 @@ function renderSelectionStep() {
                 <div>
                     <p class="eyebrow">1. lépés</p>
                     <h2>Mit szeretnél kikalkulálni?</h2>
-                    <p>Jelöld ki azokat a munkákat, amelyek érdekelnek. Csak a kiválasztott tételek kérdései fognak külön lépésekben megjelenni.</p>
+                    <p>Válassz tételt a listából.</p>
                 </div>
                 <div class="inline-price">
                     <span>Kiválasztott tételek</span>
@@ -1522,19 +1545,35 @@ function renderSelectionStep() {
             </div>
 
             <div class="selection-summary">
-                <strong>${selectedCount ? `${selectedCount} tétel kiválasztva` : "Még nincs kiválasztott tétel"}</strong>
-                <p>
-                    Ha csak egy szolgáltatás érdekel, elég azt kijelölni. A személyes adatokat csak a legvégén kell megadni.
-                </p>
+                <strong>${selectedCount ? `${selectedCount} tétel kiválasztva` : ""}</strong>
             </div>
 
-            <div class="selection-grid">
-                ${SERVICES.map(renderServiceTile).join("")}
+            <div class="service-picker-shell">
+                <div class="service-picker-row">
+                    <div class="field service-picker-field">
+                        <label for="servicePicker">Új tétel hozzáadása</label>
+                        <select id="servicePicker">
+                            <option value="">Válassz tételt</option>
+                            ${availableServices.map((service) => `
+                                <option value="${service.id}">${escapeHtml(service.name)}</option>
+                            `).join("")}
+                        </select>
+                    </div>
+                    <button
+                        type="button"
+                        class="primary-btn service-add-btn"
+                        data-action="add-selected-service"
+                        ${availableServices.length ? "" : "disabled"}
+                    >
+                        Tétel hozzáadása
+                    </button>
+                </div>
             </div>
 
-            <div class="highlight-box">
-                <strong>Webshop integráció előkészítve:</strong>
-                <p>A kiválasztott tételekben megjelennek kapcsolódó termékjavaslatok és árak is. A konkrét webshop linkeket később könnyen hozzá tudjuk kötni.</p>
+            <div class="selected-list">
+                ${selectedCount
+                    ? state.selectedServices.map((serviceId) => renderSelectedSelectionCard(serviceId)).join("")
+                    : `<div class="empty-selection">Még nem adtál hozzá tételt.</div>`}
             </div>
 
             <div class="nav-actions">
@@ -1547,22 +1586,24 @@ function renderSelectionStep() {
     `;
 }
 
-function renderServiceTile(service) {
-    const isSelected = state.selectedServices.includes(service.id);
+function renderSelectedSelectionCard(serviceId) {
+    const service = getService(serviceId);
+    const serviceStepIndex = getFlowSteps().findIndex((step) => step.id === serviceId);
 
     return `
-        <article class="service-tile ${isSelected ? "is-selected" : ""}">
-            <div class="tile-head">
-                <div>
-                    <span class="service-tag">${escapeHtml(service.badge)}</span>
-                    <h3>${escapeHtml(service.name)}</h3>
-                </div>
-                <span class="tile-price">induló ár: ${formatCurrency(service.startingPrice)}</span>
+        <article class="selection-item-card" style="${getServiceToneStyle(serviceId)}">
+            <div class="selection-item-top">
+                <span class="selection-item-name">${escapeHtml(service.name)}</span>
+                <span class="selection-item-status">Hozzáadva</span>
             </div>
-            <p>${escapeHtml(service.description)}</p>
-            <button type="button" class="tile-toggle" data-action="toggle-service" data-service-id="${service.id}">
-                ${isSelected ? "Kiválasztva" : "Tétel hozzáadása"}
-            </button>
+            <div class="selection-item-actions">
+                <button type="button" class="secondary-btn compact-btn" data-action="jump-step" data-step-index="${serviceStepIndex}">
+                    Kitöltés
+                </button>
+                <button type="button" class="ghost-btn compact-btn" data-action="remove-service" data-service-id="${service.id}">
+                    Eltávolítás
+                </button>
+            </div>
         </article>
     `;
 }
@@ -1579,17 +1620,11 @@ function renderServiceStep(service) {
                 <div>
                     <p class="eyebrow">${currentIndex + 1}. lépés</p>
                     <h2>${escapeHtml(service.name)}</h2>
-                    <p>${escapeHtml(service.description)}</p>
                 </div>
                 <div class="inline-price">
                     <span>Részösszeg</span>
                     <strong id="currentSubtotal">${formatCurrency(subtotal)}</strong>
                 </div>
-            </div>
-
-            <div class="service-note">
-                <strong>Fontos:</strong>
-                <p>${escapeHtml(service.note)}</p>
             </div>
 
             <div class="field-grid">
@@ -1633,7 +1668,6 @@ function renderShopProducts(products) {
                             <h3>${escapeHtml(product.name)}</h3>
                             <p>${escapeHtml(product.description)}</p>
                         </div>
-                        <span class="product-price">${escapeHtml(product.priceLabel)}</span>
                         <div class="product-actions">
                             <a
                                 class="product-link ${product.url ? "" : "is-disabled"}"
@@ -1732,7 +1766,7 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
     if (field.type === "textarea") {
         return `
             <div class="${fieldClass}">
-                <label for="${inputId}">${escapeHtml(field.label)}</label>
+                <label for="${inputId}">${escapeHtml(getFieldLabel(field))}</label>
                 ${field.helper ? `<p class="field-helper">${escapeHtml(field.helper)}</p>` : ""}
                 <textarea
                     id="${inputId}"
@@ -1746,7 +1780,7 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
     if (field.type === "select") {
         return `
             <div class="${fieldClass}">
-                <label for="${inputId}">${escapeHtml(field.label)}</label>
+                <label for="${inputId}">${escapeHtml(getFieldLabel(field))}</label>
                 ${field.helper ? `<p class="field-helper">${escapeHtml(field.helper)}</p>` : ""}
                 <select id="${inputId}" ${commonAttributes}>
                     ${(field.options || []).map((option) => `
@@ -1762,7 +1796,7 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
     if (field.type === "choice") {
         return `
             <fieldset class="${fieldClass}">
-                <legend>${escapeHtml(field.label)}</legend>
+                <legend>${escapeHtml(getFieldLabel(field))}</legend>
                 ${field.helper ? `<p class="field-helper">${escapeHtml(field.helper)}</p>` : ""}
                 <div class="choice-grid">
                     ${(field.options || []).map((option, index) => {
@@ -1797,7 +1831,7 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
     if (field.type === "toggle") {
         return `
             <fieldset class="${fieldClass}">
-                <legend>${escapeHtml(field.label)}</legend>
+                <legend>${escapeHtml(getFieldLabel(field))}</legend>
                 <div class="toggle-grid">
                     <div class="toggle-card">
                         <label for="${inputId}">
@@ -1817,20 +1851,23 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
     }
 
     const type = field.type === "email" || field.type === "tel" || field.type === "date" ? field.type : field.type === "number" ? "number" : "text";
+    const inputMarkup = `
+        <input
+            id="${inputId}"
+            type="${type}"
+            value="${escapeHtml(value || "")}"
+            placeholder="${escapeHtml(field.placeholder || "")}"
+            ${field.min != null ? `min="${field.min}"` : ""}
+            ${field.step != null ? `step="${field.step}"` : ""}
+            ${commonAttributes}
+        >
+    `;
 
     return `
         <div class="${fieldClass}">
-            <label for="${inputId}">${escapeHtml(field.label)}</label>
+            <label for="${inputId}">${escapeHtml(getFieldLabel(field))}</label>
             ${field.helper ? `<p class="field-helper">${escapeHtml(field.helper)}</p>` : ""}
-            <input
-                id="${inputId}"
-                type="${type}"
-                value="${escapeHtml(value || "")}"
-                placeholder="${escapeHtml(field.placeholder || "")}"
-                ${field.min != null ? `min="${field.min}"` : ""}
-                ${field.step != null ? `step="${field.step}"` : ""}
-                ${commonAttributes}
-            >
+            ${inputMarkup}
         </div>
     `;
 }
@@ -2162,6 +2199,11 @@ function handleActionClick(event) {
         return;
     }
 
+    if (action === "add-selected-service") {
+        addSelectedServiceFromPicker();
+        return;
+    }
+
     if (action === "next-step") {
         handleNextStep();
         return;
@@ -2214,6 +2256,26 @@ function handleFieldUpdate(event, shouldRerender) {
     } else {
         updateLiveTotals();
     }
+}
+
+function addSelectedServiceFromPicker() {
+    const picker = document.getElementById("servicePicker");
+    if (!(picker instanceof HTMLSelectElement)) {
+        return;
+    }
+
+    const serviceId = picker.value;
+    if (!serviceId) {
+        showFeedback("Válassz ki egy tételt a hozzáadáshoz.");
+        return;
+    }
+
+    if (!state.selectedServices.includes(serviceId)) {
+        state.selectedServices = [...state.selectedServices, serviceId];
+        ensureServiceState(serviceId);
+    }
+
+    renderApp();
 }
 
 stepContainer.addEventListener("click", handleActionClick);
