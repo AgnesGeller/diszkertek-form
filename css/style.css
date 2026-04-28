@@ -59,6 +59,7 @@ input,
 select,
 textarea {
     font: inherit;
+    touch-action: manipulation;
 }
 
 button {
@@ -309,6 +310,7 @@ a {
 .selected-service-card.is-clickable {
     cursor: pointer;
     transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .selected-service-card.is-clickable:hover,
@@ -497,6 +499,10 @@ a {
     padding: 1rem;
 }
 
+.contact-section--tools {
+    border-style: dashed;
+}
+
 .section-heading {
     display: grid;
     gap: 0.35rem;
@@ -514,6 +520,16 @@ a {
     border-radius: var(--radius-md);
     border: 1px solid rgba(72, 57, 35, 0.08);
     background: rgba(255, 255, 255, 0.6);
+}
+
+.field--customer {
+    border-color: rgba(187, 124, 55, 0.16);
+    background: rgba(255, 248, 239, 0.78);
+}
+
+.field--pro {
+    border-color: rgba(67, 103, 177, 0.18);
+    background: rgba(239, 244, 252, 0.82);
 }
 
 .field.is-full {
@@ -535,9 +551,40 @@ fieldset.field {
     overflow-wrap: anywhere;
 }
 
+.field label,
+.field legend {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
 .field legend {
     margin-bottom: 0.1rem;
     padding: 0;
+}
+
+.field-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.24rem 0.58rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.field-badge--customer {
+    background: rgba(187, 124, 55, 0.14);
+    color: #8a5823;
+}
+
+.field-badge--pro {
+    background: rgba(67, 103, 177, 0.14);
+    color: #31518d;
 }
 
 .field input[type="text"],
@@ -556,6 +603,17 @@ fieldset.field {
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.field--postalCode input {
+    max-width: 9.5rem;
+    text-align: center;
+    letter-spacing: 0.18em;
+    font-weight: 700;
+}
+
+.field--settlement input {
+    max-width: 100%;
+}
+
 .field input:focus,
 .field select:focus,
 .field textarea:focus {
@@ -569,9 +627,57 @@ fieldset.field {
     resize: vertical;
 }
 
+.field--attachments input[type="file"] {
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.98);
+}
+
 .field-helper {
     font-size: 0.84rem;
     overflow-wrap: anywhere;
+}
+
+.attachment-box {
+    display: grid;
+    gap: 0.8rem;
+}
+
+.attachment-box p {
+    margin: 0;
+}
+
+.attachment-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+}
+
+.attachment-file-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    min-height: 2rem;
+}
+
+.attachment-file-list.is-empty {
+    align-items: center;
+}
+
+.attachment-file-chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.42rem 0.72rem;
+    background: rgba(47, 107, 69, 0.1);
+    color: var(--brand-deep);
+    font-size: 0.82rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.attachment-file-empty {
+    color: var(--muted);
+    font-size: 0.88rem;
 }
 
 .choice-grid,
@@ -607,11 +713,26 @@ fieldset.field {
     gap: 0.38rem;
     height: 100%;
     padding: 0.95rem;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 .option-card input,
 .toggle-card input {
     accent-color: var(--brand);
+    cursor: pointer;
+}
+
+.field input,
+.field select,
+.field textarea,
+.service-picker-shell,
+.selected-service-card.is-clickable,
+.option-card,
+.toggle-card {
+    -webkit-tap-highlight-color: transparent;
 }
 
 .option-title-row {
@@ -925,6 +1046,22 @@ fieldset.field {
 }
 
 @media (max-width: 640px) {
+    .field--postalCode input {
+        max-width: 100%;
+        text-align: left;
+        letter-spacing: 0.08em;
+    }
+
+    .attachment-actions,
+    .attachment-file-list {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .attachment-file-chip {
+        justify-content: center;
+    }
+
     .hero-image {
         border-radius: 24px;
     }

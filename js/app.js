@@ -286,6 +286,7 @@ const SERVICES = [
         note: "A pergolák ára a méret, a szerkezet, az árnyékolás és a kiegészítők alapján változik.",
         fields: [
             { id: "area", type: "number", label: "Becsült méret", suffix: "m²", min: 0, step: 1, placeholder: "pl. 24" },
+            { id: "span", type: "number", label: "Legnagyobb fesztáv", suffix: "m", min: 0, step: 0.1, placeholder: "pl. 4.8", audience: "pro" },
             {
                 id: "type",
                 type: "choice",
@@ -296,6 +297,18 @@ const SERVICES = [
                     { value: "fa", label: "Fa pergola", note: "Melegebb természetes hatás" },
                     { value: "aluminium", label: "Alumínium pergola", note: "Tisztább, modern megjelenés" },
                     { value: "bioklimatikus", label: "Bioklimatikus rendszer", note: "Forgatható lamellás tető" }
+                ]
+            },
+            {
+                id: "attachment",
+                type: "select",
+                label: "Kapcsolódás",
+                audience: "pro",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "szabadonallo", label: "Szabadon álló" },
+                    { value: "hazhoz", label: "Házhoz csatlakozó" },
+                    { value: "vegyes", label: "Részben csatlakozó" }
                 ]
             },
             { id: "sideShade", type: "toggle", label: "Oldalárnyékolást vagy zárható oldalfalat is szeretnék", full: true },
@@ -313,6 +326,8 @@ const SERVICES = [
             },
             { id: "lighting", type: "toggle", label: "Beépített világítást is kérek", full: true },
             { id: "heating", type: "toggle", label: "Kültéri fűtést vagy komfortkiegészítőt is szeretnék", full: true },
+            { id: "foundationPrep", type: "toggle", label: "Alapozási és fogadószerkezeti előkészítés is szükséges", full: true, audience: "pro" },
+            { id: "drainagePrep", type: "toggle", label: "Vízlevezetés vagy csapadékkezelés is szükséges", full: true, audience: "pro" },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Elhelyezés, homlokzati csatlakozás, egyedi elképzelés..." }
         ],
         shopProducts: [
@@ -326,12 +341,20 @@ const SERVICES = [
                 aluminium: 155000,
                 bioklimatikus: 235000
             });
+            const spanFee = numberValue(values.span) * area * 2200;
+            const attachmentFee = lookupValue(values.attachment, {
+                szabadonallo: 0,
+                hazhoz: 85000,
+                vegyes: 120000
+            });
             const sideFee = isChecked(values.sideShade)
                 ? area * lookupValue(values.shadeType, { textil: 16000, screen: 26000, lamellas: 42000 }, 16000)
                 : 0;
             const lightingFee = isChecked(values.lighting) ? 90000 : 0;
             const heatingFee = isChecked(values.heating) ? 160000 : 0;
-            const raw = area * typeRate + sideFee + lightingFee + heatingFee;
+            const foundationFee = isChecked(values.foundationPrep) ? 180000 : 0;
+            const drainageFee = isChecked(values.drainagePrep) ? 75000 : 0;
+            const raw = area * typeRate + spanFee + attachmentFee + sideFee + lightingFee + heatingFee + foundationFee + drainageFee;
             return withStartingPrice(890000, raw);
         }
     },
@@ -355,6 +378,7 @@ const SERVICES = [
                     { value: "nagy", label: "Nagy csomag", note: "Komplex játszótér" }
                 ]
             },
+            { id: "childCount", type: "number", label: "Gyermekek száma", suffix: "fő", min: 0, step: 1, placeholder: "pl. 2" },
             {
                 id: "surface",
                 type: "select",
@@ -366,8 +390,23 @@ const SERVICES = [
                     { value: "gumi", label: "Gumiburkolat" }
                 ]
             },
+            {
+                id: "ageGroup",
+                type: "choice",
+                label: "Korosztály",
+                full: true,
+                audience: "pro",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "kicsi", label: "Kisgyermek" },
+                    { value: "vegyes", label: "Vegyes korosztály" },
+                    { value: "nagyobb", label: "Nagyobb gyermekek" }
+                ]
+            },
             { id: "install", type: "toggle", label: "Telepítéssel együtt kérem", full: true },
             { id: "fence", type: "toggle", label: "Biztonsági elhatárolás is szükséges", full: true },
+            { id: "shading", type: "toggle", label: "Árnyékolás is szükséges", full: true, audience: "pro" },
+            { id: "fallZone", type: "toggle", label: "Biztonsági esési zónát is ki kell alakítani", full: true, audience: "pro" },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Korosztály, kedvenc elemek, elhelyezés..." }
         ],
         shopProducts: [
@@ -380,14 +419,22 @@ const SERVICES = [
                 kozepes: 420000,
                 nagy: 690000
             });
+            const childFee = numberValue(values.childCount) * 12000;
             const surfaceFee = lookupValue(values.surface, {
                 nem: 0,
                 mulcs: 90000,
                 gumi: 240000
             });
+            const ageFee = lookupValue(values.ageGroup, {
+                kicsi: 35000,
+                vegyes: 65000,
+                nagyobb: 45000
+            });
             const installFee = isChecked(values.install) ? 65000 : 0;
             const fenceFee = isChecked(values.fence) ? 115000 : 0;
-            const raw = packageFee + surfaceFee + installFee + fenceFee;
+            const shadingFee = isChecked(values.shading) ? 85000 : 0;
+            const fallZoneFee = isChecked(values.fallZone) ? 95000 : 0;
+            const raw = packageFee + childFee + surfaceFee + ageFee + installFee + fenceFee + shadingFee + fallZoneFee;
             return withStartingPrice(240000, raw);
         }
     },
@@ -739,8 +786,22 @@ const SERVICES = [
                     { value: "ko", label: "Kő vagy beton szegély" }
                 ]
             },
+            {
+                id: "purpose",
+                type: "select",
+                label: "Szegély szerepe",
+                audience: "pro",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "gyep", label: "Gyep és ágyás elválasztása" },
+                    { value: "burkolat", label: "Burkolat megtámasztása" },
+                    { value: "dekor", label: "Dekoratív lezárás" }
+                ]
+            },
             { id: "curves", type: "toggle", label: "Íves vonalvezetés is lesz", full: true },
             { id: "foundation", type: "toggle", label: "Betonalapozást is kérek", full: true },
+            { id: "heightStep", type: "toggle", label: "Szintváltás vagy magassági lépcsőzés is van", full: true, audience: "pro" },
+            { id: "subgradePrep", type: "toggle", label: "Alapárok és fogadóágy előkészítése is szükséges", full: true, audience: "pro" },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Hol fut majd a szegély, milyen stílusban..." }
         ],
         calculate(values) {
@@ -751,9 +812,16 @@ const SERVICES = [
                 corten: 7800,
                 ko: 9800
             });
+            const purposeAdd = lookupValue(values.purpose, {
+                gyep: 0,
+                burkolat: 1800,
+                dekor: 1200
+            });
             const curveFee = isChecked(values.curves) ? length * 900 : 0;
             const foundationFee = isChecked(values.foundation) ? 45000 : 0;
-            const raw = length * rate + curveFee + foundationFee;
+            const heightFee = isChecked(values.heightStep) ? length * 1400 : 0;
+            const subgradeFee = isChecked(values.subgradePrep) ? 35000 : 0;
+            const raw = length * (rate + purposeAdd) + curveFee + foundationFee + heightFee + subgradeFee;
             return withStartingPrice(120000, raw);
         }
     },
@@ -1144,6 +1212,19 @@ const SERVICES = [
                     { value: "premium", label: "Prémium kiemelő világítás" }
                 ]
             },
+            {
+                id: "zonePurpose",
+                type: "checklist",
+                label: "Világítási zónák célja",
+                full: true,
+                audience: "pro",
+                options: [
+                    { value: "setany", label: "Közlekedési útvonal" },
+                    { value: "agyas", label: "Ágyás vagy növénykiemelés" },
+                    { value: "terasz", label: "Terasz vagy pihenőtér" },
+                    { value: "biztonsag", label: "Biztonsági / orientációs fény" }
+                ]
+            },
             { id: "smart", type: "toggle", label: "Okos vezérlést is szeretnék", full: true },
             {
                 id: "sceneCount",
@@ -1154,6 +1235,8 @@ const SERVICES = [
                 showWhen: { field: "smart", equals: true },
                 placeholder: "pl. 3"
             },
+            { id: "transformer", type: "toggle", label: "Transzformátor vagy vezérlődoboz telepítése is szükséges", full: true, audience: "pro" },
+            { id: "existingNetwork", type: "toggle", label: "Meglévő kültéri hálózathoz kell illeszteni", full: true, audience: "pro" },
             { id: "trench", type: "number", label: "Kábelárok hossza", suffix: "fm", min: 0, step: 1, placeholder: "pl. 26" },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Milyen hangulatot, milyen zónákat szeretnél kiemelni..." }
         ],
@@ -1169,10 +1252,14 @@ const SERVICES = [
                 vegyes: 42000,
                 premium: 56000
             });
+            const zoneCount = Array.isArray(values.zonePurpose) ? values.zonePurpose.length : 0;
+            const zoneFee = zoneCount * 18000;
             const smartFee = isChecked(values.smart) ? 95000 : 0;
             const scenesFee = isChecked(values.smart) ? numberValue(values.sceneCount) * 18000 : 0;
+            const transformerFee = isChecked(values.transformer) ? 48000 : 0;
+            const networkFee = isChecked(values.existingNetwork) ? 36000 : 0;
             const trenchFee = numberValue(values.trench) * 1800;
-            const raw = points * pointRate + smartFee + scenesFee + trenchFee;
+            const raw = points * pointRate + zoneFee + smartFee + scenesFee + transformerFee + networkFee + trenchFee;
             return withStartingPrice(145000, raw);
         }
     },
@@ -1197,6 +1284,19 @@ const SERVICES = [
                     { value: "nagy", label: "Nagyobb teljesítményű kiállás" }
                 ]
             },
+            {
+                id: "consumers",
+                type: "checklist",
+                label: "Tervezett fogyasztók",
+                full: true,
+                audience: "pro",
+                options: [
+                    { value: "robot", label: "Robotfűnyíró" },
+                    { value: "szivattyu", label: "Szivattyú vagy gépészet" },
+                    { value: "vilagitas", label: "Kerti világítás" },
+                    { value: "kapu", label: "Kapumozgatás vagy automatika" }
+                ]
+            },
             { id: "weatherproof", type: "toggle", label: "Prémium időjárásálló szerelvényeket kérek", full: true },
             { id: "outdoorKitchen", type: "toggle", label: "Kültéri konyhához vagy speciális fogyasztóhoz is kell kiállás", full: true },
             {
@@ -1210,6 +1310,8 @@ const SERVICES = [
                     { value: "jacuzzi", label: "Jacuzzi vagy nagy fogyasztó" }
                 ]
             },
+            { id: "distributionBoard", type: "toggle", label: "Külön kültéri elosztó vagy bővítés is szükséges", full: true, audience: "pro" },
+            { id: "existingNetwork", type: "toggle", label: "Meglévő hálózat felmérése és illesztése is kell", full: true, audience: "pro" },
             { id: "trench", type: "number", label: "Kábelárok hossza", suffix: "fm", min: 0, step: 1, placeholder: "pl. 18" },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Milyen eszközökhöz kell kiállás, honnan indul a hálózat..." }
         ],
@@ -1220,12 +1322,16 @@ const SERVICES = [
                 terasz: 65000,
                 nagy: 110000
             });
+            const consumerCount = Array.isArray(values.consumers) ? values.consumers.length : 0;
+            const consumerFee = consumerCount * 24000;
             const weatherFee = isChecked(values.weatherproof) ? points * 18000 : 0;
             const kitchenFee = isChecked(values.outdoorKitchen)
                 ? lookupValue(values.highLoad, { grill: 95000, jacuzzi: 160000 }, 95000)
                 : 0;
+            const boardFee = isChecked(values.distributionBoard) ? 78000 : 0;
+            const networkFee = isChecked(values.existingNetwork) ? 42000 : 0;
             const trenchFee = numberValue(values.trench) * 2200;
-            const raw = points * pointRate + weatherFee + kitchenFee + trenchFee;
+            const raw = points * pointRate + consumerFee + weatherFee + kitchenFee + boardFee + networkFee + trenchFee;
             return withStartingPrice(165000, raw);
         }
     },
@@ -1239,6 +1345,19 @@ const SERVICES = [
         fields: [
             { id: "area", type: "number", label: "Érintett terület", suffix: "m²", min: 0, step: 1, placeholder: "pl. 320" },
             {
+                id: "propertyType",
+                type: "choice",
+                label: "Milyen területet kell tisztítani?",
+                full: true,
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "epitesi", label: "Építési telek vagy nyers terület" },
+                    { value: "elhanyagolt", label: "Elhanyagolt, benőtt kert" },
+                    { value: "lakott", label: "Részben használt lakott kert" },
+                    { value: "bozotos", label: "Bozótos, erősen felverődött telek" }
+                ]
+            },
+            {
                 id: "density",
                 type: "choice",
                 label: "Mennyire benőtt a terület?",
@@ -1250,7 +1369,32 @@ const SERVICES = [
                     { value: "suru", label: "Erősen benőtt" }
                 ]
             },
+            {
+                id: "tasks",
+                type: "checklist",
+                label: "Szükséges munkák",
+                full: true,
+                options: [
+                    { value: "kaszalas", label: "Kaszálás" },
+                    { value: "bozotirtas", label: "Bozótirtás" },
+                    { value: "cserjeirtas", label: "Cserjeirtás" },
+                    { value: "kezitakaritas", label: "Kézi összeszedés / takarítás" },
+                    { value: "invaziv", label: "Invazív gyomok kezelése" }
+                ]
+            },
             { id: "removal", type: "toggle", label: "Zöldhulladék elszállítással együtt kérem", full: true },
+            {
+                id: "wasteType",
+                type: "select",
+                label: "Elszállítandó anyag jellege",
+                showWhen: { field: "removal", equals: true },
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "zold", label: "Csak zöldhulladék" },
+                    { value: "vegyes", label: "Zöldhulladék és egyéb maradványok" },
+                    { value: "epitesi", label: "Építési maradványok is vannak" }
+                ]
+            },
             { id: "stumps", type: "toggle", label: "Tuskózásra is szükség lesz", full: true },
             {
                 id: "stumpCount",
@@ -1261,18 +1405,83 @@ const SERVICES = [
                 showWhen: { field: "stumps", equals: true },
                 placeholder: "pl. 4"
             },
+            { id: "treeCutting", type: "toggle", label: "Kisebb fák / sarjak kivágása is szükséges", full: true },
+            {
+                id: "treeCount",
+                type: "number",
+                label: "Kivágandó kisebb fák száma",
+                suffix: "db",
+                min: 0,
+                step: 1,
+                showWhen: { field: "treeCutting", equals: true },
+                placeholder: "pl. 6"
+            },
+            {
+                id: "machineAccess",
+                type: "select",
+                label: "Gépbejárás",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "jo", label: "Jó gépi hozzáférés" },
+                    { value: "korlatozott", label: "Korlátozott hozzáférés" },
+                    { value: "nincs", label: "Csak kézi megközelítés" }
+                ]
+            },
+            { id: "manualCarry", type: "toggle", label: "Kézi kihordás is szükséges", full: true },
+            {
+                id: "carryDistance",
+                type: "number",
+                label: "Kihordási távolság",
+                suffix: "m",
+                min: 0,
+                step: 1,
+                showWhen: { field: "manualCarry", equals: true },
+                placeholder: "pl. 20"
+            },
+            { id: "oldMaterials", type: "toggle", label: "Régi anyagmaradványok, szemét vagy sitt is van a területen", full: true },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Elhanyagolt terület, bozót, régi anyagmaradványok..." }
         ],
         calculate(values) {
             const area = numberValue(values.area);
+            const propertyFee = lookupValue(values.propertyType, {
+                epitesi: 45000,
+                elhanyagolt: 65000,
+                lakott: 25000,
+                bozotos: 95000
+            });
             const rate = lookupValue(values.density, {
                 enyhe: 550,
                 kozepes: 1100,
                 suru: 1900
             });
+            const taskCount = Array.isArray(values.tasks) ? values.tasks.length : 0;
             const removalFee = isChecked(values.removal) ? 65000 : 0;
+            const wasteFee = isChecked(values.removal)
+                ? lookupValue(values.wasteType, {
+                    zold: 0,
+                    vegyes: 45000,
+                    epitesi: 95000
+                }, 0)
+                : 0;
             const stumpFee = isChecked(values.stumps) ? numberValue(values.stumpCount) * 22000 : 0;
-            const raw = area * rate + removalFee + stumpFee;
+            const treeFee = isChecked(values.treeCutting) ? numberValue(values.treeCount) * 18000 : 0;
+            const machineFee = lookupValue(values.machineAccess, {
+                jo: 0,
+                korlatozott: 35000,
+                nincs: 75000
+            });
+            const manualFee = isChecked(values.manualCarry) ? 45000 + numberValue(values.carryDistance) * 380 : 0;
+            const oldMaterialFee = isChecked(values.oldMaterials) ? 85000 : 0;
+            const raw = area * rate
+                + propertyFee
+                + taskCount * 26000
+                + removalFee
+                + wasteFee
+                + stumpFee
+                + treeFee
+                + machineFee
+                + manualFee
+                + oldMaterialFee;
             return withStartingPrice(110000, raw);
         }
     },
@@ -1448,6 +1657,19 @@ const SERVICES = [
                     { value: "diszko", label: "Dekoratív vegyes kő" }
                 ]
             },
+            { id: "heightPlay", type: "toggle", label: "Szintjátékot vagy kisebb domborzatot is kérek", full: true, audience: "pro" },
+            {
+                id: "basePrep",
+                type: "select",
+                label: "Alapréteg és drénelőkészítés",
+                audience: "pro",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "minimal", label: "Minimális alapelőkészítés" },
+                    { value: "kozepes", label: "Közepes drén- és alapréteg" },
+                    { value: "erositett", label: "Erősített rétegrend" }
+                ]
+            },
             { id: "planting", type: "toggle", label: "Növényekkel együtt kérem", full: true },
             {
                 id: "plantStyle",
@@ -1462,6 +1684,7 @@ const SERVICES = [
                 ]
             },
             { id: "weedBarrier", type: "toggle", label: "Gyomfogó réteget is kérek", full: true },
+            { id: "edgeSupport", type: "toggle", label: "Peremrögzítés vagy kőtámasztás is szükséges", full: true, audience: "pro" },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Napfény, stílus, kedvelt kőszínek..." }
         ],
         calculate(values) {
@@ -1471,11 +1694,18 @@ const SERVICES = [
                 meszko: 26000,
                 diszko: 34000
             });
+            const heightFee = isChecked(values.heightPlay) ? area * 2800 : 0;
+            const baseFee = lookupValue(values.basePrep, {
+                minimal: 28000,
+                kozepes: 62000,
+                erositett: 98000
+            });
             const plantingFee = isChecked(values.planting)
                 ? area * lookupValue(values.plantStyle, { visszafogott: 4000, kozepes: 6500, gazdag: 9500 }, 4000)
                 : 0;
             const weedFee = isChecked(values.weedBarrier) ? 38000 : 0;
-            const raw = area * rate + plantingFee + weedFee;
+            const edgeFee = isChecked(values.edgeSupport) ? 42000 : 0;
+            const raw = area * rate + heightFee + baseFee + plantingFee + weedFee + edgeFee;
             return withStartingPrice(150000, raw);
         }
     },
@@ -1500,7 +1730,21 @@ const SERVICES = [
                     { value: "bazalt", label: "Bazalt vagy sötét dekor" }
                 ]
             },
+            {
+                id: "fraction",
+                type: "select",
+                label: "Kavics frakciója",
+                audience: "pro",
+                options: [
+                    { value: "", label: "Válassz" },
+                    { value: "finom", label: "Finom szemcse" },
+                    { value: "kozepes", label: "Közepes szemcse" },
+                    { value: "durva", label: "Durva dekorfrakció" }
+                ]
+            },
+            { id: "depth", type: "number", label: "Rétegvastagság", suffix: "cm", min: 0, step: 1, placeholder: "pl. 5", audience: "pro" },
             { id: "geotextile", type: "toggle", label: "Geotextillel együtt kérem", full: true },
+            { id: "subgradePrep", type: "toggle", label: "Fogadófelület előkészítése és finom szintezése is kell", full: true, audience: "pro" },
             { id: "edging", type: "toggle", label: "Szegélyezést is kérek", full: true },
             {
                 id: "edgingMaterial",
@@ -1527,11 +1771,18 @@ const SERVICES = [
                 feher: 14500,
                 bazalt: 16500
             });
+            const fractionAdd = lookupValue(values.fraction, {
+                finom: 0,
+                kozepes: 1200,
+                durva: 2400
+            });
+            const depthFee = area * numberValue(values.depth) * 320;
             const geotextileFee = isChecked(values.geotextile) ? area * 650 : 0;
+            const subgradeFee = isChecked(values.subgradePrep) ? area * 1100 : 0;
             const edgingFee = isChecked(values.edging)
                 ? lookupValue(values.edgingMaterial, { muanyag: 45000, fem: 72000, corten: 98000 }, 45000)
                 : 0;
-            const raw = area * rate + geotextileFee + edgingFee;
+            const raw = area * (rate + fractionAdd) + depthFee + geotextileFee + subgradeFee + edgingFee;
             return withStartingPrice(120000, raw);
         }
     },
@@ -1663,6 +1914,7 @@ const SERVICES = [
         note: "A tó ára a méret, a technológia, a szűrés és a különleges effektek alapján változik.",
         fields: [
             { id: "area", type: "number", label: "Vízfelület mérete", suffix: "m²", min: 0, step: 1, placeholder: "pl. 9" },
+            { id: "depth", type: "number", label: "Átlagos mélység", suffix: "cm", min: 0, step: 1, placeholder: "pl. 90", audience: "pro" },
             {
                 id: "type",
                 type: "choice",
@@ -1686,12 +1938,15 @@ const SERVICES = [
                     { value: "komplex", label: "Komplex biológiai rendszer" }
                 ]
             },
+            { id: "machineRoom", type: "toggle", label: "Gépészeti akna vagy rejtett technikai tér is szükséges", full: true, audience: "pro" },
             { id: "stream", type: "toggle", label: "Patak- vagy vízesés-elemet is szeretnék", full: true },
             { id: "lighting", type: "toggle", label: "Víz alatti vagy parti világítást is kérek", full: true },
+            { id: "childSafety", type: "toggle", label: "Gyermekbiztonsági kialakítás is szükséges", full: true, audience: "pro" },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Stílus, halak, karbantarthatóság, elhelyezés..." }
         ],
         calculate(values) {
             const area = numberValue(values.area);
+            const depthFee = area * numberValue(values.depth) * 180;
             const typeRate = lookupValue(values.type, {
                 dekor: 95000,
                 halas: 125000,
@@ -1702,9 +1957,11 @@ const SERVICES = [
                 eros: 160000,
                 komplex: 280000
             });
+            const machineFee = isChecked(values.machineRoom) ? 180000 : 0;
             const streamFee = isChecked(values.stream) ? 135000 : 0;
             const lightingFee = isChecked(values.lighting) ? 85000 : 0;
-            const raw = area * typeRate + filtrationFee + streamFee + lightingFee;
+            const safetyFee = isChecked(values.childSafety) ? 95000 : 0;
+            const raw = area * typeRate + depthFee + filtrationFee + machineFee + streamFee + lightingFee + safetyFee;
             return withStartingPrice(480000, raw);
         }
     },
@@ -1729,6 +1986,19 @@ const SERVICES = [
                 ]
             },
             {
+                id: "deliverables",
+                type: "checklist",
+                label: "Kért tervrészek",
+                full: true,
+                audience: "pro",
+                options: [
+                    { value: "helyszinrajz", label: "Helyszínrajz" },
+                    { value: "burkolat", label: "Burkolat- és szintezési terv" },
+                    { value: "ultetesi", label: "Ültetési terv" },
+                    { value: "ontozes", label: "Öntözési vázlat" }
+                ]
+            },
+            {
                 id: "plotSize",
                 type: "select",
                 label: "Telekméret kategória",
@@ -1750,6 +2020,7 @@ const SERVICES = [
                     { value: "3", label: "3 vagy több kör" }
                 ]
             },
+            { id: "baseDocs", type: "toggle", label: "Meglévő alaprajz, geodézia vagy közműadat feldolgozása is kell", full: true, audience: "pro" },
             { id: "siteVisit", type: "toggle", label: "Helyszíni bejárást is kérek hozzá", full: true },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Milyen tervszintet vársz, milyen gyors határidővel..." }
         ],
@@ -1769,8 +2040,11 @@ const SERVICES = [
                 "2": 25000,
                 "3": 60000
             });
+            const deliverableCount = Array.isArray(values.deliverables) ? values.deliverables.length : 0;
+            const deliverableFee = deliverableCount * 28000;
+            const docsFee = isChecked(values.baseDocs) ? 45000 : 0;
             const visitFee = isChecked(values.siteVisit) ? 45000 : 0;
-            const raw = packageFee + plotFee + revisionFee + visitFee;
+            const raw = packageFee + deliverableFee + plotFee + revisionFee + docsFee + visitFee;
             return withStartingPrice(180000, raw);
         }
     },
@@ -1795,6 +2069,19 @@ const SERVICES = [
                     { value: "fotoreal", label: "Fotórealisztikus csomag" }
                 ]
             },
+            {
+                id: "viewTypes",
+                type: "checklist",
+                label: "Kért nézettípusok",
+                full: true,
+                audience: "pro",
+                options: [
+                    { value: "nappali", label: "Nappali összkép" },
+                    { value: "esti", label: "Esti hangulat" },
+                    { value: "legi", label: "Felülnézeti vagy madártávlati kép" },
+                    { value: "reszlet", label: "Részletkiemelés" }
+                ]
+            },
             { id: "animation", type: "toggle", label: "Rövid animációt is szeretnék", full: true },
             {
                 id: "animationLength",
@@ -1806,6 +2093,7 @@ const SERVICES = [
                 showWhen: { field: "animation", equals: true },
                 placeholder: "pl. 1"
             },
+            { id: "sourcePlan", type: "toggle", label: "Meglévő tervből vagy felmérésből kell felépíteni", full: true, audience: "pro" },
             { id: "variants", type: "number", label: "Alternatív változatok száma", min: 0, step: 1, placeholder: "pl. 2" },
             { id: "notes", type: "textarea", label: "Megjegyzés", full: true, placeholder: "Milyen nézetek, milyen hangulat, mire kell a terv..." }
         ],
@@ -1816,9 +2104,12 @@ const SERVICES = [
                 premium: 85000,
                 fotoreal: 120000
             });
+            const viewCount = Array.isArray(values.viewTypes) ? values.viewTypes.length : 0;
+            const viewFee = viewCount * 18000;
             const animationFee = isChecked(values.animation) ? numberValue(values.animationLength) * 90000 : 0;
+            const sourceFee = isChecked(values.sourcePlan) ? 35000 : 0;
             const variantsFee = numberValue(values.variants) * 30000;
-            const raw = renders * qualityRate + animationFee + variantsFee;
+            const raw = renders * qualityRate + viewFee + animationFee + sourceFee + variantsFee;
             return withStartingPrice(140000, raw);
         }
     }
@@ -1829,6 +2120,7 @@ const COMMON_SERVICE_FIELDS = [
         id: "projectStage",
         type: "select",
         label: "Munka jellege",
+        audience: "pro",
         options: [
             { value: "", label: "Válassz" },
             { value: "uj", label: "Új kialakítás" },
@@ -1841,6 +2133,7 @@ const COMMON_SERVICE_FIELDS = [
         id: "solutionLevel",
         type: "choice",
         label: "Megoldási szint",
+        audience: "pro",
         full: true,
         options: [
             { value: "", label: "Még nem döntöttem" },
@@ -1853,6 +2146,7 @@ const COMMON_SERVICE_FIELDS = [
         id: "siteAccess",
         type: "choice",
         label: "Megközelítés és helyszíni nehézség",
+        audience: "pro",
         full: true,
         options: [
             { value: "", label: "Még nem tudom" },
@@ -2222,6 +2516,41 @@ const CONTACT_SECTION_META = {
     }
 };
 
+const SERVICE_FIELD_AUDIENCE_OVERRIDES = {
+    ontozorendszer: { waterPressure: "pro", zoneTypes: "pro", existingSystem: "pro", trenchLength: "pro", terrainDifficulty: "pro" },
+    burkolatok: { thickness: "pro", subbase: "pro", edgeCondition: "pro", demolitionThickness: "pro", levelDifference: "pro", accessMode: "pro", carryDistance: "pro" },
+    agyasok: { soilState: "pro", soilReplacement: "pro", soilReplacementQty: "pro", mulchType: "pro", existingPlants: "pro", maintenanceLevel: "pro" },
+    sovenyek: { plantSpacing: "pro", soilReplacement: "pro", rootBarrier: "pro", existingRemoval: "pro", finalHeight: "pro" },
+    "fa-ultetes": { purpose: "pro", pitVolume: "pro", rootBarrier: "pro", existingStump: "pro", accessMode: "pro" },
+    fuvesites: { currentState: "pro", soilPrep: "pro", subsoil: "pro", weedTreatment: "pro", roughGrading: "pro", topsoil: "pro", topsoilQty: "pro", topsoilDepth: "pro", accessMode: "pro", carryDistance: "pro", aftercare: "pro" },
+    bontas: { thickness: "pro", wasteType: "pro", sorting: "pro", cutting: "pro", manualAccess: "pro", carryDistance: "pro", machineAccess: "pro" },
+    "tamfal-epites": { maxHeight: "pro", soilPressure: "pro", foundation: "pro", drainage: "pro", backfill: "pro", coping: "pro", accessMode: "pro", geogrid: "pro" },
+    "kerti-vilagitas": { zonePurpose: "pro", transformer: "pro", existingNetwork: "pro", trench: "pro" },
+    "kerti-aramforras": { consumers: "pro", highLoad: "pro", distributionBoard: "pro", existingNetwork: "pro", trench: "pro" },
+    telektisztitas: { propertyType: "pro", tasks: "pro", wasteType: "pro", stumps: "pro", stumpCount: "pro", machineAccess: "pro", manualCarry: "pro", carryDistance: "pro", treeCutting: "pro", treeCount: "pro", oldMaterials: "pro" },
+    "terep-rendezes": { levelDifference: "pro", workType: "pro", topsoil: "pro", topsoilQty: "pro", soilBalance: "pro", excessSoilQty: "pro", machineAccess: "pro", earthmovingMode: "pro", carryDistance: "pro", subsoil: "pro", disposal: "pro" },
+    "sziklakert-epites": { heightPlay: "pro", basePrep: "pro", edgeSupport: "pro" },
+    "diszkavics-agyas": { fraction: "pro", depth: "pro", subgradePrep: "pro" },
+    "kerites-epites": { height: "pro", privacyLevel: "pro", terrain: "pro", foundation: "pro", automation: "pro", manualAccess: "pro" },
+    "kerti-to-epites": { depth: "pro", filtration: "pro", machineRoom: "pro", childSafety: "pro" },
+    "tervrajz-keszites": { deliverables: "pro", plotSize: "pro", revisions: "pro", baseDocs: "pro" },
+    "latvanyterv-keszites": { viewTypes: "pro", sourcePlan: "pro" }
+};
+
+const CONTACT_FIELD_AUDIENCE_OVERRIDES = {
+    propertySize: "pro",
+    designArea: "pro",
+    zoning: "pro",
+    accessType: "pro",
+    gateWidth: "pro",
+    distanceFromRoad: "pro",
+    machineAccess: "pro",
+    documents: "pro",
+    documentsNote: "pro",
+    exactBudget: "pro",
+    phasePriority: "pro"
+};
+
 const CONTACT_FIELDS_RUNTIME = [
     {
         id: "requestRole",
@@ -2421,8 +2750,26 @@ function enhanceServiceDefinition(service) {
     return service;
 }
 
+function applyFieldAudienceOverrides() {
+    SERVICES.forEach((service) => {
+        const overrides = SERVICE_FIELD_AUDIENCE_OVERRIDES[service.id] || {};
+        service.fields.forEach((field) => {
+            if (overrides[field.id]) {
+                field.audience = overrides[field.id];
+            }
+        });
+    });
+
+    CONTACT_FIELDS_RUNTIME.forEach((field) => {
+        if (CONTACT_FIELD_AUDIENCE_OVERRIDES[field.id]) {
+            field.audience = CONTACT_FIELD_AUDIENCE_OVERRIDES[field.id];
+        }
+    });
+}
+
 SERVICES.push(...EXTRA_SERVICES);
 SERVICES.forEach(enhanceServiceDefinition);
+applyFieldAudienceOverrides();
 
 const SERVICE_LOOKUP = Object.fromEntries(SERVICES.map((service) => [service.id, service]));
 const CONTACT_LOOKUP = Object.fromEntries(CONTACT_FIELDS_RUNTIME.map((field) => [field.id, field]));
@@ -2762,8 +3109,40 @@ function getFieldLabel(field) {
     return field.suffix ? `${field.label} (${field.suffix})` : field.label;
 }
 
+function getFieldAudience(field) {
+    return field.audience || "customer";
+}
+
+function getFieldAudienceBadge(field) {
+    const audience = getFieldAudience(field);
+
+    if (audience === "pro") {
+        return '<span class="field-badge field-badge--pro">Szakmai mező</span>';
+    }
+
+    return '<span class="field-badge field-badge--customer">Alap kérdés</span>';
+}
+
+function renderFieldLabel(field, inputId) {
+    return `
+        <label for="${inputId}">
+            <span>${escapeHtml(getFieldLabel(field))}</span>
+            ${getFieldAudienceBadge(field)}
+        </label>
+    `;
+}
+
+function renderFieldLegend(field) {
+    return `
+        <legend>
+            <span>${escapeHtml(getFieldLabel(field))}</span>
+            ${getFieldAudienceBadge(field)}
+        </legend>
+    `;
+}
+
 function getFieldHelperText(field, scope) {
-    if (scope === "contact" && field.id === "postalCode") {
+    if (scope === "contact" && field.id === "postalCode" && state.postalLookupMessage) {
         return state.postalLookupMessage || "";
     }
 
@@ -2913,7 +3292,7 @@ function renderCurrentStep(step) {
 
 function renderSelectionStep() {
     const selectedCount = state.selectedServices.length;
-    const availableServices = SERVICES.filter((service) => !state.selectedServices.includes(service.id));
+    const hasAnyServices = SERVICES.length > 0;
 
     return `
         <section class="step-card">
@@ -2934,8 +3313,10 @@ function renderSelectionStep() {
                         <label for="servicePicker">Új tétel hozzáadása</label>
                         <select id="servicePicker">
                             <option value="">Válassz tételt</option>
-                            ${availableServices.map((service) => `
-                                <option value="${service.id}">${escapeHtml(service.name)}</option>
+                            ${SERVICES.map((service) => `
+                                <option value="${service.id}">
+                                    ${escapeHtml(service.name)}${state.selectedServices.includes(service.id) ? " (már hozzáadva)" : ""}
+                                </option>
                             `).join("")}
                         </select>
                     </div>
@@ -2943,7 +3324,7 @@ function renderSelectionStep() {
                         type="button"
                         class="primary-btn service-add-btn"
                         data-action="add-selected-service"
-                        ${availableServices.length ? "" : "disabled"}
+                        ${hasAnyServices ? "" : "disabled"}
                     >
                         Tétel hozzáadása
                     </button>
@@ -3078,6 +3459,25 @@ function renderContactSections() {
     }).join("");
 }
 
+function renderAttachmentTools() {
+    return `
+        <section class="contact-section contact-section--tools">
+            <div class="section-heading">
+                <p class="eyebrow">PDF összefoglaló</p>
+                <p class="section-intro">A jelenlegi kitöltött adatokból nyomtatható összefoglaló készül.</p>
+            </div>
+
+            <div class="highlight-box attachment-box">
+                <strong>PDF mentése</strong>
+                <p>Új ablakban nyílik meg az összefoglaló. Onnan menthető PDF-ként.</p>
+                <div class="attachment-actions">
+                    <button type="button" class="secondary-btn" data-action="export-pdf">PDF összefoglaló megnyitása</button>
+                </div>
+            </div>
+        </section>
+    `;
+}
+
 function renderContactStep() {
     const total = getGrandTotal();
 
@@ -3097,6 +3497,7 @@ function renderContactStep() {
 
             <div class="contact-section-grid">
                 ${renderContactSections()}
+                ${renderAttachmentTools()}
             </div>
 
             <div class="nav-actions">
@@ -3120,10 +3521,14 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
         return "";
     }
 
-    const fieldClass = ["field", field.full ? "is-full" : ""].filter(Boolean).join(" ");
+    const fieldClass = ["field", field.full ? "is-full" : "", `field--${getFieldAudience(field)}`, `field--${field.id}`].filter(Boolean).join(" ");
     const value = values[field.id];
     const inputId = `${scopeId}-${field.id}`;
+    const helperId = `${inputId}-helper`;
     const helperText = getFieldHelperText(field, scope);
+    const helperMarkup = helperText
+        ? `<p class="field-helper" id="${helperId}">${escapeHtml(helperText)}</p>`
+        : `<p class="field-helper" id="${helperId}" hidden></p>`;
     const commonAttributes = scope === "service"
         ? `data-scope="service" data-service-id="${scopeId}" data-field-id="${field.id}"`
         : `data-scope="contact" data-contact-field="${field.id}"`;
@@ -3131,8 +3536,8 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
     if (field.type === "textarea") {
         return `
             <div class="${fieldClass}">
-                <label for="${inputId}">${escapeHtml(getFieldLabel(field))}</label>
-                ${helperText ? `<p class="field-helper">${escapeHtml(helperText)}</p>` : ""}
+                ${renderFieldLabel(field, inputId)}
+                ${helperMarkup}
                 <textarea
                     id="${inputId}"
                     placeholder="${escapeHtml(field.placeholder || "")}"
@@ -3145,8 +3550,8 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
     if (field.type === "select") {
         return `
             <div class="${fieldClass}">
-                <label for="${inputId}">${escapeHtml(getFieldLabel(field))}</label>
-                ${helperText ? `<p class="field-helper">${escapeHtml(helperText)}</p>` : ""}
+                ${renderFieldLabel(field, inputId)}
+                ${helperMarkup}
                 <select id="${inputId}" ${commonAttributes}>
                     ${(field.options || []).map((option) => `
                         <option value="${escapeHtml(option.value)}" ${option.value === value ? "selected" : ""}>
@@ -3161,8 +3566,8 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
     if (field.type === "choice") {
         return `
             <fieldset class="${fieldClass}">
-                <legend>${escapeHtml(getFieldLabel(field))}</legend>
-                ${helperText ? `<p class="field-helper">${escapeHtml(helperText)}</p>` : ""}
+                ${renderFieldLegend(field)}
+                ${helperMarkup}
                 <div class="choice-grid">
                     ${(field.options || []).map((option, index) => {
                         const optionId = `${inputId}-${index}`;
@@ -3198,8 +3603,8 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
 
         return `
             <fieldset class="${fieldClass}">
-                <legend>${escapeHtml(getFieldLabel(field))}</legend>
-                ${helperText ? `<p class="field-helper">${escapeHtml(helperText)}</p>` : ""}
+                ${renderFieldLegend(field)}
+                ${helperMarkup}
                 <div class="choice-grid">
                     ${(field.options || []).map((option, index) => {
                         const optionId = `${inputId}-${index}`;
@@ -3232,7 +3637,7 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
     if (field.type === "toggle") {
         return `
             <fieldset class="${fieldClass}">
-                <legend>${escapeHtml(getFieldLabel(field))}</legend>
+                ${renderFieldLegend(field)}
                 <div class="toggle-grid">
                     <div class="toggle-card">
                         <label for="${inputId}">
@@ -3263,14 +3668,16 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
             ${field.inputMode ? `inputmode="${field.inputMode}"` : ""}
             ${field.maxLength ? `maxlength="${field.maxLength}"` : ""}
             ${field.pattern ? `pattern="${field.pattern}"` : ""}
+            ${field.id === "postalCode" ? `autocomplete="postal-code"` : ""}
+            ${field.id === "settlement" ? `autocomplete="address-level2"` : ""}
             ${commonAttributes}
         >
     `;
 
     return `
         <div class="${fieldClass}">
-            <label for="${inputId}">${escapeHtml(getFieldLabel(field))}</label>
-            ${helperText ? `<p class="field-helper">${escapeHtml(helperText)}</p>` : ""}
+            ${renderFieldLabel(field, inputId)}
+            ${helperMarkup}
             ${inputMarkup}
         </div>
     `;
@@ -3359,6 +3766,45 @@ function updateContactField(fieldId, value) {
     state.contactValues[fieldId] = value;
 }
 
+function setHelperText(helperId, text) {
+    const helper = document.getElementById(helperId);
+    if (!helper) {
+        return;
+    }
+
+    if (text) {
+        helper.hidden = false;
+        helper.textContent = text;
+    } else {
+        helper.hidden = true;
+        helper.textContent = "";
+    }
+}
+
+function syncPostalLookupUi() {
+    const postalInput = document.querySelector('[data-contact-field="postalCode"]');
+    const settlementInput = document.querySelector('[data-contact-field="settlement"]');
+
+    if (postalInput instanceof HTMLInputElement) {
+        postalInput.value = state.contactValues.postalCode || "";
+    }
+
+    if (settlementInput instanceof HTMLInputElement) {
+        settlementInput.value = state.contactValues.settlement || "";
+    }
+
+    setHelperText("contact-postalCode-helper", state.postalLookupMessage || "");
+
+    let settlementHelperText = "";
+    if (state.postalLookupState === "success") {
+        settlementHelperText = "Az irányítószám alapján kitöltve, szükség esetén módosítható.";
+    } else if (state.postalLookupState === "error") {
+        settlementHelperText = "Ha nem sikerül automatikusan, kézzel is megadható.";
+    }
+
+    setHelperText("contact-settlement-helper", settlementHelperText);
+}
+
 async function lookupSettlementByPostalCode(postalCode) {
     const cleanPostalCode = String(postalCode || "").trim();
 
@@ -3366,19 +3812,22 @@ async function lookupSettlementByPostalCode(postalCode) {
         state.postalLookupState = "idle";
         state.postalLookupMessage = "";
         state.contactValues.settlement = "";
-        renderApp();
+        persistState();
+        syncPostalLookupUi();
         return;
     }
 
     state.postalLookupState = "loading";
     state.postalLookupMessage = "Telep\u00fcl\u00e9s keres\u00e9se...";
-    renderApp();
+    persistState();
+    syncPostalLookupUi();
 
     if (POSTAL_CODE_OVERRIDES[cleanPostalCode]) {
         state.contactValues.settlement = POSTAL_CODE_OVERRIDES[cleanPostalCode];
         state.postalLookupState = "success";
         state.postalLookupMessage = `Telep\u00fcl\u00e9s kit\u00f6ltve: ${POSTAL_CODE_OVERRIDES[cleanPostalCode]}`;
-        renderApp();
+        persistState();
+        syncPostalLookupUi();
         return;
     }
 
@@ -3399,11 +3848,13 @@ async function lookupSettlementByPostalCode(postalCode) {
         state.contactValues.settlement = placeName;
         state.postalLookupState = "success";
         state.postalLookupMessage = `Telep\u00fcl\u00e9s kit\u00f6ltve: ${placeName}`;
-        renderApp();
+        persistState();
+        syncPostalLookupUi();
     } catch (error) {
         state.postalLookupState = "error";
         state.postalLookupMessage = "A telep\u00fcl\u00e9st most nem tudtuk automatikusan kit\u00f6lteni, k\u00e9rlek \u00edrd be k\u00e9zzel.";
-        renderApp();
+        persistState();
+        syncPostalLookupUi();
     }
 }
 
@@ -3426,6 +3877,18 @@ function getScopedFieldDefinition(input) {
     }
 
     return null;
+}
+
+function fieldHasDependentVisibility(scope, scopeId, fieldId) {
+    if (!fieldId) {
+        return false;
+    }
+
+    const fields = scope === "service"
+        ? (getService(scopeId)?.fields || [])
+        : CONTACT_FIELDS_RUNTIME;
+
+    return fields.some((field) => field.showWhen?.field === fieldId);
 }
 
 function updateLiveTotals() {
@@ -3525,6 +3988,18 @@ function buildSubmissionPayloads() {
         return `- ${service.name}: ${formatCurrency(subtotals[serviceId])} (${buildServiceMeta(service, values)})`;
     });
 
+    const services = state.selectedServices.map((serviceId) => {
+        const service = getService(serviceId);
+        const values = ensureServiceState(serviceId);
+        const lines = getVisibleFieldLines(service.fields, values);
+        return {
+            name: service.name,
+            meta: buildServiceMeta(service, values),
+            subtotal: formatCurrency(subtotals[serviceId]),
+            details: lines.length ? lines : ["Nincs további részlet megadva."]
+        };
+    });
+
     const contactLines = CONTACT_FIELDS_RUNTIME
         .map((field) => {
             if (field.id === "consent") {
@@ -3537,6 +4012,24 @@ function buildSubmissionPayloads() {
             }
 
             return `- ${field.label}: ${formatted}`;
+        })
+        .filter(Boolean);
+
+    const contact_rows = CONTACT_FIELDS_RUNTIME
+        .map((field) => {
+            if (field.id === "consent") {
+                return null;
+            }
+
+            const formatted = getFieldDisplayValue(field, state.contactValues[field.id]);
+            if (!formatted) {
+                return null;
+            }
+
+            return {
+                label: field.label,
+                value: formatted
+            };
         })
         .filter(Boolean);
 
@@ -3581,12 +4074,15 @@ function buildSubmissionPayloads() {
         summary,
         internal_summary: summary,
         customer_summary: customerSummary,
+        services,
+        contact_rows,
         intro_line: "Új kertépítési kalkuláció érkezett a webes felületről.",
         customer_intro_line: `Kedves ${customerName}, köszönjük az ajánlatkérést.`,
         customer_closing_line: "Hamarosan felvesszük veled a kapcsolatot a pontosításhoz.",
         internal_subject: `Új kertépítési kalkuláció - ${customerName}`,
         customer_subject: "Köszönjük az ajánlatkérést - Díszkertek",
-        email_subject: `Új kertépítési kalkuláció - ${customerName}`
+        email_subject: `Új kertépítési kalkuláció - ${customerName}`,
+        email_disclaimer: "A megjelenített összeg tájékoztató jellegű. A végleges ajánlat a helyszíni felmérés, a pontos mennyiségek, az anyagválasztás és a műszaki adottságok alapján készül el."
     };
 
     return {
@@ -3597,6 +4093,56 @@ function buildSubmissionPayloads() {
             ...basePayload
         }
     };
+}
+
+function wait(ms) {
+    return new Promise((resolve) => {
+        window.setTimeout(resolve, ms);
+    });
+}
+
+async function sendEmailWithRetry(templateId, payload, options = {}) {
+    const {
+        delayBefore = 0,
+        retryCount = 0,
+        retryDelay = 1600,
+        logLabel = "Email küldés"
+    } = options;
+
+    if (delayBefore > 0) {
+        await wait(delayBefore);
+    }
+
+    let lastError = null;
+
+    for (let attempt = 0; attempt <= retryCount; attempt += 1) {
+        try {
+            return await emailjs.send(EMAILJS_SERVICE_ID, templateId, payload);
+        } catch (error) {
+            lastError = error;
+
+            if (attempt < retryCount) {
+                await wait(retryDelay);
+                continue;
+            }
+        }
+    }
+
+    console.error(`${logLabel} sikertelen.`, lastError);
+    throw lastError;
+}
+
+async function sendCustomerConfirmation(customerPayload) {
+    try {
+        await sendEmailWithRetry(EMAILJS_TEMPLATE_CUSTOMER, customerPayload, {
+            delayBefore: 1800,
+            retryCount: 1,
+            retryDelay: 1800,
+            logLabel: "A visszaigazoló email küldése"
+        });
+    } catch (error) {
+        console.error("A visszaigazoló email nem ment ki.", error);
+    }
 }
 
 async function handleSubmit() {
@@ -3619,17 +4165,19 @@ async function handleSubmit() {
     try {
         const { internalPayload, customerPayload } = buildSubmissionPayloads();
 
-        await Promise.all([
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_INTERNAL, internalPayload),
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CUSTOMER, customerPayload)
-        ]);
-
+        await sendEmailWithRetry(EMAILJS_TEMPLATE_INTERNAL, internalPayload, {
+            retryCount: 1,
+            retryDelay: 1800,
+            logLabel: "A belső értesítő email küldése"
+        });
         state.isSubmitting = false;
         openSuccessModal();
+        renderApp();
+        void sendCustomerConfirmation(customerPayload);
     } catch (error) {
         state.isSubmitting = false;
         renderApp();
-        showFeedback("Az email küldése most nem sikerült. Kérlek ellenőrizd az EmailJS sablonokat és próbáld újra.");
+        showFeedback("Az email küldése most nem sikerült. Ellenőrizd az EmailJS sablonokat és a küldési limitet.");
         console.error(error);
     }
 }
@@ -3642,7 +4190,8 @@ function openSuccessModal() {
 function closeSuccessModal() {
     successModal.hidden = true;
     document.body.style.overflow = "";
-    resetApp();
+    persistState();
+    renderApp();
 }
 
 function resetApp() {
@@ -3664,6 +4213,141 @@ function clearFilledValues() {
     state.postalLookupMessage = "";
     state.postalLookupState = "idle";
     renderApp();
+}
+
+function buildPrintableSummaryHtml() {
+    const submittedAt = new Date().toLocaleString("hu-HU", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+
+    const total = formatCurrency(getGrandTotal());
+    const servicesHtml = state.selectedServices.map((serviceId) => {
+        const service = getService(serviceId);
+        const values = ensureServiceState(serviceId);
+        const subtotal = formatCurrency(service.calculate(values));
+        const lines = getVisibleFieldLines(service.fields, values);
+
+        return `
+            <section class="print-service">
+                <div class="print-service-head">
+                    <h3>${escapeHtml(service.name)}</h3>
+                    <strong>${escapeHtml(subtotal)}</strong>
+                </div>
+                <div class="print-service-meta">${escapeHtml(buildServiceMeta(service, values))}</div>
+                ${lines.length
+                    ? `<ul>${lines.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>`
+                    : `<p class="print-muted">Nincs további részlet megadva.</p>`}
+            </section>
+        `;
+    }).join("");
+
+    const contactHtml = CONTACT_FIELDS_RUNTIME
+        .filter((field) => field.id !== "consent")
+        .map((field) => {
+            const value = getFieldDisplayValue(field, state.contactValues[field.id]);
+            if (!value) {
+                return "";
+            }
+
+            return `
+                <tr>
+                    <td>${escapeHtml(field.label)}</td>
+                    <td>${escapeHtml(value)}</td>
+                </tr>
+            `;
+        })
+        .join("");
+
+    return `
+        <!DOCTYPE html>
+        <html lang="hu">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Díszkertek - Helyszíni felmérő összefoglaló</title>
+            <style>
+                body { font-family: Arial, Helvetica, sans-serif; color: #2f281f; margin: 0; background: #f5f1ea; }
+                .page { max-width: 880px; margin: 0 auto; background: #fffdf9; padding: 32px; }
+                .toolbar { max-width: 880px; margin: 0 auto; padding: 20px 32px 0; display: flex; justify-content: flex-end; }
+                .toolbar button { border: 0; border-radius: 999px; padding: 12px 18px; font-size: 14px; font-weight: 700; color: #fff; background: #1f5b3b; cursor: pointer; }
+                .hero { border-bottom: 2px solid #e8dfd3; padding-bottom: 18px; margin-bottom: 24px; }
+                .eyebrow { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #7b6b58; margin: 0 0 8px; }
+                h1 { margin: 0 0 8px; font-size: 30px; }
+                .lead { margin: 0; color: #5a4e41; line-height: 1.7; }
+                .summary { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: end; background: #f8f4ed; border: 1px solid #eadfce; border-radius: 18px; padding: 18px 20px; margin-bottom: 24px; }
+                .summary strong { font-size: 28px; color: #1f5b3b; }
+                .section { margin-bottom: 24px; }
+                .section h2 { margin: 0 0 12px; font-size: 20px; }
+                .print-service { border: 1px solid #e8dfd3; border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; background: #fcfaf7; }
+                .print-service-head { display: flex; justify-content: space-between; gap: 16px; align-items: start; }
+                .print-service-head h3 { margin: 0; font-size: 18px; }
+                .print-service-head strong { color: #1f5b3b; white-space: nowrap; }
+                .print-service-meta { margin-top: 8px; color: #6f6153; font-size: 13px; }
+                .print-service ul, .file-list ul { margin: 12px 0 0 18px; padding: 0; line-height: 1.6; }
+                .print-muted { color: #7b6b58; }
+                table { width: 100%; border-collapse: collapse; }
+                td { padding: 9px 0; border-bottom: 1px solid #eee4d8; vertical-align: top; }
+                td:first-child { width: 34%; color: #6f6153; font-weight: 700; padding-right: 18px; }
+                @media print {
+                    body { background: #fff; }
+                    .toolbar { display: none; }
+                    .page { max-width: none; padding: 0; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="toolbar">
+                <button type="button" onclick="window.print()">Nyomtatás / PDF mentése</button>
+            </div>
+            <div class="page">
+                <header class="hero">
+                    <p class="eyebrow">Díszkertek</p>
+                    <h1>Helyszíni felmérő összefoglaló</h1>
+                    <p class="lead">Generálva: ${escapeHtml(submittedAt)}</p>
+                </header>
+
+                <section class="summary">
+                    <div>
+                        <div class="eyebrow">Kiválasztott tételek</div>
+                        <div>${escapeHtml(String(state.selectedServices.length))} db</div>
+                    </div>
+                    <div>
+                        <div class="eyebrow">Tájékoztató végösszeg</div>
+                        <strong>${escapeHtml(total)}</strong>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h2>Kiválasztott tételek</h2>
+                    ${servicesHtml || `<p class="print-muted">Nincs kiválasztott tétel.</p>`}
+                </section>
+
+                <section class="section">
+                    <h2>Kapcsolati és helyszíni adatok</h2>
+                    <table>${contactHtml}</table>
+                </section>
+            </div>
+        </body>
+        </html>
+    `;
+}
+
+function exportPdfSummary() {
+    const previewWindow = window.open("", "_blank");
+
+    if (!previewWindow) {
+        showFeedback("A PDF előnézet megnyitása nem sikerült. Ellenőrizd, hogy a böngésző engedi-e az új lap megnyitását.");
+        return;
+    }
+
+    previewWindow.document.open();
+    previewWindow.document.write(buildPrintableSummaryHtml());
+    previewWindow.document.close();
+    previewWindow.focus();
 }
 
 function handleActionClick(event) {
@@ -3709,6 +4393,11 @@ function handleActionClick(event) {
         return;
     }
 
+    if (action === "export-pdf") {
+        exportPdfSummary();
+        return;
+    }
+
     if (action === "clear-form") {
         clearFilledValues();
     }
@@ -3746,6 +4435,7 @@ function handleFieldUpdate(event, shouldRerender) {
 
     const field = getScopedFieldDefinition(input);
     let value = getFieldValueFromInput(input);
+    let forceRerender = false;
 
     if (field?.id === "postalCode") {
         value = String(value || "").replace(/\D/g, "").slice(0, 4);
@@ -3775,14 +4465,28 @@ function handleFieldUpdate(event, shouldRerender) {
                 clearTimeout(postalLookupTimer);
             }
 
-            postalLookupTimer = window.setTimeout(() => {
-                lookupSettlementByPostalCode(value);
-            }, 350);
+            if (value.length === 4) {
+                postalLookupTimer = window.setTimeout(() => {
+                    lookupSettlementByPostalCode(value);
+                }, 250);
+            } else {
+                state.postalLookupState = "idle";
+                state.postalLookupMessage = "";
+
+                if (!value.length) {
+                    state.contactValues.settlement = "";
+                }
+
+                persistState();
+                syncPostalLookupUi();
+            }
         }
     }
 
-    if (shouldRerender) {
+    if (shouldRerender || forceRerender) {
         renderApp();
+    } else if (scope === "contact") {
+        persistState();
     } else {
         updateLiveTotals();
     }
@@ -3800,17 +4504,34 @@ function addSelectedServiceFromPicker() {
         return;
     }
 
-    if (!state.selectedServices.includes(serviceId)) {
-        state.selectedServices = [...state.selectedServices, serviceId];
-        ensureServiceState(serviceId);
+    if (state.selectedServices.includes(serviceId)) {
+        showFeedback("Ez a tétel már hozzá van adva.");
+        return;
     }
 
+    state.selectedServices = [...state.selectedServices, serviceId];
+    ensureServiceState(serviceId);
     renderApp();
 }
 
 stepContainer.addEventListener("click", handleActionClick);
 stepContainer.addEventListener("keydown", handleActionKeydown);
-stepContainer.addEventListener("change", (event) => handleFieldUpdate(event, true));
+stepContainer.addEventListener("change", (event) => {
+    const target = event.target;
+
+    if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement)) {
+        return;
+    }
+
+    const field = getScopedFieldDefinition(target);
+    const shouldRerender = fieldHasDependentVisibility(
+        target.dataset.scope,
+        target.dataset.serviceId || target.dataset.contactField || "",
+        field?.id
+    );
+
+    handleFieldUpdate(event, shouldRerender);
+});
 stepContainer.addEventListener("input", (event) => {
     const target = event.target;
     if (target instanceof HTMLInputElement && (target.type === "radio" || target.type === "checkbox")) {
