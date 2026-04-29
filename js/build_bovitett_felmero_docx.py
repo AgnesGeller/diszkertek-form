@@ -10,7 +10,7 @@ from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
 
 
-OUTPUT_DIR = Path(r"C:\Users\darli\bootcamp\FREEE\diszkertek-form\js\docs")
+OUTPUT_DIR = Path(__file__).resolve().parent / "docs"
 OUTPUT_PATH = OUTPUT_DIR / "Diszkertek_Bovitett_Helyszini_Felmero_Papir.docx"
 
 GREEN = "335C4E"

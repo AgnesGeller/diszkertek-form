@@ -21,3 +21,12 @@ build/
 
 # Cache
 .cache/
+__pycache__/
+*.py[cod]
+
+# Browser/runtime profiles
+edge-headless-profile/
+
+# Generated document work dirs and previews
+js/docs/_sdt_work/
+js/docs/rendered*/

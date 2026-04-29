@@ -2,6 +2,8 @@
 const EMAILJS_TEMPLATE_CUSTOMER = "template_m0utevq";
 const EMAILJS_TEMPLATE_INTERNAL = "template_ciz2tq2";
 
+const EMAIL_SEND_TIMEOUT_MS = 30000;
+
 const currencyFormatter = new Intl.NumberFormat("hu-HU");
 
 const SERVICES = [
@@ -3637,7 +3639,6 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
     if (field.type === "toggle") {
         return `
             <fieldset class="${fieldClass}">
-                ${renderFieldLegend(field)}
                 <div class="toggle-grid">
                     <div class="toggle-card">
                         <label for="${inputId}">
@@ -3648,6 +3649,7 @@ function renderContextField({ field, values, scope, scopeId, fields }) {
                                 ${commonAttributes}
                             >
                             <span class="option-title">${escapeHtml(field.label)}</span>
+                            ${getFieldAudienceBadge(field)}
                             ${field.required ? `<span class="option-note">Ez a megerősítés szükséges a beküldéshez.</span>` : ""}
                         </label>
                     </div>
@@ -4101,12 +4103,30 @@ function wait(ms) {
     });
 }
 
+function withTimeout(promise, ms, message) {
+    let timeoutId = null;
+    const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = window.setTimeout(() => {
+            const error = new Error(message);
+            error.name = "TimeoutError";
+            reject(error);
+        }, ms);
+    });
+
+    return Promise.race([promise, timeoutPromise]).finally(() => {
+        if (timeoutId) {
+            window.clearTimeout(timeoutId);
+        }
+    });
+}
+
 async function sendEmailWithRetry(templateId, payload, options = {}) {
     const {
         delayBefore = 0,
         retryCount = 0,
         retryDelay = 1600,
-        logLabel = "Email küldés"
+        logLabel = "Email küldés",
+        timeoutMs = EMAIL_SEND_TIMEOUT_MS
     } = options;
 
     if (delayBefore > 0) {
@@ -4117,9 +4137,17 @@ async function sendEmailWithRetry(templateId, payload, options = {}) {
 
     for (let attempt = 0; attempt <= retryCount; attempt += 1) {
         try {
-            return await emailjs.send(EMAILJS_SERVICE_ID, templateId, payload);
+            return await withTimeout(
+                emailjs.send(EMAILJS_SERVICE_ID, templateId, payload),
+                timeoutMs,
+                `${logLabel} túl sokáig tartott.`
+            );
         } catch (error) {
             lastError = error;
+
+            if (error?.name === "TimeoutError") {
+                break;
+            }
 
             if (attempt < retryCount) {
                 await wait(retryDelay);
@@ -4130,19 +4158,6 @@ async function sendEmailWithRetry(templateId, payload, options = {}) {
 
     console.error(`${logLabel} sikertelen.`, lastError);
     throw lastError;
-}
-
-async function sendCustomerConfirmation(customerPayload) {
-    try {
-        await sendEmailWithRetry(EMAILJS_TEMPLATE_CUSTOMER, customerPayload, {
-            delayBefore: 1800,
-            retryCount: 1,
-            retryDelay: 1800,
-            logLabel: "A visszaigazoló email küldése"
-        });
-    } catch (error) {
-        console.error("A visszaigazoló email nem ment ki.", error);
-    }
 }
 
 async function handleSubmit() {
@@ -4170,14 +4185,23 @@ async function handleSubmit() {
             retryDelay: 1800,
             logLabel: "A belső értesítő email küldése"
         });
+        await sendEmailWithRetry(EMAILJS_TEMPLATE_CUSTOMER, customerPayload, {
+            delayBefore: 1800,
+            retryCount: 1,
+            retryDelay: 1800,
+            logLabel: "A visszaigazoló email küldése"
+        });
         state.isSubmitting = false;
         openSuccessModal();
         renderApp();
-        void sendCustomerConfirmation(customerPayload);
     } catch (error) {
         state.isSubmitting = false;
         renderApp();
-        showFeedback("Az email küldése most nem sikerült. Ellenőrizd az EmailJS sablonokat és a küldési limitet.");
+        if (error?.name === "TimeoutError") {
+            showFeedback("A küldés túl sokáig tartott. Az adatok megmaradtak, kérlek ellenőrizd az internetkapcsolatot, majd próbáld újra.");
+        } else {
+            showFeedback("Az email küldése most nem sikerült. Az adatok megmaradtak, kérlek próbáld újra később.");
+        }
         console.error(error);
     }
 }
@@ -4270,6 +4294,7 @@ function buildPrintableSummaryHtml() {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Díszkertek - Helyszíni felmérő összefoglaló</title>
             <style>
+                * { box-sizing: border-box; }
                 body { font-family: Arial, Helvetica, sans-serif; color: #2f281f; margin: 0; background: #f5f1ea; }
                 .page { max-width: 880px; margin: 0 auto; background: #fffdf9; padding: 32px; }
                 .toolbar { max-width: 880px; margin: 0 auto; padding: 20px 32px 0; display: flex; justify-content: flex-end; }
@@ -4288,10 +4313,31 @@ function buildPrintableSummaryHtml() {
                 .print-service-head strong { color: #1f5b3b; white-space: nowrap; }
                 .print-service-meta { margin-top: 8px; color: #6f6153; font-size: 13px; }
                 .print-service ul, .file-list ul { margin: 12px 0 0 18px; padding: 0; line-height: 1.6; }
+                .print-service li, td { overflow-wrap: anywhere; }
                 .print-muted { color: #7b6b58; }
                 table { width: 100%; border-collapse: collapse; }
                 td { padding: 9px 0; border-bottom: 1px solid #eee4d8; vertical-align: top; }
                 td:first-child { width: 34%; color: #6f6153; font-weight: 700; padding-right: 18px; }
+                @media (max-width: 760px) {
+                    .toolbar { padding: 14px 16px 0; justify-content: stretch; }
+                    .toolbar button { width: 100%; border-radius: 14px; }
+                    .page { padding: 22px 18px; }
+                    h1 { font-size: 25px; line-height: 1.12; }
+                    .summary { grid-template-columns: 1fr; align-items: start; padding: 16px; }
+                    .summary strong { font-size: 24px; }
+                    .print-service { padding: 14px; border-radius: 14px; }
+                    .print-service-head { display: grid; gap: 6px; }
+                    .print-service-head strong { white-space: normal; }
+                    td { display: block; width: 100%; padding: 7px 0; border-bottom: 0; }
+                    td:first-child { width: 100%; padding-right: 0; padding-top: 12px; }
+                    tr { display: block; border-bottom: 1px solid #eee4d8; padding-bottom: 6px; }
+                }
+                @media (max-width: 420px) {
+                    .page { padding: 18px 14px; }
+                    h1 { font-size: 22px; }
+                    .eyebrow { letter-spacing: 1.2px; }
+                    .print-service ul, .file-list ul { margin-left: 16px; }
+                }
                 @media print {
                     body { background: #fff; }
                     .toolbar { display: none; }
@@ -4557,5 +4603,3 @@ window.startForm = startForm;
 
 restorePersistedState();
 renderApp();
-
-

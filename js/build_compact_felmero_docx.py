@@ -11,7 +11,7 @@ from docx.shared import Cm, Pt, RGBColor
 import build_bovitett_felmero_docx as base
 
 
-OUTPUT_DIR = Path(r"C:\Users\darli\bootcamp\FREEE\diszkertek-form\js\docs")
+OUTPUT_DIR = Path(__file__).resolve().parent / "docs"
 OUTPUT_PATH = OUTPUT_DIR / "form.docx"
 
 GREEN = base.GREEN
