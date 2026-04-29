@@ -4388,17 +4388,20 @@ function buildPrintableSummaryHtml() {
 }
 
 function exportPdfSummary() {
-    const previewWindow = window.open("", "_blank");
+    const html = buildPrintableSummaryHtml();
+    const previewUrl = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
+    const previewWindow = window.open(previewUrl, "_blank");
 
     if (!previewWindow) {
+        URL.revokeObjectURL(previewUrl);
         showFeedback("A PDF előnézet megnyitása nem sikerült. Ellenőrizd, hogy a böngésző engedi-e az új lap megnyitását.");
         return;
     }
 
-    previewWindow.document.open();
-    previewWindow.document.write(buildPrintableSummaryHtml());
-    previewWindow.document.close();
     previewWindow.focus();
+    window.setTimeout(() => {
+        URL.revokeObjectURL(previewUrl);
+    }, 60000);
 }
 
 function handleActionClick(event) {
