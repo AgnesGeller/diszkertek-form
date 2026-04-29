@@ -3116,6 +3116,10 @@ function getFieldAudience(field) {
 }
 
 function getFieldAudienceBadge(field) {
+    if (field.id === "consent") {
+        return "";
+    }
+
     const audience = getFieldAudience(field);
 
     if (audience === "pro") {
@@ -4319,13 +4323,14 @@ function buildPrintableSummaryHtml() {
                 td { padding: 9px 0; border-bottom: 1px solid #eee4d8; vertical-align: top; }
                 td:first-child { width: 34%; color: #6f6153; font-weight: 700; padding-right: 18px; }
                 @media (max-width: 760px) {
-                    .toolbar { padding: 14px 16px 0; justify-content: stretch; }
-                    .toolbar button { width: 100%; border-radius: 14px; }
-                    .page { padding: 22px 18px; }
+                    body { background: #fffdf9; }
+                    .toolbar { padding: 12px 10px 0; justify-content: stretch; }
+                    .toolbar button { width: 100%; border-radius: 12px; }
+                    .page { width: 100%; max-width: none; padding: 18px 10px; }
                     h1 { font-size: 25px; line-height: 1.12; }
-                    .summary { grid-template-columns: 1fr; align-items: start; padding: 16px; }
+                    .summary { grid-template-columns: 1fr; align-items: start; padding: 14px; border-radius: 14px; }
                     .summary strong { font-size: 24px; }
-                    .print-service { padding: 14px; border-radius: 14px; }
+                    .print-service { padding: 12px; border-radius: 12px; }
                     .print-service-head { display: grid; gap: 6px; }
                     .print-service-head strong { white-space: normal; }
                     td { display: block; width: 100%; padding: 7px 0; border-bottom: 0; }
@@ -4333,10 +4338,10 @@ function buildPrintableSummaryHtml() {
                     tr { display: block; border-bottom: 1px solid #eee4d8; padding-bottom: 6px; }
                 }
                 @media (max-width: 420px) {
-                    .page { padding: 18px 14px; }
+                    .page { padding: 16px 8px; }
                     h1 { font-size: 22px; }
                     .eyebrow { letter-spacing: 1.2px; }
-                    .print-service ul, .file-list ul { margin-left: 16px; }
+                    .print-service ul, .file-list ul { margin-left: 14px; }
                 }
                 @media print {
                     body { background: #fff; }
