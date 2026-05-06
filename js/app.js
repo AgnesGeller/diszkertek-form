@@ -3311,11 +3311,7 @@ function getMapSurveySummaryLines() {
     }
 
     if (state.mapSurvey.netGardenArea > 0) {
-        lines.push(`Nettó kertfelület: ${formatArea(state.mapSurvey.netGardenArea)}`);
-    }
-
-    if (state.mapSurvey.mainArea?.points?.length) {
-        lines.push(`Fő terület kerülete: ${formatLength(getPerimeterFromPoints(state.mapSurvey.mainArea.points))}`);
+        lines.push(`Megmaradt kert mérete: ${formatArea(state.mapSurvey.netGardenArea)}`);
     }
 
     if (state.mapSurvey.deductions.length) {
@@ -3556,6 +3552,10 @@ function injectMapSurveyStyles() {
             display: grid;
             gap: 0.75rem;
         }
+        .map-survey-help--top {
+            margin-top: 0.1rem;
+            margin-bottom: 0.15rem;
+        }
         .map-survey-draft-controls {
             display: flex;
             flex-wrap: wrap;
@@ -3601,7 +3601,7 @@ function injectMapSurveyStyles() {
         .map-survey-summary {
             display: grid;
             gap: 0.75rem;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
         .map-survey-metric {
             border-radius: var(--radius-md);
@@ -3685,6 +3685,10 @@ function injectMapSurveyStyles() {
             }
             .map-survey-command-bar {
                 gap: 0.85rem;
+            }
+            .map-survey-help {
+                font-size: 0.84rem;
+                line-height: 1.55;
             }
         }
     `;
@@ -3827,7 +3831,7 @@ function renderMapSurveySection() {
     const isExpanded = Boolean(state.mapSurvey.isExpanded);
     const summaryLines = getMapSurveySummaryLines();
     const isDrafting = Boolean(mapSurveyDraftMode);
-    const draftLabel = mapSurveyDraftMode === "main" ? "Fő terület rajzolása folyamatban" : "Levonás rajzolása folyamatban";
+    const draftLabel = mapSurveyDraftMode === "main" ? "Telek mérete rajzolása folyamatban" : "Levonás rajzolása folyamatban";
 
     return `
         <section class="contact-section contact-section--tools map-survey-section">
@@ -3881,6 +3885,14 @@ function renderMapSurveySection() {
                             </select>
                         </div>
                     </div>
+
+                    <div class="map-survey-help map-survey-help--top">
+                        <strong>Röviden:</strong><br>
+                        1. Írd be a címet, majd kattints a <strong>Térkép keresése</strong> gombra.<br>
+                        2. Nyomd meg a <strong>✏ Telek mérete</strong> gombot, és pontonként rajzold körbe a telket.<br>
+                        3. Minden rajz után nyomd meg a <strong>✓ Rajz lezárása</strong> gombot.<br>
+                        4. Ha kell, válaszd ki a levonandó elemet, majd a <strong>✏ Levonás</strong> gombbal rajzold körbe külön.
+                    </div>
                 </div>
 
                 <div id="mapSurveyCanvas" class="map-survey-map" aria-label="Térképes felmérés"></div>
@@ -3888,24 +3900,15 @@ function renderMapSurveySection() {
                 <div class="map-survey-command-bar">
                     <div class="map-survey-draft-controls">
                         <strong>${escapeHtml(draftLabel)}</strong>
-                        <button type="button" class="secondary-btn" data-action="map-draw-main">✏ Fő terület</button>
+                        <button type="button" class="secondary-btn" data-action="map-draw-main">✏ Telek mérete</button>
                         <button type="button" class="secondary-btn" data-action="map-draw-deduction">✏ Levonás</button>
                         <button type="button" class="ghost-btn" data-action="map-undo-point" data-draft-button ${isDrafting ? "" : "disabled"}>⌫ Utolsó pont</button>
                         <button type="button" class="secondary-btn" data-action="map-finish-draw" data-draft-button ${isDrafting ? "" : "disabled"}>✓ Rajz lezárása</button>
                         <button type="button" class="ghost-btn" data-action="map-cancel-draw" data-draft-button ${isDrafting ? "" : "disabled"}>Mégse</button>
-                        <button type="button" class="ghost-btn" data-action="map-fit-main"${state.mapSurvey.mainArea ? "" : " disabled"}>Ugrás a kirajzolt területhez</button>
+                        <button type="button" class="ghost-btn" data-action="map-fit-main"${state.mapSurvey.mainArea ? "" : " disabled"}>Ugrás a kirajzolt telekhez</button>
                         <button type="button" class="ghost-btn" data-action="map-clear-all">Minden rajz törlése</button>
                     </div>
 
-                    <div class="map-survey-help">
-                        <strong>Használat:</strong><br>
-                        1. Írd be a címet, majd kattints a <strong>Térkép keresése</strong> gombra.<br>
-                        2. Nyomd meg a <strong>✏ Fő terület</strong> gombot, majd a térképen pontonként jelöld ki a teljes kert vagy munkaterület határát. Nem csak négyszög rajzolható: annyi pontot rakhatsz le, amennyi az alakzat pontos követéséhez kell.<br>
-                        3. Ha kész vagy, nyomd meg a <strong>✓ Rajz lezárása</strong> gombot.<br>
-                        4. Ha van ház, garázs, műhely, terasz vagy más nem kertfelület, válaszd ki a típusát, nyomd meg a <strong>✏ Levonás</strong> gombot, és rajzold körbe külön. Itt is használhatsz több pontot, tehát szabálytalan alakzatot is fel tudsz venni.<br>
-                        5. Minden rajz után szükséges a <strong>✓ Rajz lezárása</strong>, különben a terület nem kerül mentésre.<br>
-                        6. A <strong>⌫ Utolsó pont</strong> az utolsó lerakott pontot törli, a <strong>Minden rajz törlése</strong> mindent nulláz.
-                    </div>
                 </div>
 
                 <div class="map-survey-summary">
@@ -3918,12 +3921,8 @@ function renderMapSurveySection() {
                         <strong>${escapeHtml(formatArea(state.mapSurvey.deductionAreaTotal))}</strong>
                     </div>
                     <div class="map-survey-metric">
-                        <span>Nettó kertfelület</span>
+                        <span>Megmaradt kert mérete</span>
                         <strong>${escapeHtml(formatArea(state.mapSurvey.netGardenArea))}</strong>
-                    </div>
-                    <div class="map-survey-metric">
-                        <span>Fő terület kerülete</span>
-                        <strong>${escapeHtml(formatLength(state.mapSurvey.mainArea?.points?.length ? getPerimeterFromPoints(state.mapSurvey.mainArea.points) : 0))}</strong>
                     </div>
                 </div>
 
@@ -3942,7 +3941,7 @@ function renderMapSurveySection() {
                                 <strong>${escapeHtml(item.label || getDeductionTypeLabel(item.type))}</strong>
                                 <span>${escapeHtml(formatArea(item.area))}</span>
                             </div>
-                            <button type="button" class="ghost-btn compact-btn" data-action="map-remove-deduction" data-deduction-id="${escapeHtml(item.id)}">Eltávolítás</button>
+                            <button type="button" class="ghost-btn compact-btn" style="color:#173d28;border-color:rgba(23,61,40,0.22);background:#ffffff;font-weight:700;" data-action="map-remove-deduction" data-deduction-id="${escapeHtml(item.id)}">Eltávolítás</button>
                         </div>
                     `).join("") : `
                         <div class="highlight-box">
@@ -3955,7 +3954,7 @@ function renderMapSurveySection() {
             </div>
             ` : `
             <div class="map-survey-collapsed-note">
-                Ez a blokk külön szakmai felmérő eszköz. Akkor nyisd meg, ha a címet térképen szeretnéd ellenőrizni, fő területet rajzolnál, vagy a ház, garázs, műhely és más nem kertfelületek levonásával nettó kertfelületet számolnál.
+                Ez a blokk külön szakmai felmérő eszköz. Akkor nyisd meg, ha a címet térképen szeretnéd ellenőrizni, a telek méretét rajzolnád, vagy a ház, garázs, műhely és más nem kertfelületek levonásával nettó kertfelületet számolnál.
                 ${summaryLines.length ? `<br><br>${escapeHtml(summaryLines.join(" • "))}` : ""}
             </div>
             `}
@@ -4049,7 +4048,7 @@ function updateMapSurveyDraftUi() {
     const title = controls.querySelector("strong");
     if (title) {
         title.textContent = mapSurveyDraftMode === "main"
-            ? "Fő terület rajzolása folyamatban"
+            ? "Telek mérete rajzolása folyamatban"
             : mapSurveyDraftMode === "deduction"
                 ? "Levonandó elem rajzolása folyamatban"
                 : "Rajzolás nincs elindítva";
@@ -4206,7 +4205,7 @@ function finishMapDraft() {
     const points = [...mapSurveyDraftPoints];
     if (mapSurveyDraftMode === "main") {
         replaceMainArea(points);
-        updateMapSurveyStatus("A fő terület mentve lett.");
+        updateMapSurveyStatus("A telek mérete mentve lett.");
     } else {
         const select = document.getElementById("mapSurveyDeductionType");
         const type = select instanceof HTMLSelectElement ? select.value : "egyeb";
@@ -4226,7 +4225,7 @@ function openMapDrawMode(mode) {
     }
 
     if (mode === "deduction" && !state.mapSurvey.mainArea) {
-        updateMapSurveyStatus("Először a fő területet rajzold meg, és csak utána jelöld a házat, garázst vagy más levonandó elemet.");
+        updateMapSurveyStatus("Először a telek méretét rajzold meg, és csak utána jelöld a házat, garázst vagy más levonandó elemet.");
         return;
     }
 
@@ -4236,7 +4235,7 @@ function openMapDrawMode(mode) {
 
     updateMapSurveyStatus(
         mode === "main"
-            ? "Kattints a térképre a fő terület pontjaihoz. Ha kész vagy, nyomd meg a Rajz lezárása gombot."
+            ? "Kattints a térképre a telek határpontjaihoz. Ha kész vagy, nyomd meg a Rajz lezárása gombot."
             : `Kattints a térképre a levonandó terület pontjaihoz (${getDeductionTypeLabel((document.getElementById("mapSurveyDeductionType") instanceof HTMLSelectElement ? document.getElementById("mapSurveyDeductionType").value : "egyeb"))}). Ha kész vagy, nyomd meg a Rajz lezárása gombot.`
     );
     updateMapSurveyDraftUi();
@@ -4246,7 +4245,7 @@ function replaceMainArea(points) {
     state.mapSurvey.mainArea = {
         id: "main-area",
         type: "main",
-        label: "Fő terület",
+        label: "Telek mérete",
         points,
         area: getAreaFromPoints(points)
     };
@@ -4390,11 +4389,16 @@ async function ensureMapSurveyMounted() {
             tap: false,
             fadeAnimation: false,
             zoomAnimation: false,
-            markerZoomAnimation: false
+            markerZoomAnimation: false,
+            minZoom: 5,
+            maxZoom: 19,
+            zoomSnap: 1,
+            zoomDelta: 1
         }).setView([state.mapSurvey.center.lat, state.mapSurvey.center.lng], state.mapSurvey.center.zoom);
 
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            maxZoom: 21,
+            maxZoom: 19,
+            maxNativeZoom: 19,
             attribution: "&copy; OpenStreetMap közreműködők"
         }).addTo(mapSurveyMap);
 
@@ -4402,6 +4406,12 @@ async function ensureMapSurveyMounted() {
         syncMapSurveyLayers();
 
         mapSurveyMap.on("moveend", () => {
+            updateMapSurveyCenterFromMap();
+            persistState();
+        });
+
+        mapSurveyMap.on("zoomend", () => {
+            mapSurveyMap.invalidateSize();
             updateMapSurveyCenterFromMap();
             persistState();
         });
@@ -4497,7 +4507,7 @@ function renderSummary() {
                     </div>
                     <p class="selected-service-meta">${escapeHtml(meta)}</p>
                     <div class="selected-service-actions">
-                        <button type="button" class="ghost-btn compact-btn" data-action="remove-service" data-service-id="${service.id}">
+                        <button type="button" class="ghost-btn compact-btn" style="color:#173d28;border-color:rgba(23,61,40,0.22);background:#ffffff;font-weight:700;" data-action="remove-service" data-service-id="${service.id}">
                             Eltávolítás
                         </button>
                     </div>
@@ -4955,6 +4965,23 @@ function scrollToMapSurveySection() {
         behavior: "smooth",
         block: "start"
     });
+}
+
+function openMapSurveyFromTopLink() {
+    const steps = getFlowSteps();
+    const contactStepIndex = steps.findIndex((step) => step.kind === "contact");
+
+    if (contactStepIndex === -1) {
+        return;
+    }
+
+    state.currentStep = contactStepIndex;
+    state.mapSurvey.isExpanded = true;
+    renderApp();
+
+    window.setTimeout(() => {
+        scrollToMapSurveySection();
+    }, 80);
 }
 
 function startForm() {
@@ -5745,11 +5772,7 @@ function handleActionClick(event) {
     }
 
     if (action === "open-map-survey") {
-        state.mapSurvey.isExpanded = true;
-        renderApp();
-        queueMicrotask(() => {
-            scrollToMapSurveySection();
-        });
+        openMapSurveyFromTopLink();
         return;
     }
 
