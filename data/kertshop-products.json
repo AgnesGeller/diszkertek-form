@@ -1,0 +1,900 @@
+{
+    "schema":  "kertshop-products.v1",
+    "generatedAt":  "2026-04-29T14:14:31+02:00",
+    "sourceUrl":  "https://agnesgeller.github.io/katalogus/",
+    "note":  "A katalogus flipbook oldalbol kinyert induló termékadatok. Ár, készlet, SKU és webshop kategóriák később tölthetők.",
+    "products":  [
+                     {
+                         "id":  "levendula",
+                         "type":  "plant",
+                         "name":  "Levendula",
+                         "subtitle":  "Lavandula angustifolia",
+                         "sourceTitle":  "Levendula - Lavandula angustifolia",
+                         "description":  "A levendula mediterrán hangulatot kölcsönöz a kertednek, szárazságtűrő, fénykedvelő és illatos virágzatával vonzza a méheket.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/levi.png",
+                                            "alt":  "Levendula növény"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "virágos",
+                                      "méhbarát",
+                                      "évelő",
+                                      "napos",
+                                      "árnyékos",
+                                      "alacsony"
+                                  ],
+                         "features":  [
+                                          "🌞 Napfénykedvelő",
+                                          "🐝 Méhbarát",
+                                          "🌿 Évelő",
+                                          "🌳 Árnyéktűrő",
+                                          "🌱 Alacsony növésű"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "koromvirag",
+                         "type":  "plant",
+                         "name":  "Körömvirág",
+                         "subtitle":  "Calendula officinalis",
+                         "sourceTitle":  "Körömvirág – Calendula officinalis",
+                         "description":  "Erősen virágzó, egynyári faj, amely vonzza a méheket és gyógyhatású is.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/koromvirag.png",
+                                            "alt":  "Körömvirág"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "virágos",
+                                      "méhbarát",
+                                      "évelő",
+                                      "napos"
+                                  ],
+                         "features":  [
+                                          "🌞 Napfénykedvelő",
+                                          "🐝 Méhbarát",
+                                          "🌿 Évelő"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "szalmagyopar",
+                         "type":  "plant",
+                         "name":  "Szalmagyopár",
+                         "subtitle":  "Helichrysum italicum",
+                         "sourceTitle":  "Szalmagyopár – Helichrysum italicum",
+                         "description":  "Szegélynövénynek kiváló, alacsony növésű virág, árnyékos helyekre is alkalmas.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/kereklevelű szalmagy.png",
+                                            "alt":  "Szalmagyopár"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "virágos",
+                                      "árnyékos",
+                                      "alacsony"
+                                  ],
+                         "features":  [
+                                          "🌳 Árnyéktűrő",
+                                          "🌱 Alacsony növésű"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "harsfa",
+                         "type":  "plant",
+                         "name":  "Hársfa",
+                         "subtitle":  "Tilia cordata / Tilia tomentosa",
+                         "sourceTitle":  "Hársfa – Tilia cordata / Tilia tomentosa",
+                         "description":  "Illatos virágai vonzzák a méheket, lombhullató árnyékot adó fa.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/hars.png",
+                                            "alt":  "Hársfa"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "fa",
+                                      "napos",
+                                      "méhbarát"
+                                  ],
+                         "features":  [
+                                          "🌞 Napos fekvés",
+                                          "🐝 Méhbarát"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "gomb-tuja",
+                         "type":  "plant",
+                         "name":  "Gömb tuja",
+                         "subtitle":  "Thuja occidentalis \u0027Danica\u0027",
+                         "sourceTitle":  "Gömb tuja – Thuja occidentalis \u0027Danica\u0027",
+                         "description":  "Alacsony növésű, kompakt örökzöld, ideális szegélyekhez és cserjefoltba.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/gombtuja.png",
+                                            "alt":  "Gömb tuja"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "tuja",
+                                      "örökzöld",
+                                      "alacsony"
+                                  ],
+                         "features":  [
+                                          "🌱 Alacsony növésű",
+                                          "🌿 Örökzöld"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "nyirfacska",
+                         "type":  "plant",
+                         "name":  "Nyírfácska",
+                         "subtitle":  "Betula pendula",
+                         "sourceTitle":  "Nyírfácska – Betula pendula",
+                         "description":  "Díszes kérgű, légies lombú fa, napos kertrészekbe.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/nyirfa.png",
+                                            "alt":  "Nyírfa"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "fa",
+                                      "napos"
+                                  ],
+                         "features":  [
+                                          "🌞 Napfénykedvelő"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "oszlopos-tuja",
+                         "type":  "plant",
+                         "name":  "Oszlopos tuja",
+                         "subtitle":  "Thuja occidentalis \u0027Columna\u0027",
+                         "sourceTitle":  "Oszlopos tuja – Thuja occidentalis \u0027Columna\u0027",
+                         "description":  "Magas, keskeny növekedésű tuja, árnyéktűrő és térelválasztásra ideális.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/Oszlopostuja.png",
+                                            "alt":  "Oszlopos tuja"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "tuja",
+                                      "árnyékos",
+                                      "örökzöld"
+                                  ],
+                         "features":  [
+                                          "🌳 Árnyéktűrő",
+                                          "🌿 Örökzöld"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "muskatli",
+                         "type":  "plant",
+                         "name":  "Muskátli",
+                         "subtitle":  "Pelargonium zonale",
+                         "sourceTitle":  "Muskátli – Pelargonium zonale",
+                         "description":  "Hosszan virágzó kedvenc, méheket vonz és balkonra is ültethető.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/muskatli.png",
+                                            "alt":  "Muskátli"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "virágos",
+                                      "méhbarát",
+                                      "évelő"
+                                  ],
+                         "features":  [
+                                          "🐝 Méhbarát",
+                                          "🌿 Évelő"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "japan-juhar",
+                         "type":  "plant",
+                         "name":  "Japán juhar",
+                         "subtitle":  "Acer palmatum",
+                         "sourceTitle":  "Japán juhar – Acer palmatum",
+                         "description":  "Színes lombú, alacsony termetű díszfa, jól tűri az árnyékot.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/japanjuhar.png",
+                                            "alt":  "Japán juhar"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "fa",
+                                      "árnyékos"
+                                  ],
+                         "features":  [
+                                          "🌳 Árnyéktűrő"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "smaragd-tuja",
+                         "type":  "plant",
+                         "name":  "Smaragd tuja",
+                         "subtitle":  "Thuja occidentalis \u0027Smaragd\u0027",
+                         "sourceTitle":  "Smaragd tuja - Thuja occidentalis \u0027Smaragd\u0027",
+                         "description":  "Pompás zöld lombú tuja, napos helyen gyorsan növekedik.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/smaragdtuja .png",
+                                            "alt":  "Smaragd tuja"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "tuja",
+                                      "örökzöld",
+                                      "napos"
+                                  ],
+                         "features":  [
+                                          "🌿 Örökzöld",
+                                          "🌞 Napfénykedvelő"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "arnyliliom",
+                         "type":  "plant",
+                         "name":  "Árnyliliom",
+                         "subtitle":  "Hosta spp",
+                         "sourceTitle":  "Árnyliliom - Hosta spp",
+                         "description":  "Díszes levélzetű árnyéktűrő évelő, virágai méhbarátok.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/arnyek.jpg",
+                                            "alt":  "Árnyliliom"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "virágos",
+                                      "árnyékos",
+                                      "méhbarát"
+                                  ],
+                         "features":  [
+                                          "🌳 Árnyéktűrő",
+                                          "🐝 Méhbarát"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "disznapraforgo",
+                         "type":  "plant",
+                         "name":  "Dísznapraforgó",
+                         "subtitle":  "Helianthus annuus",
+                         "sourceTitle":  "Dísznapraforgó – Helianthus annuus",
+                         "description":  "Feltűnő virágzatával napos kertrészeket díszít, magassága miatt háttérnövényként is jó választás.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/disznapraforgo.png",
+                                            "alt":  "Dísznapraforgó"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "virágos",
+                                      "évelő"
+                                  ],
+                         "features":  [
+                                          "🌞 Napfénykedvelő",
+                                          "🌿 Évelő"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "lucfenyo",
+                         "type":  "plant",
+                         "name":  "Lucfenyő",
+                         "subtitle":  "Picea abies",
+                         "sourceTitle":  "Lucfenyő – Picea abies",
+                         "description":  "Klasszikus örökzöld fa, amely szeles helyekre is telepíthető.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/luc.png",
+                                            "alt":  "Lucfenyő"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "fa",
+                                      "örökzöld"
+                                  ],
+                         "features":  [
+                                          "🌿 Örökzöld"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "menta",
+                         "type":  "plant",
+                         "name":  "Menta",
+                         "subtitle":  "Mentha spicata",
+                         "sourceTitle":  "Menta – Mentha spicata",
+                         "description":  "Illatos levele és virágai miatt népszerű gyógynövény, méhbarátként is kiváló.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/menta.png",
+                                            "alt":  "Menta"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "virágos",
+                                      "méhbarát",
+                                      "évelő"
+                                  ],
+                         "features":  [
+                                          "🐝 Méhbarát",
+                                          "🌿 Évelő"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "talajtakaro-varjuhaj",
+                         "type":  "plant",
+                         "name":  "Talajtakaró varjúháj",
+                         "subtitle":  "Sedum spurium",
+                         "sourceTitle":  "Talajtakaró varjúháj – Sedum spurium",
+                         "description":  "Alacsony, terjedő növekedésű évelő virág, amely kiválóan takarja a talajt.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/varjuhaj.png",
+                                            "alt":  "Varjúháj"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "virágos",
+                                      "évelő",
+                                      "alacsony"
+                                  ],
+                         "features":  [
+                                          "🌱 Alacsony növésű",
+                                          "🌿 Évelő"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "arnyekturo-gyepkeverek",
+                         "type":  "plant",
+                         "name":  "Árnyéktűrő gyepkeverék",
+                         "subtitle":  null,
+                         "sourceTitle":  "Árnyéktűrő gyepkeverék",
+                         "description":  "Dús gyep, amely jól érzi magát kevésbé napos, árnyékos kertrészekben is.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/gyp.png",
+                                            "alt":  "Árnyéktűrő gyep"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "gyep",
+                                      "árnyékos",
+                                      "évelő"
+                                  ],
+                         "features":  [
+                                          "🌳 Árnyéktűrő",
+                                          "🌿 Évelő"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "hortenzia",
+                         "type":  "plant",
+                         "name":  "Hortenzia",
+                         "subtitle":  "Hydrangea macrophylla",
+                         "sourceTitle":  "Hortenzia – Hydrangea macrophylla",
+                         "description":  "Színes virágzatú évelő, amely savanyú talajban pompázik igazán, félárnyékban is jól fejlődik.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/hortenzia.jpg",
+                                            "alt":  "Hortenzia"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "dísznövény",
+                                      "évelő"
+                                  ],
+                         "features":  [
+                                          "🌿 Évelő",
+                                          "🌥 Félárnyékos",
+                                          "💧 Vízkedvelő"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "cseresznyefa",
+                         "type":  "plant",
+                         "name":  "Cseresznyefa",
+                         "subtitle":  "Prunus avium",
+                         "sourceTitle":  "Cseresznyefa – Prunus avium",
+                         "description":  "Tavasszal virágba borul, nyárra pedig lédús, zamatos termést hoz.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/cseri.png",
+                                            "alt":  "Cseresznyefa"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "gyümölcsfa",
+                                      "lombhullató"
+                                  ],
+                         "features":  [
+                                          "🍒 Gyümölcsfa",
+                                          "🌳 Lombhullató"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "macskamenta-catnip",
+                         "type":  "plant",
+                         "name":  "Macskamenta (Catnip)",
+                         "subtitle":  "Nepeta cataria",
+                         "sourceTitle":  "Macskamenta (Catnip) – Nepeta cataria",
+                         "description":  "A cicák kedvence, illatos levelei és virágai gyógynövényként is használhatóak.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/cat.jpg",
+                                            "alt":  "Macskamenta"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "gyógynövény",
+                                      "évelő"
+                                  ],
+                         "features":  [
+                                          "🌿 Évelő",
+                                          "🩺 Gyógynövény"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "buxus",
+                         "type":  "plant",
+                         "name":  "Buxus",
+                         "subtitle":  "Buxus sempervirens",
+                         "sourceTitle":  "Buxus - Buxus sempervirens",
+                         "description":  "Tömör lombja miatt ideális alacsony sövénynek, jól formázható.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/buxus1 (1).jpg",
+                                            "alt":  "Buxus"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "örökzöld",
+                                      "sövény"
+                                  ],
+                         "features":  [
+                                          "🌲 Örökzöld",
+                                          "✂️ Formázható"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "kereklevelu-szalmagyopar",
+                         "type":  "plant",
+                         "name":  "Kereklevelű szalmagyopár",
+                         "subtitle":  "Helichrysum petiolare",
+                         "sourceTitle":  "Kereklevelű szalmagyopár – Helichrysum petiolare",
+                         "description":  "Szárazságtűrő dísznövény, amely hosszan megtartja virágait és formáját.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/kereklevelű szalmagy.png",
+                                            "alt":  "Kereklevelű szalmagyopár"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "évelő",
+                                      "szárazságtűrő"
+                                  ],
+                         "features":  [
+                                          "🌿 Évelő",
+                                          "☀️ Napos helyre"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "rozsa",
+                         "type":  "plant",
+                         "name":  "Rózsa",
+                         "subtitle":  "Rosa spp",
+                         "sourceTitle":  "Rózsa – Rosa spp",
+                         "description":  "Klasszikus kertdísz, illatos virágai sokféle színben elérhetők.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/rosa.jpg",
+                                            "alt":  "Rózsa"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "dísznövény",
+                                      "illatos"
+                                  ],
+                         "features":  [
+                                          "🌹 Dísznövény",
+                                          "💐 Illatos"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "mak-poppy",
+                         "type":  "plant",
+                         "name":  "Mák (Poppy)",
+                         "subtitle":  "Papaver rhoeas",
+                         "sourceTitle":  "Mák (Poppy) – Papaver rhoeas",
+                         "description":  "Látványos színfoltja a virágágyásnak, elbűvölő szirmokkal és könnyed habitussal.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/poppy.jpg",
+                                            "alt":  "Mák"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "vadvirág",
+                                      "egynyári"
+                                  ],
+                         "features":  [
+                                          "🌺 Vadvirág",
+                                          "🕊 Egynyári"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "premium-antikolt-terko",
+                         "type":  "paving",
+                         "name":  "Prémium Antikolt Térkő",
+                         "subtitle":  null,
+                         "sourceTitle":  "Prémium Antikolt Térkő",
+                         "description":  "Ez a térkő megoldás ideális nagyobb udvarokhoz, természetes kőhatásával elegáns összhangot teremt a növényzettel.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/terko-premium.jpg",
+                                            "alt":  "Prémium antikolt térkő"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "antikolt",
+                                      "rusztikus",
+                                      "fagyallo",
+                                      "csuszásmentes"
+                                  ],
+                         "features":  [
+                                          "🎨 Színek: szürke, homok, terrakotta",
+                                          "❄️ Fagyálló",
+                                          "🦶 Csúszásmentes"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "gyephezagos-terko",
+                         "type":  "paving",
+                         "name":  "Gyephézagos térkő",
+                         "subtitle":  "Vitép Gaia",
+                         "sourceTitle":  "Gyephézagos térkő – Vitép Gaia",
+                         "description":  "Masszív, vízáteresztő térkő, amely lehetővé teszi a zöldfelület megtartását parkolókban, kocsibeállóknál és kertekben.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/gyepracs.jpg",
+                                            "alt":  "Gyephézagos térkő"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "gyephézagos",
+                                      "vízáteresztő"
+                                  ],
+                         "features":  [
+                                          "🌱 Gyephézagos",
+                                          "🚗 Személyautós forgalomra",
+                                          "💧 Vízáteresztő"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "travertin-classic-antikolt",
+                         "type":  "paving",
+                         "name":  "Travertin Classic Antikolt",
+                         "subtitle":  null,
+                         "sourceTitle":  "Travertin Classic Antikolt",
+                         "description":  "Természetes mészkőből készült, bézs árnyalatú, rusztikus megjelenésű térkő, amely eleganciát sugároz kültéren és beltéren egyaránt.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/travertin.jpg",
+                                            "alt":  "Travertin Classic Antikolt"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "antikolt",
+                                      "rusztikus"
+                                  ],
+                         "features":  [
+                                          "🪨 Antikolt",
+                                          "🏡 Kültéri és beltéri"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "fuego-antico",
+                         "type":  "paving",
+                         "name":  "Fuego Antico",
+                         "subtitle":  null,
+                         "sourceTitle":  "Fuego Antico",
+                         "description":  "Bontott tégla hatású, mediterrán stílusú térkő, enyhén karcos felülettel és töredezett élekkel, ideális kerti utakhoz és teraszokhoz.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/fuego.jpg",
+                                            "alt":  "Fuego Antico"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "antikolt",
+                                      "rusztikus",
+                                      "mediterrán"
+                                  ],
+                         "features":  [
+                                          "🏛 Antikolt",
+                                          "🌿 Mediterrán stílus"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "mercato",
+                         "type":  "paving",
+                         "name":  "Mercato",
+                         "subtitle":  "Fahéj",
+                         "sourceTitle":  "Mercato – Fahéj",
+                         "description":  "Meleg árnyalatú, satírozott felületű térkő, amely patinás hangulatot kölcsönöz a burkolt felületeknek.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/mercato.jpg",
+                                            "alt":  "Mercato Fahéj"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "antikolt",
+                                      "rusztikus",
+                                      "szemelyauto"
+                                  ],
+                         "features":  [
+                                          "🍂 Antikolt",
+                                          "🚗 Személyautós forgalomra"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "castello-antico-kombi",
+                         "type":  "paving",
+                         "name":  "Castello Antico Kombi",
+                         "subtitle":  null,
+                         "sourceTitle":  "Castello Antico Kombi",
+                         "description":  "Hullámos élekkel és finoman karcolt felülettel rendelkező térkő, amely klasszikus stílusban varázsolja újjá a kültéri tereket.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/castello.jpg",
+                                            "alt":  "Castello Antico Kombi"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "antikolt",
+                                      "rusztikus",
+                                      "kombi",
+                                      "hullamos"
+                                  ],
+                         "features":  [
+                                          "🏛 Antikolt",
+                                          "🔀 Kombi forma",
+                                          "🌊 Hullámos szélű"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "cicero",
+                         "type":  "paving",
+                         "name":  "Cicero",
+                         "subtitle":  null,
+                         "sourceTitle":  "Cicero",
+                         "description":  "Finom felületű, antik eleganciát sugárzó térkő, amely az ókori római kertművészet hangulatát idézi.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/cicero.jpg",
+                                            "alt":  "Cicero térkő"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "antikolt",
+                                      "rusztikus",
+                                      "disztegla"
+                                  ],
+                         "features":  [
+                                          "🏛 Antikolt",
+                                          "🧱 Dísztégla"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "termesko-burkolat",
+                         "type":  "paving",
+                         "name":  "Terméskő burkolat",
+                         "subtitle":  "Solnhofeni mészkő",
+                         "sourceTitle":  "Terméskő burkolat – Solnhofeni mészkő",
+                         "description":  "Természetes, szabálytalan formájú kőlapokból álló burkolat, amely rusztikus és időtálló megjelenést biztosít. Kültéren és beltéren is alkalmazható.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/solnhofeni.jpg",
+                                            "alt":  "Terméskő burkolat"
+                                        }
+                                    ],
+                         "tags":  [
+                                      "terméskő",
+                                      "rusztikus",
+                                      "hasitott"
+                                  ],
+                         "features":  [
+                                          "🪨 Terméskő",
+                                          "🏡 Kültéri és beltéri",
+                                          "🪓 Hasított felület"
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "kertfelujitas-elotte-utana",
+                         "type":  "reference",
+                         "name":  "Kertfelújítás – Előtte / Utána",
+                         "subtitle":  null,
+                         "sourceTitle":  "Kertfelújítás – Előtte / Utána",
+                         "description":  "Az eredeti zöldterületet rusztikus térkövekkel, virágágyással és pergolával alakítottuk át – harmonikus és könnyen karbantartható látvány.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/before.jpg",
+                                            "alt":  "Előtte kép"
+                                        },
+                                        {
+                                            "src":  "assets/img/after.jpg",
+                                            "alt":  "Utána kép"
+                                        }
+                                    ],
+                         "tags":  [
+
+                                  ],
+                         "features":  [
+
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     },
+                     {
+                         "id":  "kertfelujitas-elotte-utana",
+                         "type":  "reference",
+                         "name":  "Kertfelújítás – Előtte / Utána",
+                         "subtitle":  null,
+                         "sourceTitle":  "Kertfelújítás – Előtte / Utána",
+                         "description":  "Az eredeti zöldterületet rusztikus térkövekkel, virágágyással és pergolával alakítottuk át – harmonikus és könnyen karbantartható látvány.",
+                         "images":  [
+                                        {
+                                            "src":  "assets/img/munka (18).jpeg",
+                                            "alt":  "Előtte kép"
+                                        },
+                                        {
+                                            "src":  "assets/img/munka (7).jpeg",
+                                            "alt":  "Utána kép"
+                                        }
+                                    ],
+                         "tags":  [
+
+                                  ],
+                         "features":  [
+
+                                      ],
+                         "source":  {
+                                        "catalogUrl":  "https://agnesgeller.github.io/katalogus/",
+                                        "extractedFrom":  "AgnesGeller/katalogus GitHub Pages"
+                                    }
+                     }
+                 ]
+}

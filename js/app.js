@@ -2797,12 +2797,28 @@ const startButton = document.getElementById("startButton");
 const successModal = document.getElementById("successModal");
 const closeSuccessButton = document.getElementById("closeSuccessButton");
 const STORAGE_KEY = "diszkertek-form-state-v1";
+const LEAFLET_ASSET_URLS = {
+    css: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
+    js: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
+    drawCss: "https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css",
+    drawJs: "https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"
+};
+const MAP_SURVEY_DEDUCTION_TYPES = [
+    { value: "haz", label: "Ház" },
+    { value: "garazs", label: "Garázs" },
+    { value: "muhely", label: "Műhely" },
+    { value: "terasz", label: "Terasz" },
+    { value: "medence", label: "Medence" },
+    { value: "burkolt", label: "Burkolt, nem kertfelület" },
+    { value: "egyeb", label: "Egyéb" }
+];
 
 const state = {
     currentStep: 0,
     selectedServices: [],
     serviceValues: {},
     contactValues: createDefaultContactState(),
+    mapSurvey: createDefaultMapSurveyState(),
     isSubmitting: false,
     postalLookupMessage: "",
     postalLookupState: "idle"
@@ -2832,12 +2848,112 @@ function createDefaultContactState() {
     }, {});
 }
 
+function createDefaultMapSurveyState() {
+    return {
+        isExpanded: false,
+        searchQuery: "",
+        searchStatus: "",
+        searchResultLabel: "",
+        center: { lat: 47.4979, lng: 19.0402, zoom: 17 },
+        mainArea: null,
+        deductions: [],
+        grossArea: 0,
+        deductionAreaTotal: 0,
+        netGardenArea: 0,
+        notes: ""
+    };
+}
+
+function normalizeMapCenter(rawCenter) {
+    const fallback = createDefaultMapSurveyState().center;
+    const lat = Number(rawCenter?.lat);
+    const lng = Number(rawCenter?.lng);
+    const zoom = Number(rawCenter?.zoom);
+
+    return {
+        lat: Number.isFinite(lat) ? lat : fallback.lat,
+        lng: Number.isFinite(lng) ? lng : fallback.lng,
+        zoom: Number.isFinite(zoom) ? zoom : fallback.zoom
+    };
+}
+
+function sanitizePolygonPoints(rawPoints) {
+    if (!Array.isArray(rawPoints)) {
+        return [];
+    }
+
+    return rawPoints
+        .map((point) => ({
+            lat: Number(point?.lat),
+            lng: Number(point?.lng)
+        }))
+        .filter((point) => Number.isFinite(point.lat) && Number.isFinite(point.lng));
+}
+
+function sanitizeMapShape(rawShape, fallbackType = "") {
+    if (!rawShape || typeof rawShape !== "object") {
+        return null;
+    }
+
+    const points = sanitizePolygonPoints(rawShape.points);
+    if (points.length < 3) {
+        return null;
+    }
+
+    return {
+        id: rawShape.id ? String(rawShape.id) : `shape-${Date.now()}`,
+        type: rawShape.type ? String(rawShape.type) : fallbackType,
+        label: rawShape.label ? String(rawShape.label) : "",
+        points,
+        area: Number.isFinite(Number(rawShape.area)) ? Number(rawShape.area) : 0
+    };
+}
+
+function buildPersistableMapSurveyState(rawSurvey = {}) {
+    const defaults = createDefaultMapSurveyState();
+    const mainArea = sanitizeMapShape(rawSurvey.mainArea, "main");
+    const deductions = Array.isArray(rawSurvey.deductions)
+        ? rawSurvey.deductions
+            .map((item) => sanitizeMapShape(item, item?.type || "egyeb"))
+            .filter(Boolean)
+        : [];
+
+    const grossArea = Number(rawSurvey.grossArea);
+    const deductionAreaTotal = Number(rawSurvey.deductionAreaTotal);
+    const netGardenArea = Number(rawSurvey.netGardenArea);
+
+    return {
+        ...defaults,
+        isExpanded: Boolean(rawSurvey.isExpanded),
+        searchQuery: rawSurvey.searchQuery == null ? "" : String(rawSurvey.searchQuery),
+        searchStatus: rawSurvey.searchStatus == null ? "" : String(rawSurvey.searchStatus),
+        searchResultLabel: rawSurvey.searchResultLabel == null ? "" : String(rawSurvey.searchResultLabel),
+        center: normalizeMapCenter(rawSurvey.center),
+        mainArea,
+        deductions,
+        grossArea: Number.isFinite(grossArea) ? grossArea : 0,
+        deductionAreaTotal: Number.isFinite(deductionAreaTotal) ? deductionAreaTotal : 0,
+        netGardenArea: Number.isFinite(netGardenArea) ? netGardenArea : 0,
+        notes: rawSurvey.notes == null ? "" : String(rawSurvey.notes)
+    };
+}
+
 const POSTAL_CODE_OVERRIDES = {
     "2011": "Budakal\u00e1sz",
     "2013": "Pom\u00e1z"
 };
 
 let postalLookupTimer = null;
+let leafletAssetsPromise = null;
+let mapSurveyMap = null;
+let mapSurveyLayers = null;
+let mapSurveyMainLayer = null;
+let activeDrawHandler = null;
+let mapSurveyDraftLayer = null;
+let mapSurveyDraftLine = null;
+let mapSurveyDraftMarkersLayer = null;
+let mapSurveyDraftPoints = [];
+let mapSurveyDraftMode = "";
 
 function sanitizeFieldValue(field, value) {
     if (field.type === "toggle") {
@@ -2905,7 +3021,8 @@ function persistState() {
         currentStep: state.currentStep,
         selectedServices: [...state.selectedServices],
         serviceValues: state.serviceValues,
-        contactValues: state.contactValues
+        contactValues: state.contactValues,
+        mapSurvey: state.mapSurvey
     };
 
     try {
@@ -2946,6 +3063,7 @@ function restorePersistedState() {
         state.selectedServices = selectedServices;
         state.serviceValues = buildPersistableServiceState(selectedServices, parsed?.serviceValues || {});
         state.contactValues = buildPersistableContactState(parsed?.contactValues || {});
+        state.mapSurvey = buildPersistableMapSurveyState(parsed?.mapSurvey || {});
 
         const steps = getFlowSteps();
         const savedStep = Number(parsed?.currentStep);
@@ -3177,6 +3295,40 @@ function getVisibleFieldLines(fields, values) {
         .filter(Boolean);
 }
 
+function getMapSurveySummaryLines() {
+    const lines = [];
+
+    if (state.mapSurvey.searchResultLabel) {
+        lines.push(`Térképes találat: ${state.mapSurvey.searchResultLabel}`);
+    }
+
+    if (state.mapSurvey.grossArea > 0) {
+        lines.push(`Bruttó felület: ${formatArea(state.mapSurvey.grossArea)}`);
+    }
+
+    if (state.mapSurvey.deductionAreaTotal > 0) {
+        lines.push(`Levonandó felület összesen: ${formatArea(state.mapSurvey.deductionAreaTotal)}`);
+    }
+
+    if (state.mapSurvey.netGardenArea > 0) {
+        lines.push(`Nettó kertfelület: ${formatArea(state.mapSurvey.netGardenArea)}`);
+    }
+
+    if (state.mapSurvey.mainArea?.points?.length) {
+        lines.push(`Fő terület kerülete: ${formatLength(getPerimeterFromPoints(state.mapSurvey.mainArea.points))}`);
+    }
+
+    if (state.mapSurvey.deductions.length) {
+        lines.push(`Levonandó elemek: ${state.mapSurvey.deductions.map((item) => `${item.label} (${formatArea(item.area)})`).join(", ")}`);
+    }
+
+    if (state.mapSurvey.notes) {
+        lines.push(`Térképes megjegyzés: ${state.mapSurvey.notes}`);
+    }
+
+    return lines;
+}
+
 function getSelectedServiceTotals() {
     return state.selectedServices.reduce((accumulator, serviceId) => {
         const service = getService(serviceId);
@@ -3204,6 +3356,1074 @@ function buildServiceMeta(service, values) {
     return lines.join(" • ");
 }
 
+function injectMapSurveyStyles() {
+    if (typeof document === "undefined" || document.getElementById("mapSurveyInlineStyles")) {
+        return;
+    }
+
+    const style = document.createElement("style");
+    style.id = "mapSurveyInlineStyles";
+    style.textContent = `
+        .map-survey-section {
+            border: 2px solid rgba(21, 69, 44, 0.34);
+            background:
+                linear-gradient(180deg, rgba(26, 74, 47, 0.97) 0%, rgba(43, 94, 64, 0.96) 100%);
+            box-shadow: 0 20px 42px rgba(12, 38, 24, 0.18);
+        }
+        .map-survey-section .section-heading {
+            display: grid;
+            gap: 0.7rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            padding-bottom: 1rem;
+        }
+        .map-survey-section .eyebrow {
+            color: rgba(232, 244, 236, 0.82);
+        }
+        .map-survey-kicker {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            border-radius: 999px;
+            padding: 0.38rem 0.72rem;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: #eef7f0;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .map-survey-section .section-heading h3 {
+            margin: 0;
+            color: #ffffff;
+            font-size: clamp(1.75rem, 2.8vw, 2.2rem);
+            line-height: 1;
+            letter-spacing: 0.01em;
+        }
+        .map-survey-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .map-survey-title-main {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 0;
+        }
+        .map-survey-icon-badge {
+            width: 2rem;
+            height: 2rem;
+            min-width: 2rem;
+            max-width: 2rem;
+            min-height: 2rem;
+            max-height: 2rem;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            border-radius: 0.65rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+        .map-survey-icon {
+            width: 1rem;
+            height: 1rem;
+            min-width: 1rem;
+            max-width: 1rem;
+            min-height: 1rem;
+            max-height: 1rem;
+            display: block;
+        }
+        .top-map-link {
+            border-radius: 999px;
+            border: 1px solid rgba(47, 107, 69, 0.14);
+            background: rgba(47, 107, 69, 0.08);
+            color: var(--brand-deep);
+            font-size: 0.84rem;
+            font-weight: 800;
+            padding: 0.55rem 0.9rem;
+        }
+        .map-survey-toggle {
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+        }
+        .map-survey-toggle:hover,
+        .map-survey-toggle:focus-visible {
+            border-color: rgba(255, 255, 255, 0.28);
+            background: rgba(255, 255, 255, 0.14);
+        }
+        .map-survey-section .section-intro {
+            color: rgba(240, 247, 242, 0.92);
+            max-width: 56rem;
+        }
+        .map-survey-body {
+            display: grid;
+            gap: 1rem;
+            animation: mapSurveyReveal 240ms ease;
+            transform-origin: top;
+        }
+        .map-survey-collapsed-note {
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.08);
+            padding: 1rem 1.05rem;
+            color: #f2f7f3;
+            line-height: 1.65;
+        }
+        @keyframes mapSurveyReveal {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .map-survey-shell {
+            display: grid;
+            gap: 1rem;
+        }
+        .map-survey-shell .field,
+        .map-survey-shell .field label,
+        .map-survey-shell .field legend {
+            color: #173d28;
+        }
+        .map-survey-shell .field-helper,
+        .map-survey-shell .option-note {
+            color: #375a46;
+        }
+        .map-survey-toolbar {
+            display: grid;
+            gap: 0.9rem;
+        }
+        .map-survey-search-row,
+        .map-survey-draw-row,
+        .map-survey-result-row {
+            display: grid;
+            gap: 0.75rem;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: end;
+        }
+        .map-survey-toolbar .field {
+            margin: 0;
+        }
+        .map-survey-toolbar .field textarea {
+            min-height: 110px;
+        }
+        .map-survey-actions,
+        .map-survey-secondary-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .map-survey-actions {
+            align-items: center;
+        }
+        .map-survey-actions .secondary-btn,
+        .map-survey-secondary-actions .ghost-btn {
+            border-color: rgba(17, 52, 33, 0.18);
+            background: rgba(255, 255, 255, 0.88);
+            color: #15452c;
+            font-size: 0.82rem;
+            font-weight: 800;
+            padding: 0.58rem 0.82rem;
+            min-height: 2.45rem;
+            box-shadow: 0 8px 18px rgba(16, 55, 35, 0.08);
+        }
+        .map-survey-actions .secondary-btn:hover,
+        .map-survey-secondary-actions .ghost-btn:hover,
+        .map-survey-actions .secondary-btn:focus-visible,
+        .map-survey-secondary-actions .ghost-btn:focus-visible {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(16, 55, 35, 0.12);
+        }
+        .map-survey-search-row .secondary-btn {
+            min-height: 2.7rem;
+            padding: 0.62rem 0.9rem;
+            font-size: 0.83rem;
+        }
+        .map-survey-status {
+            font-size: 0.88rem;
+            color: #eef5f0;
+            line-height: 1.5;
+        }
+        .map-survey-command-bar {
+            display: grid;
+            gap: 0.75rem;
+        }
+        .map-survey-draft-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+            padding: 0.8rem 0.9rem;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .map-survey-draft-controls .ghost-btn,
+        .map-survey-draft-controls .secondary-btn {
+            border-color: rgba(17, 52, 33, 0.18);
+            background: rgba(255, 255, 255, 0.9);
+            color: #15452c;
+            font-size: 0.8rem;
+            font-weight: 800;
+            padding: 0.55rem 0.82rem;
+            min-height: 2.35rem;
+        }
+        .map-survey-draft-controls .ghost-btn[disabled],
+        .map-survey-draft-controls .secondary-btn[disabled] {
+            opacity: 0.46;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .map-survey-help {
+            padding: 0.9rem 1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.08);
+            color: #eef5f0;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+        .map-survey-map {
+            min-height: 420px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid rgba(17, 52, 33, 0.36);
+            background: rgba(235, 241, 236, 0.82);
+        }
+        .map-survey-summary {
+            display: grid;
+            gap: 0.75rem;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .map-survey-metric {
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.12);
+            padding: 0.9rem 1rem;
+        }
+        .map-survey-metric span {
+            display: block;
+            font-size: 0.84rem;
+            color: rgba(235, 244, 238, 0.8);
+            margin-bottom: 0.2rem;
+        }
+        .map-survey-metric strong {
+            color: #ffffff;
+            font-size: 1.15rem;
+        }
+        .map-survey-list {
+            display: grid;
+            gap: 0.7rem;
+        }
+        .map-survey-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 0.75rem;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.85rem 0.95rem;
+        }
+        .map-survey-list-item strong {
+            display: block;
+            color: #ffffff;
+        }
+        .map-survey-list-item span {
+            display: block;
+            color: rgba(235, 244, 238, 0.82);
+            font-size: 0.88rem;
+            margin-top: 0.25rem;
+        }
+        @media (max-width: 900px) {
+            .map-survey-summary {
+                grid-template-columns: 1fr;
+            }
+            .map-survey-title-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 640px) {
+            .map-survey-search-row,
+            .map-survey-draw-row,
+            .map-survey-result-row {
+                grid-template-columns: 1fr;
+            }
+            .map-survey-title-row,
+            .map-survey-title-main {
+                align-items: start;
+                flex-direction: column;
+            }
+            .map-survey-icon-badge {
+                width: 2rem;
+                height: 2rem;
+                min-width: 2rem;
+                max-width: 2rem;
+                min-height: 2rem;
+                max-height: 2rem;
+                border-radius: 0.65rem;
+            }
+            .map-survey-map {
+                min-height: 320px;
+            }
+            .map-survey-actions,
+            .map-survey-secondary-actions {
+                flex-direction: column;
+            }
+            .map-survey-actions button,
+            .map-survey-secondary-actions button,
+            .map-survey-draft-controls button {
+                width: 100%;
+            }
+            .map-survey-command-bar {
+                gap: 0.85rem;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        const existing = Array.from(document.querySelectorAll("script")).find((item) => item.src === src);
+        if (existing) {
+            if (existing.dataset.loaded === "true") {
+                resolve();
+                return;
+            }
+
+            existing.addEventListener("load", () => resolve(), { once: true });
+            existing.addEventListener("error", () => reject(new Error(`Nem sikerült betölteni: ${src}`)), { once: true });
+            return;
+        }
+
+        const script = document.createElement("script");
+        script.src = src;
+        script.async = true;
+        script.addEventListener("load", () => {
+            script.dataset.loaded = "true";
+            resolve();
+        }, { once: true });
+        script.addEventListener("error", () => reject(new Error(`Nem sikerült betölteni: ${src}`)), { once: true });
+        document.head.appendChild(script);
+    });
+}
+
+function ensureStylesheet(href, id) {
+    if (document.getElementById(id)) {
+        return;
+    }
+
+    const link = document.createElement("link");
+    link.id = id;
+    link.rel = "stylesheet";
+    link.href = href;
+    document.head.appendChild(link);
+}
+
+function ensureLeafletReady() {
+    if (typeof window !== "undefined" && window.L && window.L.Control?.Draw) {
+        return Promise.resolve(window.L);
+    }
+
+    if (!leafletAssetsPromise) {
+        injectMapSurveyStyles();
+        ensureStylesheet(LEAFLET_ASSET_URLS.css, "leaflet-css");
+        ensureStylesheet(LEAFLET_ASSET_URLS.drawCss, "leaflet-draw-css");
+        leafletAssetsPromise = loadScript(LEAFLET_ASSET_URLS.js)
+            .then(() => loadScript(LEAFLET_ASSET_URLS.drawJs))
+            .then(() => window.L);
+    }
+
+    return leafletAssetsPromise;
+}
+
+function formatArea(value) {
+    return `${currencyFormatter.format(Math.round(value || 0))} m²`;
+}
+
+function formatLength(value) {
+    return `${currencyFormatter.format(Math.round(value || 0))} fm`;
+}
+
+function getDeductionTypeLabel(type) {
+    return MAP_SURVEY_DEDUCTION_TYPES.find((item) => item.value === type)?.label || "Egyéb";
+}
+
+function getPolygonPointsFromLayer(layer) {
+    if (!layer || typeof layer.getLatLngs !== "function") {
+        return [];
+    }
+
+    const latlngs = layer.getLatLngs();
+    const ring = Array.isArray(latlngs[0]) ? latlngs[0] : latlngs;
+
+    return ring
+        .map((latlng) => ({
+            lat: Number(latlng.lat),
+            lng: Number(latlng.lng)
+        }))
+        .filter((point) => Number.isFinite(point.lat) && Number.isFinite(point.lng));
+}
+
+function getAreaFromPoints(points) {
+    if (!window.L?.GeometryUtil || points.length < 3) {
+        return 0;
+    }
+
+    const latlngs = points.map((point) => window.L.latLng(point.lat, point.lng));
+    return Math.round(Math.abs(window.L.GeometryUtil.geodesicArea(latlngs)));
+}
+
+function getPerimeterFromPoints(points) {
+    if (!window.L || points.length < 2) {
+        return 0;
+    }
+
+    const latlngs = points.map((point) => window.L.latLng(point.lat, point.lng));
+    let total = 0;
+
+    for (let index = 0; index < latlngs.length; index += 1) {
+        const current = latlngs[index];
+        const next = latlngs[(index + 1) % latlngs.length];
+        total += current.distanceTo(next);
+    }
+
+    return Math.round(total);
+}
+
+function recalculateMapSurveyTotals() {
+    const mainAreaValue = state.mapSurvey.mainArea?.area || 0;
+    const deductionAreaTotal = state.mapSurvey.deductions.reduce((sum, item) => sum + (item.area || 0), 0);
+
+    state.mapSurvey.grossArea = mainAreaValue;
+    state.mapSurvey.deductionAreaTotal = deductionAreaTotal;
+    state.mapSurvey.netGardenArea = Math.max(0, mainAreaValue - deductionAreaTotal);
+}
+
+function updateMapSurveyCenterFromMap() {
+    if (!mapSurveyMap) {
+        return;
+    }
+
+    const center = mapSurveyMap.getCenter();
+    state.mapSurvey.center = {
+        lat: Number(center.lat.toFixed(6)),
+        lng: Number(center.lng.toFixed(6)),
+        zoom: mapSurveyMap.getZoom()
+    };
+}
+
+function renderMapSurveySection() {
+    const deductions = state.mapSurvey.deductions;
+    const isExpanded = Boolean(state.mapSurvey.isExpanded);
+    const summaryLines = getMapSurveySummaryLines();
+    const isDrafting = Boolean(mapSurveyDraftMode);
+    const draftLabel = mapSurveyDraftMode === "main" ? "Fő terület rajzolása folyamatban" : "Levonás rajzolása folyamatban";
+
+    return `
+        <section class="contact-section contact-section--tools map-survey-section">
+            <div class="section-heading">
+                <span class="map-survey-kicker">Opcionális szakmai felmérés</span>
+                <div class="map-survey-title-row">
+                    <div class="map-survey-title-main">
+                        <div class="map-survey-icon-badge" aria-hidden="true">
+                            <svg class="map-survey-icon" viewBox="0 0 64 64">
+                                <path fill="#DB4437" d="M32 4c-11.7 0-21.2 9.2-21.2 20.7 0 14.9 17.9 34.3 20.2 36.7.6.7 1.7.7 2.4 0 2.3-2.4 20.2-21.8 20.2-36.7C53.2 13.2 43.7 4 32 4z"/>
+                                <circle cx="32" cy="24.7" r="10.3" fill="#fff"/>
+                                <circle cx="32" cy="24.7" r="5.8" fill="#1A73E8"/>
+                            </svg>
+                        </div>
+                        <h3>Térképes helyszíni felmérés</h3>
+                    </div>
+                    <button type="button" class="secondary-btn map-survey-toggle" data-action="map-toggle">
+                        ${isExpanded ? "Blokk összecsukása" : "Blokk megnyitása"}
+                    </button>
+                </div>
+                <p class="section-intro">Cím alapján irányítsd a térképet a helyszínre, rajzold körbe a teljes kert vagy munkaterület határát, majd külön vond le a ház, garázs, műhely vagy más nem kertfelületek alapterületét.</p>
+            </div>
+
+            ${isExpanded ? `
+            <div class="map-survey-body">
+            <div class="map-survey-shell">
+                <div class="map-survey-toolbar">
+                    <div class="map-survey-search-row">
+                        <div class="field field--customer is-full">
+                            <label for="mapSurveySearch">
+                                <span>Cím vagy helyszín keresése</span>
+                                <span class="field-badge field-badge--customer">Alap kérdés</span>
+                            </label>
+                            <input id="mapSurveySearch" type="text" value="${escapeHtml(state.mapSurvey.searchQuery)}" placeholder="pl. Pomáz, Tölgyfa utca 12.">
+                        </div>
+                        <button type="button" class="secondary-btn" data-action="map-search">Térkép keresése</button>
+                    </div>
+
+                    <p class="map-survey-status" id="mapSurveyStatus">${escapeHtml(state.mapSurvey.searchStatus || "A keresés után kézzel is pontosítható a térkép helyzete.")}</p>
+
+                    <div class="map-survey-draw-row">
+                        <div class="field field--pro">
+                            <label for="mapSurveyDeductionType">
+                                <span>Levonandó elem típusa</span>
+                                <span class="field-badge field-badge--pro">Szakmai mező</span>
+                            </label>
+                            <select id="mapSurveyDeductionType">
+                                ${MAP_SURVEY_DEDUCTION_TYPES.map((option) => `
+                                    <option value="${escapeHtml(option.value)}">${escapeHtml(option.label)}</option>
+                                `).join("")}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mapSurveyCanvas" class="map-survey-map" aria-label="Térképes felmérés"></div>
+
+                <div class="map-survey-command-bar">
+                    <div class="map-survey-draft-controls">
+                        <strong>${escapeHtml(draftLabel)}</strong>
+                        <button type="button" class="secondary-btn" data-action="map-draw-main">✏ Fő terület</button>
+                        <button type="button" class="secondary-btn" data-action="map-draw-deduction">✏ Levonás</button>
+                        <button type="button" class="ghost-btn" data-action="map-undo-point" data-draft-button ${isDrafting ? "" : "disabled"}>⌫ Utolsó pont</button>
+                        <button type="button" class="secondary-btn" data-action="map-finish-draw" data-draft-button ${isDrafting ? "" : "disabled"}>✓ Rajz lezárása</button>
+                        <button type="button" class="ghost-btn" data-action="map-cancel-draw" data-draft-button ${isDrafting ? "" : "disabled"}>Mégse</button>
+                        <button type="button" class="ghost-btn" data-action="map-fit-main"${state.mapSurvey.mainArea ? "" : " disabled"}>Ugrás a kirajzolt területhez</button>
+                        <button type="button" class="ghost-btn" data-action="map-clear-all">Minden rajz törlése</button>
+                    </div>
+
+                    <div class="map-survey-help">
+                        <strong>Használat:</strong><br>
+                        1. Írd be a címet, majd kattints a <strong>Térkép keresése</strong> gombra.<br>
+                        2. Nyomd meg a <strong>✏ Fő terület</strong> gombot, majd a térképen pontonként jelöld ki a teljes kert vagy munkaterület határát. Nem csak négyszög rajzolható: annyi pontot rakhatsz le, amennyi az alakzat pontos követéséhez kell.<br>
+                        3. Ha kész vagy, nyomd meg a <strong>✓ Rajz lezárása</strong> gombot.<br>
+                        4. Ha van ház, garázs, műhely, terasz vagy más nem kertfelület, válaszd ki a típusát, nyomd meg a <strong>✏ Levonás</strong> gombot, és rajzold körbe külön. Itt is használhatsz több pontot, tehát szabálytalan alakzatot is fel tudsz venni.<br>
+                        5. Minden rajz után szükséges a <strong>✓ Rajz lezárása</strong>, különben a terület nem kerül mentésre.<br>
+                        6. A <strong>⌫ Utolsó pont</strong> az utolsó lerakott pontot törli, a <strong>Minden rajz törlése</strong> mindent nulláz.
+                    </div>
+                </div>
+
+                <div class="map-survey-summary">
+                    <div class="map-survey-metric">
+                        <span>Bruttó felület</span>
+                        <strong>${escapeHtml(formatArea(state.mapSurvey.grossArea))}</strong>
+                    </div>
+                    <div class="map-survey-metric">
+                        <span>Levonandó összesen</span>
+                        <strong>${escapeHtml(formatArea(state.mapSurvey.deductionAreaTotal))}</strong>
+                    </div>
+                    <div class="map-survey-metric">
+                        <span>Nettó kertfelület</span>
+                        <strong>${escapeHtml(formatArea(state.mapSurvey.netGardenArea))}</strong>
+                    </div>
+                    <div class="map-survey-metric">
+                        <span>Fő terület kerülete</span>
+                        <strong>${escapeHtml(formatLength(state.mapSurvey.mainArea?.points?.length ? getPerimeterFromPoints(state.mapSurvey.mainArea.points) : 0))}</strong>
+                    </div>
+                </div>
+
+                <div class="field field--pro is-full">
+                    <label for="mapSurveyNotes">
+                        <span>Térképes megjegyzés</span>
+                        <span class="field-badge field-badge--pro">Szakmai mező</span>
+                    </label>
+                    <textarea id="mapSurveyNotes" placeholder="pl. a hátsó telekhatár bizonytalan, a garázs és a műhely egy tömbben van, a tényleges kert csak a ház mögött kezdődik...">${escapeHtml(state.mapSurvey.notes || "")}</textarea>
+                </div>
+
+                <div class="map-survey-list">
+                    ${deductions.length ? deductions.map((item) => `
+                        <div class="map-survey-list-item">
+                            <div>
+                                <strong>${escapeHtml(item.label || getDeductionTypeLabel(item.type))}</strong>
+                                <span>${escapeHtml(formatArea(item.area))}</span>
+                            </div>
+                            <button type="button" class="ghost-btn compact-btn" data-action="map-remove-deduction" data-deduction-id="${escapeHtml(item.id)}">Eltávolítás</button>
+                        </div>
+                    `).join("") : `
+                        <div class="highlight-box">
+                            <strong>Még nincs levonandó elem</strong>
+                            <p>Ha a ház, garázs, műhely vagy más nem kertfelület ráesik a kijelölt területre, rajzold körbe külön levonásként.</p>
+                        </div>
+                    `}
+                </div>
+            </div>
+            </div>
+            ` : `
+            <div class="map-survey-collapsed-note">
+                Ez a blokk külön szakmai felmérő eszköz. Akkor nyisd meg, ha a címet térképen szeretnéd ellenőrizni, fő területet rajzolnál, vagy a ház, garázs, műhely és más nem kertfelületek levonásával nettó kertfelületet számolnál.
+                ${summaryLines.length ? `<br><br>${escapeHtml(summaryLines.join(" • "))}` : ""}
+            </div>
+            `}
+        </section>
+    `;
+}
+
+async function searchMapSurveyLocation() {
+    const query = String(state.mapSurvey.searchQuery || "").trim();
+    if (!query) {
+        showFeedback("Adj meg egy címet vagy helyszínt a térkép kereséséhez.");
+        return;
+    }
+
+    state.mapSurvey.searchStatus = "Keresés folyamatban...";
+    updateMapSurveyStatus(state.mapSurvey.searchStatus);
+    persistState();
+
+    try {
+        const url = new URL("https://nominatim.openstreetmap.org/search");
+        url.searchParams.set("format", "jsonv2");
+        url.searchParams.set("limit", "1");
+        url.searchParams.set("countrycodes", "hu");
+        url.searchParams.set("q", query);
+
+        const response = await fetch(url.toString(), {
+            headers: {
+                Accept: "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const results = await response.json();
+        const best = Array.isArray(results) ? results[0] : null;
+
+        if (!best) {
+            state.mapSurvey.searchStatus = "Nem találtunk pontos egyezést. Irányítsd kézzel a térképet a megfelelő helyre.";
+            updateMapSurveyStatus(state.mapSurvey.searchStatus);
+            return;
+        }
+
+        state.mapSurvey.center = {
+            lat: Number(best.lat),
+            lng: Number(best.lon),
+            zoom: 19
+        };
+        state.mapSurvey.searchResultLabel = best.display_name || query;
+        state.mapSurvey.searchStatus = `Találat: ${state.mapSurvey.searchResultLabel}`;
+
+        if (mapSurveyMap) {
+            mapSurveyMap.flyTo([state.mapSurvey.center.lat, state.mapSurvey.center.lng], state.mapSurvey.center.zoom, {
+                animate: true,
+                duration: 0.8
+            });
+            window.setTimeout(() => {
+                mapSurveyMap.invalidateSize();
+            }, 120);
+            updateMapSurveyStatus(state.mapSurvey.searchStatus);
+            persistState();
+            scrollToMapSurveySection();
+            return;
+        }
+
+        renderApp();
+        queueMicrotask(() => {
+            scrollToMapSurveySection();
+        });
+    } catch (error) {
+        console.error("A térképes keresés nem sikerült.", error);
+        state.mapSurvey.searchStatus = "A címkeresés most nem sikerült. A térképet kézzel is a megfelelő helyre irányíthatod.";
+        updateMapSurveyStatus(state.mapSurvey.searchStatus);
+    }
+}
+
+function updateMapSurveyStatus(message) {
+    state.mapSurvey.searchStatus = message;
+    const status = document.getElementById("mapSurveyStatus");
+    if (status) {
+        status.textContent = message;
+    }
+}
+
+function updateMapSurveyDraftUi() {
+    const controls = document.querySelector(".map-survey-draft-controls");
+    if (!controls) {
+        return;
+    }
+    const title = controls.querySelector("strong");
+    if (title) {
+        title.textContent = mapSurveyDraftMode === "main"
+            ? "Fő terület rajzolása folyamatban"
+            : mapSurveyDraftMode === "deduction"
+                ? "Levonandó elem rajzolása folyamatban"
+                : "Rajzolás nincs elindítva";
+    }
+
+    controls.querySelectorAll("[data-draft-button]").forEach((button) => {
+        button.disabled = !mapSurveyDraftMode;
+    });
+
+    if (mapSurveyMap) {
+        window.requestAnimationFrame(() => {
+            mapSurveyMap.invalidateSize();
+        });
+    }
+}
+
+function clearActiveDrawHandler() {
+    if (activeDrawHandler && typeof activeDrawHandler.disable === "function") {
+        activeDrawHandler.disable();
+    }
+    activeDrawHandler = null;
+}
+
+function clearDraftLayers() {
+    if (mapSurveyDraftLayer && mapSurveyMap) {
+        mapSurveyMap.removeLayer(mapSurveyDraftLayer);
+    }
+    if (mapSurveyDraftLine && mapSurveyMap) {
+        mapSurveyMap.removeLayer(mapSurveyDraftLine);
+    }
+    if (mapSurveyDraftMarkersLayer && mapSurveyMap) {
+        mapSurveyMap.removeLayer(mapSurveyDraftMarkersLayer);
+    }
+    mapSurveyDraftLayer = null;
+    mapSurveyDraftLine = null;
+    mapSurveyDraftMarkersLayer = null;
+}
+
+function setMapDraftInteraction(isDrafting) {
+    if (!mapSurveyMap) {
+        return;
+    }
+
+    const methods = [
+        "dragging",
+        "doubleClickZoom",
+        "scrollWheelZoom",
+        "boxZoom",
+        "keyboard",
+        "touchZoom"
+    ];
+
+    methods.forEach((methodName) => {
+        const handler = mapSurveyMap[methodName];
+        if (!handler || typeof handler.enable !== "function" || typeof handler.disable !== "function") {
+            return;
+        }
+
+        if (isDrafting) {
+            handler.disable();
+            return;
+        }
+
+        handler.enable();
+    });
+}
+
+function resetMapDraft() {
+    clearActiveDrawHandler();
+    setMapDraftInteraction(false);
+    clearDraftLayers();
+    mapSurveyDraftPoints = [];
+    mapSurveyDraftMode = "";
+}
+
+function syncDraftLayers() {
+    if (!mapSurveyMap || !window.L) {
+        return;
+    }
+
+    clearDraftLayers();
+
+    if (!mapSurveyDraftPoints.length) {
+        return;
+    }
+
+    const latlngs = mapSurveyDraftPoints.map((point) => [point.lat, point.lng]);
+    mapSurveyDraftMarkersLayer = window.L.layerGroup().addTo(mapSurveyMap);
+    latlngs.forEach((latlng, index) => {
+        const marker = window.L.circleMarker(latlng, {
+            radius: 6,
+            weight: 2,
+            color: "#ffffff",
+            fillColor: mapSurveyDraftMode === "main" ? "#2f6b45" : "#8a5823",
+            fillOpacity: 1
+        }).bindTooltip(String(index + 1), {
+            permanent: true,
+            direction: "top",
+            offset: [0, -8],
+            className: "map-survey-point-tooltip"
+        });
+        mapSurveyDraftMarkersLayer.addLayer(marker);
+    });
+
+    mapSurveyDraftLine = window.L.polyline(latlngs, {
+        color: mapSurveyDraftMode === "main" ? "#2f6b45" : "#8a5823",
+        weight: 3,
+        dashArray: "6 4"
+    }).addTo(mapSurveyMap);
+
+    if (mapSurveyDraftPoints.length >= 3) {
+        mapSurveyDraftLayer = window.L.polygon(latlngs, {
+            color: mapSurveyDraftMode === "main" ? "#2f6b45" : "#8a5823",
+            weight: 3,
+            fillOpacity: 0.16
+        }).addTo(mapSurveyMap);
+    }
+}
+
+function addDraftPoint(latlng) {
+    mapSurveyDraftPoints = [
+        ...mapSurveyDraftPoints,
+        {
+            lat: Number(latlng.lat),
+            lng: Number(latlng.lng)
+        }
+    ];
+    syncDraftLayers();
+    updateMapSurveyStatus(`Pontok száma: ${mapSurveyDraftPoints.length}. Ha kész vagy, nyomd meg a Rajz lezárása gombot.`);
+    updateMapSurveyDraftUi();
+}
+
+function undoDraftPoint() {
+    if (!mapSurveyDraftPoints.length) {
+        return;
+    }
+
+    mapSurveyDraftPoints = mapSurveyDraftPoints.slice(0, -1);
+    syncDraftLayers();
+    updateMapSurveyStatus(
+        mapSurveyDraftPoints.length
+            ? `Pontok száma: ${mapSurveyDraftPoints.length}.`
+            : "A rajz üres. Kattints a térképre pontok hozzáadásához."
+    );
+    updateMapSurveyDraftUi();
+}
+
+function finishMapDraft() {
+    if (mapSurveyDraftPoints.length < 3) {
+        updateMapSurveyStatus("Legalább 3 pont kell a terület lezárásához.");
+        return;
+    }
+
+    const points = [...mapSurveyDraftPoints];
+    if (mapSurveyDraftMode === "main") {
+        replaceMainArea(points);
+        updateMapSurveyStatus("A fő terület mentve lett.");
+    } else {
+        const select = document.getElementById("mapSurveyDeductionType");
+        const type = select instanceof HTMLSelectElement ? select.value : "egyeb";
+        addDeductionArea(points, type);
+        updateMapSurveyStatus(`${getDeductionTypeLabel(type)} levonása mentve lett.`);
+    }
+
+    resetMapDraft();
+    updateMapSurveyDraftUi();
+    renderApp();
+}
+
+function openMapDrawMode(mode) {
+    if (!mapSurveyMap || !window.L) {
+        showFeedback("A térképes rajzoló eszköz most még nem áll készen.");
+        return;
+    }
+
+    if (mode === "deduction" && !state.mapSurvey.mainArea) {
+        updateMapSurveyStatus("Először a fő területet rajzold meg, és csak utána jelöld a házat, garázst vagy más levonandó elemet.");
+        return;
+    }
+
+    resetMapDraft();
+    mapSurveyDraftMode = mode;
+    setMapDraftInteraction(true);
+
+    updateMapSurveyStatus(
+        mode === "main"
+            ? "Kattints a térképre a fő terület pontjaihoz. Ha kész vagy, nyomd meg a Rajz lezárása gombot."
+            : `Kattints a térképre a levonandó terület pontjaihoz (${getDeductionTypeLabel((document.getElementById("mapSurveyDeductionType") instanceof HTMLSelectElement ? document.getElementById("mapSurveyDeductionType").value : "egyeb"))}). Ha kész vagy, nyomd meg a Rajz lezárása gombot.`
+    );
+    updateMapSurveyDraftUi();
+}
+
+function replaceMainArea(points) {
+    state.mapSurvey.mainArea = {
+        id: "main-area",
+        type: "main",
+        label: "Fő terület",
+        points,
+        area: getAreaFromPoints(points)
+    };
+    recalculateMapSurveyTotals();
+}
+
+function addDeductionArea(points, type) {
+    const item = {
+        id: `deduction-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        type,
+        label: getDeductionTypeLabel(type),
+        points,
+        area: getAreaFromPoints(points)
+    };
+
+    state.mapSurvey.deductions = [...state.mapSurvey.deductions, item];
+    recalculateMapSurveyTotals();
+}
+
+function removeDeductionArea(deductionId) {
+    state.mapSurvey.deductions = state.mapSurvey.deductions.filter((item) => item.id !== deductionId);
+    recalculateMapSurveyTotals();
+    renderApp();
+}
+
+function clearMapSurveyAreas() {
+    state.mapSurvey.mainArea = null;
+    state.mapSurvey.deductions = [];
+    recalculateMapSurveyTotals();
+    renderApp();
+}
+
+function getBoundsFromSurvey() {
+    if (!window.L) {
+        return null;
+    }
+
+    const bounds = [];
+    if (state.mapSurvey.mainArea?.points?.length) {
+        bounds.push(...state.mapSurvey.mainArea.points);
+    }
+    state.mapSurvey.deductions.forEach((item) => {
+        if (item.points?.length) {
+            bounds.push(...item.points);
+        }
+    });
+
+    if (!bounds.length) {
+        return null;
+    }
+
+    return window.L.latLngBounds(bounds.map((point) => [point.lat, point.lng]));
+}
+
+function syncMapSurveyLayers() {
+    if (!mapSurveyLayers || !window.L) {
+        return;
+    }
+
+    mapSurveyLayers.clearLayers();
+    mapSurveyMainLayer = null;
+
+    if (state.mapSurvey.mainArea?.points?.length) {
+        mapSurveyMainLayer = window.L.polygon(
+            state.mapSurvey.mainArea.points.map((point) => [point.lat, point.lng]),
+            { color: "#2f6b45", weight: 3 }
+        );
+        mapSurveyLayers.addLayer(mapSurveyMainLayer);
+    }
+
+    state.mapSurvey.deductions.forEach((item) => {
+        const layer = window.L.polygon(
+            item.points.map((point) => [point.lat, point.lng]),
+            { color: "#8a5823", weight: 3, dashArray: "6 4" }
+        );
+        mapSurveyLayers.addLayer(layer);
+    });
+
+    const bounds = getBoundsFromSurvey();
+    if (bounds && mapSurveyMap) {
+        mapSurveyMap.fitBounds(bounds.pad(0.15));
+    }
+}
+
+function attachMapSurveyEvents() {
+    const searchInput = document.getElementById("mapSurveySearch");
+    const notesInput = document.getElementById("mapSurveyNotes");
+
+    if (searchInput && !searchInput.dataset.bound) {
+        searchInput.dataset.bound = "true";
+        searchInput.addEventListener("input", (event) => {
+            state.mapSurvey.searchQuery = event.target.value;
+            persistState();
+        });
+        searchInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                void searchMapSurveyLocation();
+            }
+        });
+    }
+
+    if (notesInput && !notesInput.dataset.bound) {
+        notesInput.dataset.bound = "true";
+        notesInput.addEventListener("input", (event) => {
+            state.mapSurvey.notes = event.target.value;
+            persistState();
+        });
+    }
+}
+
+async function ensureMapSurveyMounted() {
+    if (state.currentStep !== getFlowSteps().length - 1) {
+        return;
+    }
+
+    if (!state.mapSurvey.isExpanded) {
+        return;
+    }
+
+    const canvas = document.getElementById("mapSurveyCanvas");
+    if (!canvas) {
+        return;
+    }
+
+    attachMapSurveyEvents();
+
+    try {
+        const L = await ensureLeafletReady();
+        if (!document.getElementById("mapSurveyCanvas")) {
+            return;
+        }
+
+        if (mapSurveyMap) {
+            mapSurveyMap.remove();
+        }
+
+        mapSurveyMap = L.map(canvas, {
+            zoomControl: true,
+            scrollWheelZoom: false,
+            tap: false,
+            fadeAnimation: false,
+            zoomAnimation: false,
+            markerZoomAnimation: false
+        }).setView([state.mapSurvey.center.lat, state.mapSurvey.center.lng], state.mapSurvey.center.zoom);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 21,
+            attribution: "&copy; OpenStreetMap közreműködők"
+        }).addTo(mapSurveyMap);
+
+        mapSurveyLayers = L.featureGroup().addTo(mapSurveyMap);
+        syncMapSurveyLayers();
+
+        mapSurveyMap.on("moveend", () => {
+            updateMapSurveyCenterFromMap();
+            persistState();
+        });
+
+        mapSurveyMap.on("click", (event) => {
+            if (!mapSurveyDraftMode) {
+                return;
+            }
+
+            addDraftPoint(event.latlng);
+        });
+
+        const bounds = getBoundsFromSurvey();
+        if (bounds) {
+            mapSurveyMap.fitBounds(bounds.pad(0.15));
+        }
+    } catch (error) {
+        console.error("A térképes modul nem tölthető be.", error);
+        updateMapSurveyStatus("A térkép most nem tölthető be. Ellenőrizd az internetkapcsolatot.");
+    }
+}
+
 function renderApp() {
     const steps = getFlowSteps();
     if (state.currentStep > steps.length - 1) {
@@ -3222,6 +4442,7 @@ function renderHeader(steps) {
     stepCounter.textContent = `${state.currentStep + 1} / ${steps.length}`;
     stepTitle.textContent = current.title;
     progressBar.style.width = `${(state.currentStep / Math.max(steps.length - 1, 1)) * 100}%`;
+    const hasContactStep = steps.some((step) => step.kind === "contact");
 
     stepPills.innerHTML = steps
         .map((step, index) => {
@@ -3237,7 +4458,11 @@ function renderHeader(steps) {
                 </button>
             `;
         })
-        .join("");
+        .join("") + (hasContactStep ? `
+            <button type="button" class="step-pill top-map-link" data-action="open-map-survey">
+                Online térkép
+            </button>
+        ` : "");
 }
 
 function renderSummary() {
@@ -3283,6 +4508,15 @@ function renderSummary() {
 }
 
 function renderCurrentStep(step) {
+    clearActiveDrawHandler();
+
+    if (step.kind !== "contact" && mapSurveyMap) {
+        mapSurveyMap.remove();
+        mapSurveyMap = null;
+        mapSurveyLayers = null;
+        mapSurveyMainLayer = null;
+    }
+
     if (step.kind === "selection") {
         stepContainer.innerHTML = renderSelectionStep();
         return;
@@ -3294,6 +4528,9 @@ function renderCurrentStep(step) {
     }
 
     stepContainer.innerHTML = renderContactStep();
+    queueMicrotask(() => {
+        void ensureMapSurveyMounted();
+    });
 }
 
 function renderSelectionStep() {
@@ -3461,7 +4698,7 @@ function renderContactSections() {
                     })).join("")}
                 </div>
             </section>
-        `;
+        ` + (sectionId === "site" ? renderMapSurveySection() : "");
     }).join("");
 }
 
@@ -3703,6 +4940,18 @@ function clearFeedback() {
 
 function scrollToCalculator() {
     document.getElementById("calculator").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
+
+function scrollToMapSurveySection() {
+    const mapSection = document.querySelector(".map-survey-section");
+    if (!mapSection) {
+        return;
+    }
+
+    mapSection.scrollIntoView({
         behavior: "smooth",
         block: "start"
     });
@@ -4021,6 +5270,8 @@ function buildSubmissionPayloads() {
         })
         .filter(Boolean);
 
+    const mapSurveyLines = getMapSurveySummaryLines();
+
     const contact_rows = CONTACT_FIELDS_RUNTIME
         .map((field) => {
             if (field.id === "consent") {
@@ -4039,12 +5290,29 @@ function buildSubmissionPayloads() {
         })
         .filter(Boolean);
 
+    mapSurveyLines.forEach((line, index) => {
+        const separatorIndex = line.indexOf(":");
+        if (separatorIndex === -1) {
+            contact_rows.push({
+                label: index === 0 ? "Térképes felmérés" : "",
+                value: line
+            });
+            return;
+        }
+
+        contact_rows.push({
+            label: line.slice(0, separatorIndex),
+            value: line.slice(separatorIndex + 1).trim()
+        });
+    });
+
     const summary = [
         "Kiválasztott tételek",
         ...serviceSummaries,
         "",
         "Kapcsolati adatok",
         ...contactLines,
+        ...(mapSurveyLines.length ? ["", "Térképes felmérés", ...mapSurveyLines.map((line) => `- ${line}`)] : []),
         "",
         `Tájékoztató végösszeg: ${formatCurrency(total)}`
     ].join("\n");
@@ -4227,6 +5495,7 @@ function resetApp() {
     state.selectedServices = [];
     state.serviceValues = {};
     state.contactValues = createDefaultContactState();
+    state.mapSurvey = createDefaultMapSurveyState();
     state.isSubmitting = false;
     state.postalLookupMessage = "";
     state.postalLookupState = "idle";
@@ -4238,6 +5507,7 @@ function resetApp() {
 function clearFilledValues() {
     state.serviceValues = buildPersistableServiceState(state.selectedServices, {});
     state.contactValues = createDefaultContactState();
+    state.mapSurvey = createDefaultMapSurveyState();
     state.postalLookupMessage = "";
     state.postalLookupState = "idle";
     renderApp();
@@ -4285,6 +5555,27 @@ function buildPrintableSummaryHtml() {
                 <tr>
                     <td>${escapeHtml(field.label)}</td>
                     <td>${escapeHtml(value)}</td>
+                </tr>
+            `;
+        })
+        .join("");
+
+    const mapSurveyHtml = getMapSurveySummaryLines()
+        .map((line) => {
+            const separatorIndex = line.indexOf(":");
+            if (separatorIndex === -1) {
+                return `
+                    <tr>
+                        <td>Térképes felmérés</td>
+                        <td>${escapeHtml(line)}</td>
+                    </tr>
+                `;
+            }
+
+            return `
+                <tr>
+                    <td>${escapeHtml(line.slice(0, separatorIndex))}</td>
+                    <td>${escapeHtml(line.slice(separatorIndex + 1).trim())}</td>
                 </tr>
             `;
         })
@@ -4379,7 +5670,7 @@ function buildPrintableSummaryHtml() {
 
                 <section class="section">
                     <h2>Kapcsolati és helyszíni adatok</h2>
-                    <table>${contactHtml}</table>
+                    <table>${contactHtml}${mapSurveyHtml}</table>
                 </section>
             </div>
         </body>
@@ -4439,6 +5730,73 @@ function handleActionClick(event) {
 
     if (action === "remove-service") {
         removeService(actionTarget.dataset.serviceId);
+        return;
+    }
+
+    if (action === "map-search") {
+        void searchMapSurveyLocation();
+        return;
+    }
+
+    if (action === "map-toggle") {
+        state.mapSurvey.isExpanded = !state.mapSurvey.isExpanded;
+        renderApp();
+        return;
+    }
+
+    if (action === "open-map-survey") {
+        state.mapSurvey.isExpanded = true;
+        renderApp();
+        queueMicrotask(() => {
+            scrollToMapSurveySection();
+        });
+        return;
+    }
+
+    if (action === "map-draw-main") {
+        openMapDrawMode("main");
+        return;
+    }
+
+    if (action === "map-draw-deduction") {
+        openMapDrawMode("deduction");
+        return;
+    }
+
+    if (action === "map-undo-point") {
+        undoDraftPoint();
+        return;
+    }
+
+    if (action === "map-finish-draw") {
+        finishMapDraft();
+        return;
+    }
+
+    if (action === "map-cancel-draw") {
+        resetMapDraft();
+        updateMapSurveyStatus("A rajzolás megszakítva.");
+        renderApp();
+        return;
+    }
+
+    if (action === "map-fit-main") {
+        const bounds = getBoundsFromSurvey();
+        if (bounds && mapSurveyMap) {
+            mapSurveyMap.fitBounds(bounds.pad(0.15));
+        } else if (mapSurveyMap) {
+            mapSurveyMap.setView([state.mapSurvey.center.lat, state.mapSurvey.center.lng], state.mapSurvey.center.zoom);
+        }
+        return;
+    }
+
+    if (action === "map-clear-all") {
+        clearMapSurveyAreas();
+        return;
+    }
+
+    if (action === "map-remove-deduction") {
+        removeDeductionArea(actionTarget.dataset.deductionId);
         return;
     }
 
